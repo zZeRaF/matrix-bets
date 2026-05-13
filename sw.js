@@ -9,9 +9,9 @@ const STATIC_ASSETS = [
   "./manifest.webmanifest",
   "./styles/matrix.css",
   "./js/app.js",
-  "./icons/app-icon-192-v2.png",
-  "./icons/app-icon-512-v2.png",
-  "./icons/app-icon-v2.png",
+  "./icons/app-icon-192-v3.png",
+  "./icons/app-icon-512-v3.png",
+  "./icons/app-icon-v3.png",
   "./icons/robot-portrait-600.png",
 ];
 
