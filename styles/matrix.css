@@ -315,6 +315,35 @@ body {
   overflow: hidden;
   opacity: 1;
   transition: opacity 0.55s ease-out;
+  animation: splash-flicker-bg 6s infinite steps(40);
+}
+/* Scanlines fixes par-dessus (effet CRT vieux moniteur) */
+.splash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 102, 0.05) 0px,
+    rgba(0, 255, 102, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  animation: scanlines-drift 6s linear infinite;
+}
+/* Bandeau de glitch horizontal qui descend */
+.splash::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  pointer-events: none;
+  z-index: 6;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 102, 0.55), transparent);
+  animation: glitch-sweep 4.5s linear infinite;
 }
 .splash.splash-fade {
   opacity: 0;
@@ -345,6 +374,22 @@ body {
   gap: 12px;
   color: var(--mx-green-bright);
   text-shadow: 0 0 16px rgba(0, 255, 102, 0.8), 0 0 32px rgba(0, 255, 102, 0.4);
+  animation: brand-flicker 3.2s infinite;
+}
+.splash-brand {
+  position: relative;
+}
+.splash-brand::before,
+.splash-brand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.splash-typewriter {
+  position: relative;
+  display: inline-block;
+  animation: text-glitch 3.5s infinite;
 }
 .splash-prompt {
   font-size: 2rem;
@@ -419,6 +464,72 @@ body {
 @keyframes pulse-prompt {
   0%, 100% { opacity: 1; transform: translateY(0); }
   50% { opacity: 0.5; transform: translateY(-2px); }
+}
+
+/* ── EFFETS GLITCH / FLICKER / SCANLINES (style films futuristes) ── */
+@keyframes splash-flicker-bg {
+  0%, 19.9%, 22%, 62.9%, 64%, 84.9%, 86%, 100% { background: #000700; }
+  20%, 21.9% { background: #001a08; }
+  63%, 63.9% { background: #000400; }
+  85%, 85.9% { background: #001a08; }
+}
+@keyframes scanlines-drift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(3px); }
+}
+@keyframes glitch-sweep {
+  0%   { top: -10px; opacity: 0; }
+  4%   { opacity: 0.9; }
+  50%  { opacity: 0.8; }
+  100% { top: 110%; opacity: 0; }
+}
+@keyframes brand-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    filter: none;
+  }
+  20%, 24%, 55% {
+    opacity: 0.35;
+    filter: brightness(1.5) contrast(1.4);
+  }
+  22% {
+    opacity: 0.7;
+    transform: translateX(1px);
+  }
+  70% { opacity: 1; }
+  71% { opacity: 0.5; transform: skewX(-0.5deg); }
+  72% { opacity: 1; transform: none; }
+}
+@keyframes text-glitch {
+  0%, 65%, 100% {
+    text-shadow:
+      0 0 12px rgba(0, 255, 102, 0.8),
+      0 0 24px rgba(0, 255, 102, 0.4);
+  }
+  66% {
+    text-shadow:
+      2px 0 0 rgba(255, 0, 170, 0.9),
+      -2px 0 0 rgba(0, 200, 255, 0.85),
+      0 0 12px rgba(0, 255, 102, 0.7);
+  }
+  68% {
+    text-shadow:
+      -3px 0 0 rgba(255, 0, 170, 0.9),
+      3px 0 0 rgba(0, 255, 255, 0.85),
+      0 0 16px rgba(0, 255, 102, 0.6);
+    transform: translateX(2px);
+  }
+  70% {
+    text-shadow:
+      1px 0 0 rgba(255, 0, 170, 0.7),
+      -1px 0 0 rgba(0, 255, 255, 0.7);
+    transform: translateX(-1px);
+  }
+  72% {
+    text-shadow:
+      0 0 12px rgba(0, 255, 102, 0.8);
+    transform: none;
+  }
 }
 @keyframes blink-cursor {
   0%, 49% { opacity: 1; }
