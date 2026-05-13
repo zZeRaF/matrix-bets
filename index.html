@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#00FF66">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,15 +11,116 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="styles/matrix.css">
   <title>Matrix Bets</title>
+  <!-- Alpine.js 3.14.x -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 </head>
-<body>
-  <main class="boot">
-    <h1>MATRIX BETS</h1>
-    <p class="boot-status">Initialisation…</p>
-    <p class="boot-meta">v0.1 · squelette en cours</p>
+<body x-data="app()" x-init="init()">
+
+  <!-- ─── HEADER STICKY : Bankroll + date ─── -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-prompt">$_</span>
+      <span class="brand-text">MATRIX BETS</span>
+    </div>
+    <div class="bankroll" @click="editBankroll()">
+      <span class="bankroll-lbl">BANKROLL</span>
+      <span class="bankroll-val" x-text="fmtEur(bankroll)"></span>
+    </div>
+  </header>
+
+  <!-- ─── BANNIÈRE INFO DU JOUR ─── -->
+  <div class="day-banner" x-show="data">
+    <span class="day-banner-date" x-text="formatDateFr(data?.date)"></span>
+    <span class="day-banner-meta">
+      <span x-text="data?.top?.length || 0"></span>&nbsp;paris&nbsp;·&nbsp;
+      <span x-text="data?.n_matches_analysed || '?'"></span>&nbsp;matchs analysés
+    </span>
+  </div>
+
+  <!-- ─── LOADING / ERREUR ─── -->
+  <template x-if="state === 'loading'">
+    <div class="empty">
+      <p class="empty-status">Chargement des paris…</p>
+    </div>
+  </template>
+
+  <template x-if="state === 'error'">
+    <div class="empty">
+      <p class="empty-status err">⚠ Impossible de charger latest.json</p>
+      <p class="empty-meta" x-text="errorMsg"></p>
+      <button class="btn" @click="loadData()">Réessayer</button>
+    </div>
+  </template>
+
+  <template x-if="state === 'empty'">
+    <div class="empty">
+      <p class="empty-status">Aucun pari validé aujourd'hui.</p>
+      <p class="empty-meta">Reviens plus tard ou consulte les jours précédents.</p>
+    </div>
+  </template>
+
+  <!-- ─── FIL D'ACTUALITÉ DES PARIS ─── -->
+  <main class="feed" x-show="state === 'ok' && tab === 'paris'">
+    <template x-for="pari in data.top" :key="pari.rank">
+      <article class="bet-card"
+               :class="ruleClass(pari.rule_id)"
+               @click="openDetail(pari.match_slug)">
+
+        <header class="bet-card-head">
+          <span class="rank" x-text="'#' + pari.rank"></span>
+          <span class="rule-tag" x-text="pari.rule_id + (pari.rule_id === 'R1' ? ' ⭐' : '')"></span>
+          <span class="rule-source" x-text="pari.rule_source"></span>
+          <span class="bet-time" x-text="pari.kickoff_time"></span>
+        </header>
+
+        <h2 class="match">
+          <span class="home" x-text="pari.home_team"></span>
+          <span class="vs">vs</span>
+          <span class="away" x-text="pari.away_team"></span>
+        </h2>
+
+        <p class="competition" x-text="pari.competition + (pari.country ? ' · ' + pari.country : '')"></p>
+
+        <p class="verdict" x-text="pari.verdict"></p>
+
+        <footer class="bet-card-foot">
+          <span class="cote">
+            <span class="lbl">cote</span>
+            <span class="val" x-text="pari.cote_reelle ? pari.cote_reelle.toFixed(2) : '—'"></span>
+          </span>
+          <span class="mise">
+            <span class="lbl">mise (/100€)</span>
+            <span class="val" x-text="pari.kelly_mise_100eur ? pari.kelly_mise_100eur.toFixed(2) + '€' : '—'"></span>
+          </span>
+          <span class="score">
+            <span class="lbl">score</span>
+            <span class="val" x-text="pari.score_pari?.toFixed(0)"></span>
+          </span>
+        </footer>
+      </article>
+    </template>
   </main>
+
+  <!-- ─── ONGLET STATISTIQUES (placeholder) ─── -->
+  <main class="placeholder-tab" x-show="tab === 'stats'">
+    <p class="empty-status">📊 Statistiques</p>
+    <p class="empty-meta">Cet onglet sera disponible en J3 : win rate, ROI, évolution bankroll, perfo par règle.</p>
+  </main>
+
+  <!-- ─── BOTTOM NAVIGATION ─── -->
+  <nav class="bottom-nav">
+    <button class="nav-btn" :class="{active: tab === 'paris'}" @click="tab = 'paris'">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-lbl">Paris</span>
+    </button>
+    <button class="nav-btn" :class="{active: tab === 'stats'}" @click="tab = 'stats'">
+      <span class="nav-icon">📊</span>
+      <span class="nav-lbl">Stats</span>
+    </button>
+  </nav>
+
+  <script src="js/app.js"></script>
   <script>
-    // Enregistre le service worker en silence (ignore si le site n'est pas servi en HTTPS local)
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("sw.js").catch(() => {});
