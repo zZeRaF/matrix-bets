@@ -14,6 +14,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageEnhance, ImageChops
 
 # ─── Sources & sorties ───
 SOURCE_AVIF = Path(r"C:/Users/flori/Downloads/robot ia.avif")
+SOURCE_BALL = Path(r"C:/Users/flori/Downloads/pngtree-glowing-blue-soccer-ball-with-electric-effect-isolated-on-transparent-background-png-image_15766231.png")
 OUT = Path(__file__).parent
 MASTER_SIZE = 1024
 TARGETS = [(1024, "icon-master-1024.png"), (512, "icon-512.png"),
@@ -195,8 +196,35 @@ def _draw_hud_frame(img: Image.Image) -> None:
         d.rectangle([x, y, x + sz, y + sz], fill=HUD)
 
 
+def _matrix_ball(size_px: int) -> Image.Image:
+    """Charge le ballon photoréaliste électrique (bleu) et le retourne en ton vert MATRIX
+    via rotation hue HSV. L'aura électrique source est préservée, juste recoloriée."""
+    src = Image.open(SOURCE_BALL).convert("RGBA")
+    src = src.resize((size_px, size_px), Image.LANCZOS)
+    r, g, b, a = src.split()
+    rgb = Image.merge("RGB", (r, g, b))
+    hsv = rgb.convert("HSV")
+    h, s, v = hsv.split()
+    # Bleu hue ~170/255 → Vert hue ~85/255 : rotation de -85 (cyan-vert MATRIX)
+    h_shifted = h.point(lambda x: (x - 85) % 256)
+    rgb_green = Image.merge("HSV", (h_shifted, s, v)).convert("RGB")
+    r2, g2, b2 = rgb_green.split()
+    return Image.merge("RGBA", (r2, g2, b2, a))
+
+
+def _paste_matrix_ball(img: Image.Image) -> None:
+    """Colle le ballon Matrix à la position de l'ancien dessin (bas-gauche).
+    Diamètre = 2 × ancien r = S × 0.15 (= dimension du rond actuel)."""
+    S = img.size[0]
+    cx = int(S * 0.18)
+    cy = int(S * 0.78)
+    diam = int(S * 0.15)
+    ball = _matrix_ball(diam)
+    img.alpha_composite(ball, (cx - diam // 2, cy - diam // 2))
+
+
 def _draw_ball(img: Image.Image) -> None:
-    """Dessine un ballon de foot stylisé en bas à gauche avec glow vert."""
+    """[OBSOLÈTE — remplacé par _paste_matrix_ball] Dessin manuel ancien."""
     S = img.size[0]
     cx = int(S * 0.18)
     cy = int(S * 0.78)
@@ -289,12 +317,11 @@ def build_master() -> Image.Image:
     # Brightness boost entre-deux (+15% → +7%)
     glowed = ImageEnhance.Brightness(glowed).enhance(1.07)
 
-    print("[7/7] Lueur yeux badass + cadre HUD + pluie + ballon")
+    print("[7/7] Lueur yeux + pluie + ballon Matrix (sans cadre HUD)")
     eyes_boosted = _enhance_eyes(glowed)
     img = eyes_boosted if eyes_boosted.mode == "RGBA" else eyes_boosted.convert("RGBA")
     _add_matrix_rain(img)
-    _draw_hud_frame(img)
-    _draw_ball(img)
+    _paste_matrix_ball(img)
 
     return img
 
