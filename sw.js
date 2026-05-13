@@ -4,7 +4,7 @@
 //   - data/*.json : NETWORK-FIRST
 //   - reste (CSS/JS/icons) : CACHE-FIRST avec bumping de version
 
-const CACHE_NAME = "betime-v8";
+const CACHE_NAME = "betime-v9";
 const STATIC_ASSETS = [
   "./manifest.webmanifest",
   "./styles/matrix.css",
@@ -66,8 +66,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // data/*.json : NETWORK-FIRST
-  if (url.pathname.includes("/data/") && url.pathname.endsWith(".json")) {
+  // data/*.json + audio/* : NETWORK-FIRST (toujours frais)
+  if (
+    (url.pathname.includes("/data/") && url.pathname.endsWith(".json")) ||
+    url.pathname.includes("/audio/")
+  ) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {

@@ -344,14 +344,14 @@ function app() {
     },
 
     async detectAudio() {
-      // Web Audio API toujours dispo dans les navigateurs modernes
       this.audioAvailable = !!(window.AudioContext || window.webkitAudioContext);
-      // En plus, si un MP3 est posé dans audio/, on le joue par-dessus le beep
+      // Cache-buster basé sur la date du jour pour forcer rechargement quotidien
+      const bust = Math.floor(Date.now() / 1000 / 3600); // change chaque heure
       const extensions = ["mp3", "m4a", "wav", "aac", "ogg"];
       for (const ext of extensions) {
-        const url = `audio/intro.${ext}`;
+        const url = `audio/intro.${ext}?v=${bust}`;
         try {
-          const res = await fetch(url, { method: "HEAD" });
+          const res = await fetch(url, { method: "HEAD", cache: "no-cache" });
           if (res.ok) {
             const audio = document.getElementById("splash-audio");
             if (audio) audio.src = url;
