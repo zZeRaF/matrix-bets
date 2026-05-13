@@ -1,0 +1,67 @@
+/* ============================================================
+   Matrix Bets — palette MATRIX cohérente avec le pipeline
+   (extraite de decision_tree/arbre_decision_paris.html + kelly_calculator.html)
+   ============================================================ */
+:root {
+  --mx-bg: #001000;
+  --mx-bg-dark: #002000;
+  --mx-bg-darker: #001505;
+  --mx-green-bright: #00FF66;
+  --mx-green-pastel: #82FFB4;
+  --mx-green-header: #0A4D2A;
+  --mx-red-bright: #FF1B1B;
+  --mx-orange: #FFC000;
+  --mx-blue: #00B0F0;
+  --mx-border-thick: #216037;
+  --mx-border-thin: #195A2D;
+  --mx-text: #C8E6C9;
+  --mx-muted: #5D8C6E;
+  --mx-mono: "Consolas", "Cascadia Mono", "JetBrains Mono", "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--mx-bg);
+  color: var(--mx-text);
+  font-family: var(--mx-mono);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.boot {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+.boot h1 {
+  font-size: 2.5rem;
+  letter-spacing: 0.3em;
+  color: var(--mx-green-bright);
+  text-shadow: 0 0 12px rgba(0,255,102,0.45);
+  margin: 0 0 16px;
+}
+.boot-status {
+  color: var(--mx-green-pastel);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  margin: 0 0 32px;
+}
+.boot-status::before {
+  content: "> ";
+  color: var(--mx-green-bright);
+}
+.boot-meta {
+  color: var(--mx-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}

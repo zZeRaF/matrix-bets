@@ -1,0 +1,15 @@
+# Local dev
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Node (au cas où on utilise un build plus tard)
+node_modules/
+package-lock.json
+
+# Python (le générateur vit dans le projet OneDrive, mais au cas où)
+__pycache__/
+*.pyc
+.venv/
