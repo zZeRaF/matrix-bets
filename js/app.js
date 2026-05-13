@@ -303,6 +303,7 @@ function app() {
     selectedMatchSlug: null,
     detailSubtab: "analyse",        // "analyse" ou "pari"
     selectedLayer: null,            // null | "consensus" | "macro" | "meso" | "micro" | "news"
+    coteInputs: {},                 // { [pari.rank]: cote saisie utilisateur } (réactif Alpine)
 
     // === Splash ===
     showSplash: true,
