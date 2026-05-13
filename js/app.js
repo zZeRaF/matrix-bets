@@ -298,6 +298,11 @@ function app() {
     errorMsg: "",
     tab: "paris",
 
+    // Vue détail match
+    currentView: "feed",            // "feed" ou "detail"
+    selectedMatchSlug: null,
+    detailSubtab: "analyse",        // "analyse" ou "pari"
+
     // === Splash ===
     showSplash: true,
     splashFading: false,
@@ -540,8 +545,42 @@ function app() {
     },
 
     openDetail(slug) {
-      console.log("TODO J2 : ouverture détail", slug);
-      alert("Détail du match : " + slug + "\n\n(Vue détaillée à coder dans la prochaine étape.)");
+      this.selectedMatchSlug = slug;
+      this.currentView = "detail";
+      this.detailSubtab = "analyse";
+      // Scroll en haut de la vue
+      window.scrollTo({ top: 0, behavior: "instant" });
+    },
+
+    backToFeed() {
+      this.currentView = "feed";
+      this.selectedMatchSlug = null;
+    },
+
+    selectedMatch() {
+      if (!this.data || !this.selectedMatchSlug) return null;
+      return (this.data.matches || {})[this.selectedMatchSlug] || null;
+    },
+
+    // Paris liés à ce match dans le TOP (peut y avoir plusieurs : 1X2 + OU + joueur)
+    selectedMatchBets() {
+      if (!this.data || !this.selectedMatchSlug) return [];
+      return (this.data.top || []).filter(p => p.match_slug === this.selectedMatchSlug);
+    },
+
+    // Helpers de formatage pour la vue détail
+    fmtNum(v, decimals = 2) {
+      if (v == null || isNaN(v)) return "—";
+      return Number(v).toFixed(decimals);
+    },
+    fmtPct(v, decimals = 1) {
+      if (v == null || isNaN(v)) return "—";
+      return (Number(v) * 100).toFixed(decimals) + "%";
+    },
+    fmtSigned(v, decimals = 2) {
+      if (v == null || isNaN(v)) return "—";
+      const n = Number(v);
+      return (n >= 0 ? "+" : "") + n.toFixed(decimals);
     },
 
     editBankroll() {

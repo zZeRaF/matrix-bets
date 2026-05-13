@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-ar";
+      var APP_VERSION = "20260513-as";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -72,7 +72,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-ar</div>
+      <div class="splash-version" id="splash-version">build 20260513-as</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -136,7 +136,7 @@
   </template>
 
   <!-- ─── FIL D'ACTUALITÉ DES PARIS ─── -->
-  <main class="feed" x-show="state === 'ok' && tab === 'paris'">
+  <main class="feed" x-show="state === 'ok' && tab === 'paris' && currentView === 'feed'">
     <template x-for="pari in data.top" :key="pari.rank">
       <article class="bet-card"
                :class="ruleClass(pari.rule_id)"
@@ -174,6 +174,205 @@
           </span>
         </footer>
       </article>
+    </template>
+  </main>
+
+  <!-- ─── VUE DÉTAIL MATCH ─── -->
+  <main class="match-detail" x-show="state === 'ok' && tab === 'paris' && currentView === 'detail'" x-cloak>
+    <template x-if="selectedMatch()">
+      <div>
+        <!-- Header retour + nom match -->
+        <header class="detail-header">
+          <button class="detail-back" @click="backToFeed()">
+            <span class="back-arrow">‹</span> RETOUR
+          </button>
+          <div class="detail-title">
+            <h1>
+              <span x-text="selectedMatch().home"></span>
+              <span class="vs">vs</span>
+              <span x-text="selectedMatch().away"></span>
+            </h1>
+            <p class="detail-meta">
+              <span x-text="selectedMatch().competition + (selectedMatch().country ? ' · ' + selectedMatch().country : '')"></span>
+              <span class="dot">·</span>
+              <span x-text="selectedMatch().kickoff_time"></span>
+            </p>
+          </div>
+        </header>
+
+        <!-- Sous-onglets Analyse / Pari -->
+        <nav class="detail-subtabs">
+          <button class="subtab" :class="{active: detailSubtab === 'analyse'}" @click="detailSubtab = 'analyse'">ANALYSE</button>
+          <button class="subtab" :class="{active: detailSubtab === 'pari'}" @click="detailSubtab = 'pari'">PARI</button>
+        </nav>
+
+        <!-- ──── ONGLET ANALYSE ──── -->
+        <div class="detail-body" x-show="detailSubtab === 'analyse'">
+          <!-- CONSENSUS (verdict final, en premier) -->
+          <template x-if="selectedMatch().layers?.consensus">
+            <section class="layer-section layer-consensus">
+              <h2 class="layer-title">CONSENSUS · verdict global</h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">1X2</div>
+                  <div class="stat-val" x-text="selectedMatch().layers.consensus.consensus_1x2?.verdict || '—'"></div>
+                  <div class="stat-sub" x-text="selectedMatch().layers.consensus.consensus_1x2?.confidence || ''"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">OVER / UNDER</div>
+                  <div class="stat-val" x-text="selectedMatch().layers.consensus.consensus_ou?.verdict || '—'"></div>
+                  <div class="stat-sub" x-text="selectedMatch().layers.consensus.consensus_ou?.confidence || ''"></div>
+                </div>
+                <template x-if="selectedMatch().layers.consensus.consensus_decisive">
+                  <div class="layer-stat">
+                    <div class="stat-lbl">JOUEUR DÉCISIF</div>
+                    <div class="stat-val" x-text="selectedMatch().layers.consensus.consensus_decisive?.verdict || '—'"></div>
+                    <div class="stat-sub" x-text="selectedMatch().layers.consensus.consensus_decisive?.confidence || ''"></div>
+                  </div>
+                </template>
+              </div>
+            </section>
+          </template>
+
+          <!-- MACRO (saison) -->
+          <template x-if="selectedMatch().layers?.macro">
+            <section class="layer-section layer-macro">
+              <h2 class="layer-title">MACRO · saison entière (Footystats)</h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">Total buts attendus</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.macro.total_buts_attendus)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Écart domination (E27)</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.macro.calculations?.E27)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Buts attendus HOME (D26)</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.macro.calculations?.D26)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Buts attendus AWAY (F26)</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.macro.calculations?.F26)"></div>
+                </div>
+              </div>
+              <template x-if="selectedMatch().layers.macro.calculations">
+                <div class="layer-verdict">
+                  <span x-text="selectedMatch().layers.macro.calculations?.verdict_1x2 || 'Pas de verdict'"></span>
+                </div>
+              </template>
+            </section>
+          </template>
+
+          <!-- MESO (10 derniers) -->
+          <template x-if="selectedMatch().layers?.meso">
+            <section class="layer-section layer-meso">
+              <h2 class="layer-title">MESO · forme récente 10 derniers (Flashscore)</h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">Score HOME</div>
+                  <div class="stat-val green" x-text="fmtNum(selectedMatch().layers.meso.global_score_home, 0)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Score AWAY</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.meso.global_score_away, 0)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Total buts attendus</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.meso.total_buts_attendus)"></div>
+                </div>
+              </div>
+            </section>
+          </template>
+
+          <!-- MICRO (XI) -->
+          <template x-if="selectedMatch().layers?.micro">
+            <section class="layer-section layer-micro">
+              <h2 class="layer-title">MICRO · rapport forces XI (FotMob)</h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">Verdict 1X2</div>
+                  <div class="stat-val" x-text="selectedMatch().layers.micro.global_verdict_1x2 || '—'"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Zones HOME / TIE / AWAY</div>
+                  <div class="stat-val">
+                    <span x-text="selectedMatch().layers.micro.global_zones_home || 0"></span>
+                    <span class="muted">/</span>
+                    <span x-text="selectedMatch().layers.micro.global_zones_tie || 0"></span>
+                    <span class="muted">/</span>
+                    <span x-text="selectedMatch().layers.micro.global_zones_away || 0"></span>
+                  </div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Total buts attendus</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.micro.total_buts_attendus)"></div>
+                </div>
+              </div>
+              <!-- Top joueurs décisifs -->
+              <template x-if="selectedMatch().layers.micro.decisive_players">
+                <div class="decisive-players">
+                  <h3 class="sub-title">Joueurs décisifs</h3>
+                  <div class="decisive-grid">
+                    <div class="decisive-col">
+                      <h4>HOME</h4>
+                      <ul>
+                        <template x-for="p in (selectedMatch().layers.micro.decisive_players.home || []).slice(0, 3)" :key="p.fm_id">
+                          <li>
+                            <span class="player-name" x-text="p.name"></span>
+                            <span class="player-pos" x-text="'· ' + (p.pos_label || p.role)"></span>
+                            <span class="player-score" x-text="fmtNum(p.score_decisif_brut, 1) + '/100'"></span>
+                          </li>
+                        </template>
+                      </ul>
+                    </div>
+                    <div class="decisive-col">
+                      <h4>AWAY</h4>
+                      <ul>
+                        <template x-for="p in (selectedMatch().layers.micro.decisive_players.away || []).slice(0, 3)" :key="p.fm_id">
+                          <li>
+                            <span class="player-name" x-text="p.name"></span>
+                            <span class="player-pos" x-text="'· ' + (p.pos_label || p.role)"></span>
+                            <span class="player-score" x-text="fmtNum(p.score_decisif_brut, 1) + '/100'"></span>
+                          </li>
+                        </template>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </section>
+          </template>
+
+          <!-- NEWS -->
+          <template x-if="selectedMatch().layers?.news">
+            <section class="layer-section layer-news">
+              <h2 class="layer-title">NEWS · contexte qualitatif (Flashscore + FotMob)</h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">Articles analysés</div>
+                  <div class="stat-val">
+                    <span x-text="selectedMatch().layers.news.n_articles_scored || 0"></span>
+                    <span class="muted">/ <span x-text="selectedMatch().layers.news.n_articles_total || 0"></span></span>
+                  </div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Score favorabilité</div>
+                  <div class="stat-val" x-text="selectedMatch().layers.news.favorability || '—'"></div>
+                </div>
+              </div>
+            </section>
+          </template>
+        </div>
+
+        <!-- ──── ONGLET PARI (placeholder, codé en Push 2) ──── -->
+        <div class="detail-body" x-show="detailSubtab === 'pari'">
+          <div class="empty">
+            <p class="empty-status">PRISE DE PARI</p>
+            <p class="empty-meta">Onglet en cours de construction. Tu y trouveras la mise Kelly recommandée pré-remplie, saisie cote bookmaker, et l'historique des paris placés.</p>
+          </div>
+        </div>
+      </div>
     </template>
   </main>
 
