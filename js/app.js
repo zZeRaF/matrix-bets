@@ -230,9 +230,17 @@ function app() {
     },
 
     enableAudio() {
-      // Active le son hack synthétisé (Web Audio API)
+      if (this.audioStarted) return; // déjà actif
+      // iOS exige que l'AudioContext soit créé DANS un user gesture handler
       try {
-        playHackSequence();
+        const ctx = _ensureAudio();
+        if (ctx && ctx.state === "suspended") {
+          ctx.resume().then(() => {
+            playHackSequence();
+          }).catch(() => playHackSequence());
+        } else {
+          playHackSequence();
+        }
         this.audioStarted = true;
       } catch (e) {
         console.warn("Audio error:", e);

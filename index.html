@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-r";
+      var APP_VERSION = "20260513-s";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -51,7 +51,8 @@
 <body x-data="app()" x-init="init()">
 
   <!-- ─── SPLASH SCREEN (style MATRIX + Galactik vibes + freeze apocalyptique) ─── -->
-  <div id="splash" class="splash" :class="{ 'splash-fade': splashFading }" x-show="showSplash" x-cloak>
+  <div id="splash" class="splash" :class="{ 'splash-fade': splashFading }" x-show="showSplash" x-cloak
+       @click="if (!audioStarted) enableAudio()">
     <canvas id="matrix-rain"></canvas>
     <!-- Ondulations énergétiques Galactik-style (pulse rings) -->
     <div class="splash-pulse-ring"></div>
@@ -67,9 +68,9 @@
     <button class="splash-skip" x-show="splashSkipAvailable" @click="skipSplash()">
       SKIP <span class="skip-arrow">→</span>
     </button>
-    <!-- Bouton AUDIO (apparaît au lancement, premier tap = autorise audio hack synthétisé) -->
-    <button class="splash-audio-toggle" x-show="!audioStarted && audioAvailable" @click="enableAudio()">
-      <span class="audio-icon">▶</span> <span>HACK SON</span>
+    <!-- Bouton AUDIO (apparaît au lancement, ou tap n'importe où sur le splash) -->
+    <button class="splash-audio-toggle" x-show="!audioStarted && audioAvailable" @click.stop="enableAudio()">
+      <span class="audio-icon">▶</span> <span>TAP POUR LE SON</span>
     </button>
     <!-- Audio element (source ajoutée dynamiquement si présent) -->
     <audio id="splash-audio" preload="auto"></audio>
@@ -80,7 +81,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-r</div>
+      <div class="splash-version" id="splash-version">build 20260513-s</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
