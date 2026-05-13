@@ -102,9 +102,9 @@ def _enhance_eyes(img: Image.Image) -> Image.Image:
     out = img.convert("RGBA")
     w, h = out.size
 
-    # Ajustement fin : œil gauche -1.5%x -0.5%y / œil droit -4%x
-    eye_left = (int(w * 0.571), int(h * 0.213))
-    eye_right = (int(w * 0.675), int(h * 0.225))
+    # Ajustement fin : oeil gauche -0.2%x -0.2%y / oeil droit -2.5%x
+    eye_left = (int(w * 0.569), int(h * 0.211))
+    eye_right = (int(w * 0.650), int(h * 0.225))
 
     # Diamètres réduits de 50% — LEDs plus petites et fines
     # Couche 1 : Halo très large vert (atmosphère)
