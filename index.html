@@ -18,9 +18,19 @@
 </head>
 <body x-data="app()" x-init="init()">
 
-  <!-- ─── SPLASH SCREEN (style MATRIX) ─── -->
+  <!-- ─── SPLASH SCREEN (style MATRIX + Galactik vibes + freeze apocalyptique) ─── -->
   <div id="splash" class="splash" :class="{ 'splash-fade': splashFading }" x-show="showSplash" x-cloak>
     <canvas id="matrix-rain"></canvas>
+    <!-- Ondulations énergétiques Galactik-style (pulse rings) -->
+    <div class="splash-pulse-ring"></div>
+    <div class="splash-pulse-ring ring-delay-1"></div>
+    <div class="splash-pulse-ring ring-delay-2"></div>
+    <!-- Bandes de freeze apocalyptique -->
+    <div class="apocalypse-bands"></div>
+    <!-- Flash ERROR rouge (système corrompu) -->
+    <div class="splash-error">! SYSTEM CORRUPTED !</div>
+    <!-- Flash WARNING orange -->
+    <div class="splash-warning">⚠ ANOMALY DETECTED</div>
     <div class="splash-content">
       <div class="splash-logo">
         <span class="splash-brand">

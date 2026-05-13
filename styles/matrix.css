@@ -672,6 +672,138 @@ body {
   .splash-scene { display: none; }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   FREEZE APOCALYPTIQUE + GALACTIK ENERGY (effets premium)
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Ondulations Galactik-style (cercles d'énergie qui se propagent) ── */
+.splash-pulse-ring {
+  position: absolute;
+  top: 42%; left: 50%;
+  width: 80px; height: 80px;
+  border: 2px solid var(--mx-green-bright);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  box-shadow: 0 0 30px rgba(0, 255, 102, 0.5),
+              inset 0 0 30px rgba(0, 255, 102, 0.3);
+  animation: galactik-pulse 2.4s infinite cubic-bezier(.2, .6, .4, 1);
+}
+.splash-pulse-ring.ring-delay-1 { animation-delay: 0.8s; border-color: var(--mx-green-pastel); }
+.splash-pulse-ring.ring-delay-2 { animation-delay: 1.6s; }
+
+@keyframes galactik-pulse {
+  0% {
+    width: 60px; height: 60px;
+    opacity: 0.95;
+    border-width: 3px;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  100% {
+    width: 700px; height: 700px;
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+/* ── Bandes noires de freeze apocalyptique (déchirure écran) ── */
+.apocalypse-bands {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  background:
+    linear-gradient(to bottom,
+      transparent 0,         transparent 22%,
+      #000 22%,              #000 25%,
+      transparent 25%,       transparent 58%,
+      #000 58%,              #000 60%,
+      transparent 60%,       transparent 81%,
+      #000 81%,              #000 83%,
+      transparent 83%
+    );
+  animation: apocalypse-tear 5s infinite;
+}
+@keyframes apocalypse-tear {
+  0%, 38%, 40.2%, 71%, 73%, 100%   { opacity: 0; }
+  39%                              { opacity: 0.95; transform: translateX(0); }
+  39.4%                            { opacity: 0.6; transform: translateX(-8px); }
+  39.8%                            { opacity: 0.9; transform: translateX(4px); }
+  40%                              { opacity: 0; transform: none; }
+  72%                              { opacity: 0.7; transform: translateX(0); }
+  72.5%                            { opacity: 0.4; transform: translateX(6px); }
+}
+
+/* ── Flash "SYSTEM CORRUPTED" rouge ── */
+.splash-error {
+  position: absolute;
+  top: 28%; left: 50%;
+  transform: translateX(-50%);
+  color: #FF1B1B;
+  font-family: var(--mx-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 12px rgba(255, 27, 27, 0.9), 0 0 24px rgba(255, 27, 27, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+  white-space: nowrap;
+  animation: error-flash 5s infinite;
+}
+@keyframes error-flash {
+  0%, 38.5%, 100%        { opacity: 0; }
+  39%                    { opacity: 1; transform: translateX(-50%) translateY(0); }
+  39.3%                  { opacity: 0; }
+  39.6%                  { opacity: 1; transform: translateX(-48%) translateY(-2px); }
+  39.9%                  { opacity: 0; }
+  40%                    { opacity: 0.5; }
+  40.3%                  { opacity: 0; }
+}
+
+/* ── Flash "ANOMALY DETECTED" orange ── */
+.splash-warning {
+  position: absolute;
+  bottom: 24%; left: 50%;
+  transform: translateX(-50%);
+  color: var(--mx-orange);
+  font-family: var(--mx-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 8px rgba(255, 192, 0, 0.8);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+  white-space: nowrap;
+  animation: warning-flash 5s infinite;
+}
+@keyframes warning-flash {
+  0%, 71%, 73.5%, 100%   { opacity: 0; }
+  72%                    { opacity: 1; }
+  72.5%                  { opacity: 0; }
+  73%                    { opacity: 0.8; transform: translateX(-49%); }
+}
+
+/* ── Saccade globale (stutter) sur le content ── */
+.splash-content {
+  animation: content-stutter 5s infinite;
+}
+@keyframes content-stutter {
+  0%, 38.5%, 41%, 71%, 74%, 100%   { transform: none; filter: none; }
+  39%                              { transform: translateX(-4px) translateY(2px); filter: invert(0.08) contrast(1.4); }
+  39.5%                            { transform: translateX(3px); filter: hue-rotate(15deg); }
+  40%                              { transform: translateY(-3px); filter: brightness(1.4); }
+  40.5%                            { transform: none; filter: none; }
+  72%                              { transform: translateX(2px) skewY(0.4deg); filter: contrast(1.3); }
+  73%                              { transform: translateX(-3px); filter: brightness(1.2); }
+}
+
 /* ─── DESKTOP RESPONSIVE ─── */
 @media (min-width: 720px) {
   body {

@@ -44,39 +44,89 @@ def _crop_square(img: Image.Image) -> Image.Image:
 
 
 def _matrix_silhouette(img: Image.Image) -> Image.Image:
-    """Transforme l'image en silhouette MATRIX : fond noir absolu, robot vert détaillé.
+    """Transforme l'image en silhouette MATRIX : fond noir absolu, robot vert vif.
 
-    Approche : détection RGB directe. Le robot métallique est NEUTRE (R≈G≈B), le fond
-    rouge a R >> G,B et le fond bleu a B >> R,G. On masque par déséquilibre RGB.
+    Mapping vert PLUS CLAIR pour augmenter le contraste :
+      - Niveau 0-22 : noir
+      - Niveau 22-100 : vert sombre (50→130)
+      - Niveau 100-180 : vert moyen (130→220)
+      - Niveau 180-255 : vert très clair (220→255) — détails métalliques nets
     """
     rgb = img.convert("RGB")
     hsv = rgb.convert("HSV")
     _, _, v_ch = hsv.split()
-    v_enh = ImageEnhance.Contrast(v_ch).enhance(1.6)
+    v_enh = ImageEnhance.Contrast(v_ch).enhance(1.7)
 
     rgb_pixels = list(rgb.getdata())
     v_pixels = list(v_enh.getdata())
     out_pixels = []
     for (r, g, b), v in zip(rgb_pixels, v_pixels):
-        # Détection fond rouge : R domine clairement sur G et B
+        # Fonds rouge et bleu → noir
         is_red_bg = r > 70 and (r - g) > 25 and (r - b) > 25
-        # Détection fond bleu : B domine clairement sur R et G
         is_blue_bg = b > 70 and (b - r) > 25 and (b - g) > 25
         if is_red_bg or is_blue_bg:
             out_pixels.append((0, 7, 0))
         else:
-            # Pixel neutre/robot : remap luminance vers vert MATRIX
             if v < 22:
                 out_pixels.append((0, 7, 0))
+            elif v < 100:
+                # Tons sombres : vert sombre à moyen
+                t = (v - 22) / 78.0
+                gr = int(50 + t * 80)
+                out_pixels.append((int(gr * 0.08), gr, int(gr * 0.22)))
+            elif v < 180:
+                # Tons moyens : vert moyen à clair (le plus de contraste ici)
+                t = (v - 100) / 80.0
+                gr = int(130 + t * 90)
+                out_pixels.append((int(gr * 0.10), gr, int(gr * 0.25)))
             else:
-                t = min(1.0, (v - 22) / 230.0) ** 0.72
-                gr = int(40 + t * 215)
-                rd = int(t * 18)
-                bl = int(t * 50)
+                # Hautes lumières : vert très clair (yeux + reflets badass)
+                t = (v - 180) / 75.0
+                gr = int(220 + t * 35)
+                # Touche de blanc pour faire ressortir les reflets
+                rd = int(60 + t * 80)
+                bl = int(90 + t * 60)
                 out_pixels.append((min(255, rd), min(255, gr), min(255, bl)))
 
     out = Image.new("RGB", img.size)
     out.putdata(out_pixels)
+    return out
+
+
+def _enhance_eyes(img: Image.Image) -> Image.Image:
+    """Détecte les pixels TRÈS clairs (yeux + LEDs) et ajoute un halo lumineux."""
+    rgb = img.convert("RGB")
+    w, h = rgb.size
+    # Masque des "yeux" : pixels où R+G+B > 700 (très lumineux après mapping vert)
+    bright_mask = Image.new("L", (w, h), 0)
+    bm = bright_mask.load()
+    px = rgb.load()
+    for y in range(int(h * 0.15), int(h * 0.45)):  # zone haute = visage probable
+        for x in range(w):
+            r, g, b = px[x, y]
+            if (r + g + b) > 600 and g > 200:
+                bm[x, y] = 255
+
+    # Halo en floutant ce masque
+    glow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow_layer)
+    # On dessine des cercles lumineux verts là où le masque est blanc
+    bright_data = list(bright_mask.getdata())
+    points = [(i % w, i // w) for i, v in enumerate(bright_data) if v > 0]
+    # Sample pour éviter trop de points (cluster autour des yeux)
+    if points:
+        # Grouper points proches (simple : on prend des centres-de-masse approximés)
+        # Approche simple : on dessine un petit cercle clair sur tous les points → flou ensuite
+        for (x, y) in points:
+            gd.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(140, 255, 180, 180))
+
+    glow_blurred = glow_layer.filter(ImageFilter.GaussianBlur(radius=8))
+    glow_strong = glow_layer.filter(ImageFilter.GaussianBlur(radius=18))
+    # Composer en lighten
+    out = img.convert("RGBA")
+    out = Image.alpha_composite(out, glow_strong)
+    out = Image.alpha_composite(out, glow_blurred)
+    out = Image.alpha_composite(out, glow_layer)
     return out
 
 
@@ -221,9 +271,12 @@ def build_master() -> Image.Image:
     print("[5/6] Vignetting pour noir-iser les bords résiduels")
     silhouette = _apply_vignette(silhouette, strength=0.92)
 
-    print("[6/6] Glow + cadre HUD + pluie Matrix + ballon")
+    print("[6/7] Glow général")
     glowed = _add_glow_layer(silhouette)
-    img = glowed.convert("RGBA")
+
+    print("[7/7] Lueur yeux badass + cadre HUD + pluie + ballon")
+    eyes_boosted = _enhance_eyes(glowed)
+    img = eyes_boosted if eyes_boosted.mode == "RGBA" else eyes_boosted.convert("RGBA")
     _add_matrix_rain(img)
     _draw_hud_frame(img)
     _draw_ball(img)
