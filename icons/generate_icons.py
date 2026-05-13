@@ -55,8 +55,8 @@ def _matrix_silhouette(img: Image.Image) -> Image.Image:
     rgb = img.convert("RGB")
     hsv = rgb.convert("HSV")
     _, _, v_ch = hsv.split()
-    # Contraste réduit (1.7 → 1.3) pour déboucher les ombres
-    v_enh = ImageEnhance.Contrast(v_ch).enhance(1.3)
+    # Contraste entre-deux (1.7 → 1.3 → 1.5)
+    v_enh = ImageEnhance.Contrast(v_ch).enhance(1.5)
 
     rgb_pixels = list(rgb.getdata())
     v_pixels = list(v_enh.getdata())
@@ -68,26 +68,26 @@ def _matrix_silhouette(img: Image.Image) -> Image.Image:
         if is_red_bg or is_blue_bg:
             out_pixels.append((0, 7, 0))
         else:
-            # Seuil noir abaissé (22 → 12) : moins d'ombres écrasées
-            if v < 12:
+            # Seuil noir entre-deux (22 → 12 → 17)
+            if v < 17:
                 out_pixels.append((0, 7, 0))
             elif v < 100:
-                # Tons sombres relevés (50→130 → 80→160) : ombres débouchées
-                t = (v - 12) / 88.0
-                gr = int(80 + t * 80)
+                # Tons sombres entre-deux (50→130 puis 80→160 → 65→145)
+                t = (v - 17) / 83.0
+                gr = int(65 + t * 80)
                 out_pixels.append((int(gr * 0.08), gr, int(gr * 0.22)))
             elif v < 180:
-                # Tons moyens un peu relevés (130→220 → 160→235)
+                # Tons moyens entre-deux (130→220 puis 160→235 → 145→228)
                 t = (v - 100) / 80.0
-                gr = int(160 + t * 75)
+                gr = int(145 + t * 83)
                 out_pixels.append((int(gr * 0.10), gr, int(gr * 0.25)))
             else:
-                # Hautes lumières plus brillantes (220→255 → 235→255 + plus de blanc)
+                # Hautes lumières entre-deux (220→255 puis 235→255 → 228→255)
                 t = (v - 180) / 75.0
-                gr = int(235 + t * 20)
-                # Touche de blanc renforcée pour les reflets
-                rd = int(90 + t * 100)
-                bl = int(120 + t * 80)
+                gr = int(228 + t * 27)
+                # Touche de blanc intermédiaire pour les reflets
+                rd = int(75 + t * 90)
+                bl = int(105 + t * 70)
                 out_pixels.append((min(255, rd), min(255, gr), min(255, bl)))
 
     out = Image.new("RGB", img.size)
@@ -281,13 +281,13 @@ def build_master() -> Image.Image:
     print("[4/6] Silhouette MATRIX (fond noir / robot vert)")
     silhouette = _matrix_silhouette(sq)
 
-    print("[5/7] Vignetting réduit (0.92 → 0.75) pour ne pas trop assombrir les bords")
-    silhouette = _apply_vignette(silhouette, strength=0.75)
+    print("[5/7] Vignetting entre-deux (0.92 → 0.75 → 0.83)")
+    silhouette = _apply_vignette(silhouette, strength=0.83)
 
-    print("[6/7] Glow général + boost exposition")
+    print("[6/7] Glow général + boost exposition +7%")
     glowed = _add_glow_layer(silhouette)
-    # Brightness boost global +15% pour augmenter l'exposition perçue
-    glowed = ImageEnhance.Brightness(glowed).enhance(1.15)
+    # Brightness boost entre-deux (+15% → +7%)
+    glowed = ImageEnhance.Brightness(glowed).enhance(1.07)
 
     print("[7/7] Lueur yeux badass + cadre HUD + pluie + ballon")
     eyes_boosted = _enhance_eyes(glowed)
@@ -305,9 +305,9 @@ def build_robot_portrait() -> Image.Image:
     src = Image.open(SOURCE_AVIF).convert("RGB")
     sq = _crop_square(src).resize((MASTER_SIZE, MASTER_SIZE), Image.LANCZOS)
     silhouette = _matrix_silhouette(sq)
-    silhouette = _apply_vignette(silhouette, strength=0.78)
+    silhouette = _apply_vignette(silhouette, strength=0.86)
     glowed = _add_glow_layer(silhouette)
-    glowed = ImageEnhance.Brightness(glowed).enhance(1.15)
+    glowed = ImageEnhance.Brightness(glowed).enhance(1.07)
     eyes = _enhance_eyes(glowed)
     img = eyes if eyes.mode == "RGBA" else eyes.convert("RGBA")
     # Pas de cadre HUD, pas de ballon, pas de pluie — sprite pur
