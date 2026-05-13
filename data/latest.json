@@ -1,7 +1,7 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "date": "2026-05-14",
-  "generated_at": "2026-05-13T17:20:44",
+  "generated_at": "2026-05-13T17:31:14",
   "n_matches_analysed": 9,
   "n_paris_candidats": 29,
   "scoring_formula": "score_pari = conf_pts × bet_mult + nb_couches_convergentes",
