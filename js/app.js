@@ -363,6 +363,23 @@ function app() {
 
     enableAudio() {
       if (this.audioStarted) return;
+      // Si un fichier audio est disponible, on le joue EN PRIORITÉ
+      // Sinon, fallback sur le son synthétisé Web Audio
+      const audio = document.getElementById("splash-audio");
+      if (audio && audio.src) {
+        audio.volume = 0.9;
+        audio.play().then(() => {
+          this.audioStarted = true;
+        }).catch(() => {
+          // Si la lecture du fichier échoue, fallback Codex
+          this._playSynthSound();
+        });
+        return;
+      }
+      this._playSynthSound();
+    },
+
+    _playSynthSound() {
       try {
         const ctx = _ensureAudio();
         if (!ctx) return;
