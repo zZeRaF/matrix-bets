@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Macro Footystats — Charlotte vs New York City</title>
+<style>
+  body { background:#001000; color:#82FFB4; font-family:Consolas, monospace; margin:0; padding:0; }
+  .container { max-width:1100px; margin:0 auto; padding:20px; }
+  h1 { color:#00FF66; text-align:center; border:2px solid #216037; padding:12px; background:#002000; margin-top:0; font-size:18px; }
+  h2 { color:#00FF66; border-bottom:2px solid #216037; padding-bottom:4px; margin-top:22px; font-size:15px; }
+  h3 { color:#D4A340; margin-top:0; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin:6px 0; font-size:12px; }
+  th, td { border:1px solid #195A2D; padding:5px 7px; text-align:center; color:#FFF; }
+  th { background:#002000; color:#00FF66; }
+  td.label { text-align:right; color:#82FFB4; font-weight:600; }
+  td.center-val { background:#002000; color:#FFF; font-weight:700; }
+  td.empty { background:#001000; border:none; }
+  .subtitle { text-align:center; color:#93BB7D; font-style:italic; margin-bottom:14px; font-size:11px; }
+  .verdict { padding:8px; text-align:center; font-weight:700; font-size:13px; margin-top:8px; border-radius:4px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .block { background:#001800; padding:10px; border:1px solid #216037; }
+  .block p { margin:3px 0; color:#FFF; font-size:12px; }
+  .timing-table tr.avg td { background:#002000; color:#00FF66; font-weight:700; }
+  .bar-row { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .bar-label { width:60px; color:#82FFB4; font-weight:600; font-size:11px; }
+  .bar-bg { flex:1; height:16px; background:#001800; border:1px solid #195A2D; }
+  .bar-fill { height:100%; transition:width 0.3s; }
+  .bar-val { width:50px; text-align:right; font-weight:700; font-size:11px; }
+</style></head>
+<body><div class="container">
+<h1>ANALYSE MACRO FOOTYSTATS — Charlotte (Home) vs New York City (Away)</h1>
+<p class="subtitle">Compétition : USA MLS · Stats Home (A) / Away (B) · Coef FIFA : Charlotte=1.00 · New York City=1.00</p>
+
+<h2>ANALYSE MACRO — Stats saison</h2>
+<table>
+  <tr><th></th><th>Charlotte</th><th>Moy combinée</th><th>New York City</th></tr>
+  <tr><td class="label">Moy buts dans matchs</td><td class="center-val">3.5</td><td class="center-val">2.75</td><td class="center-val">2.0</td></tr>
+  <tr><td class="label">Wins %</td><td>50%</td><td class="empty"></td><td>25%</td></tr>
+  <tr><td class="label">Draws %</td><td>33%</td><td class="empty"></td><td>25%</td></tr>
+  <tr><td class="label">Losses %</td><td>17%</td><td class="empty"></td><td>50%</td></tr>
+  <tr><td class="label">Buts marqués / match</td><td style="background:#00FF66;color:#000;font-weight:400">2.33</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">0.75</td></tr>
+  <tr><td class="label">xG créé / match</td><td style="background:#FFC000;color:#000;font-weight:400">1.56</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.2</td></tr>
+  <tr><td class="label">Ratio buts/xG (efficacité)</td><td style="background:#00FF66;color:#000;font-weight:400">1.49</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">0.62</td></tr>
+  <tr><td class="label">xG concédé / match</td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.32</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.71</td></tr>
+  <tr><td class="label">Buts encaissés / match</td><td style="background:#FFC000;color:#000;font-weight:400">1.17</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.25</td></tr>
+  <tr><td class="label">Indice domination défensive</td><td style="background:#FFC000;color:#000;font-weight:400">0.89</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">0.73</td></tr>
+  <tr><td class="label">Buts attendus</td><td class="center-val">2.91</td><td class="center-val">2.04</td><td class="center-val">0.88</td></tr>
+  <tr><td class="label">Indice domination GLOBALE</td><td style="background:#00FF66;color:#000;font-weight:600">2.3</td><td class="center-val">1.84</td><td style="background:#FF1B1B;color:#FFF;font-weight:600">0.46</td></tr>
+</table>
+
+<div class="verdict" style="background:#00B0F0;color:#FFF">
+  Avantage attaque
+</div>
+
+<h2>SYNTHÈSE</h2>
+<table>
+  <tr><th>Charlotte</th><th>ANALYSE</th><th>New York City</th></tr>
+  <tr><td style="background:#00FF66;color:#000;font-weight:600">Bonne Attaque</td><td class="center-val">Attaque<br>buts attendus : 2.91 vs 0.88</td><td style="background:#FF1B1B;color:#FFF;font-weight:600">Mauvaise Attaque</td></tr>
+  <tr><td style="background:#FFC000;color:#000;font-weight:600">Défense Moyenne</td><td class="center-val">Vainqueur : <b style="color:#00FF66">Charlotte</b></td><td style="background:#FFC000;color:#000;font-weight:600">Défense Moyenne</td></tr>
+  <tr><td class="empty"></td><td class="center-val">Moyenne buts attendus : <b>3.27</b></td><td class="empty"></td></tr>
+</table>
+
+<h2>VERDICTS</h2>
+<div class="verdict" style="background:#FFC000;color:#FFF;font-size:16px">
+  ❌ Pas de prono double chance
+</div>
+<div class="verdict" style="background:#00FF66;color:#000;font-size:16px;margin-top:10px">
+  ✅ Victoire Charlotte + Over 1,5
+</div>
+
+
+        <h2>TIMING DES BUTS</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>1ère vs 2e mi-temps (% buts marqués)</h3>
+            <table class="timing-table">
+              <tr><th></th><th>1ère MT</th><th>2e MT</th></tr>
+              <tr><td>Charlotte</td><td>21.4%</td><td>78.6%</td></tr>
+              <tr><td>New York City</td><td>33.3%</td><td>66.7%</td></tr>
+              <tr class="avg"><td>MOYENNE</td><td>27.3%</td><td>72.7%</td></tr>
+            </table>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Buts plutôt EN 2e MI-TEMPS (72.7%)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Distribution intervalles 10 min (croisement)</h3>
+            
+            <div class="bar-row">
+              <span class="bar-label">0-10 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:0%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">0.0%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">11-20 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:13%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">3.5%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">21-30 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:26%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">7.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">31-40 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:61%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">16.6%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">41-50 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:13%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">3.5%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">51-60 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:39%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">10.7%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">61-70 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:87%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">23.8%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">71-80 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:26%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">7.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">81-90 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:100%;background:#00FF66"></div></div>
+              <span class="bar-val" style="color:#00FF66">27.3%</span>
+            </div>
+            <div class="verdict" style="background:#00FF66;color:#000;margin-top:10px">
+              Pic de buts attendus : 81-90 min (27.3%)
+            </div>
+          </div>
+        </div>
+        
+
+
+        <h2>HISTORIQUE H2H</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>Bilan all-time</h3>
+            <p><b>12</b> confrontations</p>
+            <p>Charlotte : <b>6</b> V (50.0%)</p>
+            <p>New York City : <b>4</b> V (33.3%)</p>
+            <p>Nuls : <b>2</b> (16.7%)</p>
+            <div class="verdict" style="background:#FFC000;color:#FFF">
+              Équipe dominante : ÉQUILIBRÉ (—)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Tendance buts</h3>
+            <p>Moy buts/match : <b>2.33</b></p>
+            <p>Over 1.5 : <b>67%</b></p>
+            <p>Over 2.5 : <b>42%</b></p>
+            <p>Over 3.5 : <b>25%</b></p>
+            <p>BTTS : <b>50%</b></p>
+            <div class="verdict" style="background:#FFC000;color:#FFF">
+              Match ÉQUILIBRÉ (—)
+            </div>
+          </div>
+        </div>
+        
+
+</div></body></html>

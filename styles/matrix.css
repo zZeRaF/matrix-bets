@@ -417,7 +417,82 @@ body {
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+.open-arrow {
+  margin-left: auto;
+  color: var(--mx-green-pastel);
+  font-size: 1.4rem;
+  line-height: 1;
+  font-weight: 400;
+  opacity: 0.7;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* Section cliquable : indicateur visuel + feedback tap */
+.layer-section.clickable {
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.layer-section.clickable:hover .open-arrow,
+.layer-section.clickable:active .open-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+.layer-section.clickable:active {
+  transform: scale(0.995);
+  background: rgba(0, 32, 16, 0.95);
+}
+
+/* ─── VUE LAYER DÉTAIL — overlay plein écran avec iframe ─── */
+.layer-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  animation: layerFadeIn 0.18s ease-out;
+}
+@keyframes layerFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.layer-detail-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  background: rgba(0, 16, 8, 0.97);
+  border-bottom: 1px solid var(--mx-border-thick);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.layer-detail-title {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--mx-green-bright);
+  text-transform: uppercase;
+  font-weight: 700;
+  flex: 1;
+  text-align: center;
+  padding-right: 70px; /* compense la largeur du bouton retour */
+}
+.layer-detail-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  border: 0;
+  background: #001000;
+  display: block;
+}
+/* Quand un layer est ouvert, on cache la nav du bas pour éviter le chevauchement */
+body.layer-open .bottom-nav { display: none; }
 .layer-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));

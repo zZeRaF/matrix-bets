@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-as";
+      var APP_VERSION = "20260513-bt";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -72,7 +72,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-as</div>
+      <div class="splash-version" id="splash-version">build 20260513-bt</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -210,8 +210,10 @@
         <div class="detail-body" x-show="detailSubtab === 'analyse'">
           <!-- CONSENSUS (verdict final, en premier) -->
           <template x-if="selectedMatch().layers?.consensus">
-            <section class="layer-section layer-consensus">
-              <h2 class="layer-title">CONSENSUS · verdict global</h2>
+            <section class="layer-section layer-consensus clickable"
+                     @click="openLayer('consensus')"
+                     :class="{available: hasLayerHtml('consensus')}">
+              <h2 class="layer-title">CONSENSUS <span class="open-arrow" x-show="hasLayerHtml('consensus')">›</span></h2>
               <div class="layer-grid">
                 <div class="layer-stat">
                   <div class="stat-lbl">1X2</div>
@@ -236,8 +238,10 @@
 
           <!-- MACRO (saison) -->
           <template x-if="selectedMatch().layers?.macro">
-            <section class="layer-section layer-macro">
-              <h2 class="layer-title">MACRO · saison entière (Footystats)</h2>
+            <section class="layer-section layer-macro clickable"
+                     @click="openLayer('macro')"
+                     :class="{available: hasLayerHtml('macro')}">
+              <h2 class="layer-title">MACRO · saison entière <span class="open-arrow" x-show="hasLayerHtml('macro')">›</span></h2>
               <div class="layer-grid">
                 <div class="layer-stat">
                   <div class="stat-lbl">Total buts attendus</div>
@@ -266,8 +270,10 @@
 
           <!-- MESO (10 derniers) -->
           <template x-if="selectedMatch().layers?.meso">
-            <section class="layer-section layer-meso">
-              <h2 class="layer-title">MESO · forme récente 10 derniers (Flashscore)</h2>
+            <section class="layer-section layer-meso clickable"
+                     @click="openLayer('meso')"
+                     :class="{available: hasLayerHtml('meso')}">
+              <h2 class="layer-title">MESO · forme récente 10 derniers <span class="open-arrow" x-show="hasLayerHtml('meso')">›</span></h2>
               <div class="layer-grid">
                 <div class="layer-stat">
                   <div class="stat-lbl">Score HOME</div>
@@ -287,8 +293,10 @@
 
           <!-- MICRO (XI) -->
           <template x-if="selectedMatch().layers?.micro">
-            <section class="layer-section layer-micro">
-              <h2 class="layer-title">MICRO · rapport forces XI (FotMob)</h2>
+            <section class="layer-section layer-micro clickable"
+                     @click="openLayer('micro')"
+                     :class="{available: hasLayerHtml('micro')}">
+              <h2 class="layer-title">MICRO · rapport forces XI <span class="open-arrow" x-show="hasLayerHtml('micro')">›</span></h2>
               <div class="layer-grid">
                 <div class="layer-stat">
                   <div class="stat-lbl">Verdict 1X2</div>
@@ -346,8 +354,10 @@
 
           <!-- NEWS -->
           <template x-if="selectedMatch().layers?.news">
-            <section class="layer-section layer-news">
-              <h2 class="layer-title">NEWS · contexte qualitatif (Flashscore + FotMob)</h2>
+            <section class="layer-section layer-news clickable"
+                     @click="openLayer('news')"
+                     :class="{available: hasLayerHtml('news')}">
+              <h2 class="layer-title">NEWS · contexte qualitatif <span class="open-arrow" x-show="hasLayerHtml('news')">›</span></h2>
               <div class="layer-grid">
                 <div class="layer-stat">
                   <div class="stat-lbl">Articles analysés</div>
@@ -375,6 +385,23 @@
       </div>
     </template>
   </main>
+
+  <!-- ─── VUE DÉTAIL COUCHE (iframe HTML rendu) ─── -->
+  <div class="layer-detail-overlay" x-show="selectedLayer" x-cloak @keydown.escape.window="closeLayer()">
+    <header class="layer-detail-header">
+      <button class="detail-back" @click="closeLayer()">
+        <span class="back-arrow">‹</span> RETOUR
+      </button>
+      <h2 class="layer-detail-title">
+        <span x-text="layerLabel(selectedLayer)"></span>
+      </h2>
+    </header>
+    <iframe class="layer-detail-frame"
+            :src="layerHtmlUrl(selectedLayer)"
+            x-show="selectedLayer"
+            referrerpolicy="no-referrer"
+            sandbox="allow-same-origin allow-popups"></iframe>
+  </div>
 
   <!-- ─── ONGLET STATISTIQUES (placeholder) ─── -->
   <main class="placeholder-tab" x-show="tab === 'stats'">

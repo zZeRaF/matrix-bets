@@ -302,6 +302,7 @@ function app() {
     currentView: "feed",            // "feed" ou "detail"
     selectedMatchSlug: null,
     detailSubtab: "analyse",        // "analyse" ou "pari"
+    selectedLayer: null,            // null | "consensus" | "macro" | "meso" | "micro" | "news"
 
     // === Splash ===
     showSplash: true,
@@ -555,6 +556,44 @@ function app() {
     backToFeed() {
       this.currentView = "feed";
       this.selectedMatchSlug = null;
+      this.selectedLayer = null;
+    },
+
+    // Ouvre la vue HTML détaillée d'une couche (iframe sur data/<date>/<slug>/<layer>.html)
+    openLayer(layerKey) {
+      if (!this.hasLayerHtml(layerKey)) return;
+      this.selectedLayer = layerKey;
+      document.body.classList.add("layer-open");
+    },
+
+    closeLayer() {
+      this.selectedLayer = null;
+      document.body.classList.remove("layer-open");
+    },
+
+    hasLayerHtml(layerKey) {
+      const m = this.selectedMatch();
+      if (!m) return false;
+      const list = m.layers_html_available || [];
+      return list.includes(layerKey);
+    },
+
+    layerHtmlUrl(layerKey) {
+      if (!layerKey || !this.data || !this.selectedMatchSlug) return "";
+      const date = this.data.date;
+      const slug = this.selectedMatchSlug;
+      const v = this.data.generated_at ? encodeURIComponent(this.data.generated_at) : Date.now();
+      return `data/${date}/${slug}/${layerKey}.html?v=${v}`;
+    },
+
+    layerLabel(key) {
+      return {
+        consensus: "CONSENSUS · synthèse",
+        macro: "MACRO · saison entière",
+        meso: "MESO · 10 derniers matchs",
+        micro: "MICRO · rapport forces XI",
+        news: "NEWS · contexte qualitatif",
+      }[key] || (key || "").toUpperCase();
     },
 
     selectedMatch() {

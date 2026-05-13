@@ -1,7 +1,7 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "date": "2026-05-14",
-  "generated_at": "2026-05-13T12:14:02",
+  "generated_at": "2026-05-13T17:20:44",
   "n_matches_analysed": 9,
   "n_paris_candidats": 29,
   "scoring_formula": "score_pari = conf_pts × bet_mult + nb_couches_convergentes",
@@ -2380,6 +2380,13 @@
           ]
         }
       },
+      "layers_html_available": [
+        "macro",
+        "meso",
+        "micro",
+        "news",
+        "consensus"
+      ],
       "lineups": {
         "status": "ok",
         "home": {
@@ -5763,6 +5770,13 @@
           ]
         }
       },
+      "layers_html_available": [
+        "macro",
+        "meso",
+        "micro",
+        "news",
+        "consensus"
+      ],
       "lineups": {
         "status": "ok",
         "home": {
@@ -9157,6 +9171,13 @@
           ]
         }
       },
+      "layers_html_available": [
+        "macro",
+        "meso",
+        "micro",
+        "news",
+        "consensus"
+      ],
       "lineups": {
         "status": "ok",
         "home": {
@@ -12568,6 +12589,13 @@
           ]
         }
       },
+      "layers_html_available": [
+        "macro",
+        "meso",
+        "micro",
+        "news",
+        "consensus"
+      ],
       "lineups": {
         "status": "ok",
         "home": {
@@ -15736,6 +15764,13 @@
           ]
         }
       },
+      "layers_html_available": [
+        "macro",
+        "meso",
+        "micro",
+        "news",
+        "consensus"
+      ],
       "lineups": {
         "status": "ok",
         "home": {

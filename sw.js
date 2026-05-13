@@ -4,7 +4,7 @@
 //   - data/*.json : NETWORK-FIRST
 //   - reste (CSS/JS/icons) : CACHE-FIRST avec bumping de version
 
-const CACHE_NAME = "betime-v9";
+const CACHE_NAME = "betime-v10";
 const STATIC_ASSETS = [
   "./manifest.webmanifest",
   "./styles/matrix.css",

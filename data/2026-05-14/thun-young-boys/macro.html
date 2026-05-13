@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Macro Footystats — Thun vs Young Boys</title>
+<style>
+  body { background:#001000; color:#82FFB4; font-family:Consolas, monospace; margin:0; padding:0; }
+  .container { max-width:1100px; margin:0 auto; padding:20px; }
+  h1 { color:#00FF66; text-align:center; border:2px solid #216037; padding:12px; background:#002000; margin-top:0; font-size:18px; }
+  h2 { color:#00FF66; border-bottom:2px solid #216037; padding-bottom:4px; margin-top:22px; font-size:15px; }
+  h3 { color:#D4A340; margin-top:0; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin:6px 0; font-size:12px; }
+  th, td { border:1px solid #195A2D; padding:5px 7px; text-align:center; color:#FFF; }
+  th { background:#002000; color:#00FF66; }
+  td.label { text-align:right; color:#82FFB4; font-weight:600; }
+  td.center-val { background:#002000; color:#FFF; font-weight:700; }
+  td.empty { background:#001000; border:none; }
+  .subtitle { text-align:center; color:#93BB7D; font-style:italic; margin-bottom:14px; font-size:11px; }
+  .verdict { padding:8px; text-align:center; font-weight:700; font-size:13px; margin-top:8px; border-radius:4px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .block { background:#001800; padding:10px; border:1px solid #216037; }
+  .block p { margin:3px 0; color:#FFF; font-size:12px; }
+  .timing-table tr.avg td { background:#002000; color:#00FF66; font-weight:700; }
+  .bar-row { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .bar-label { width:60px; color:#82FFB4; font-weight:600; font-size:11px; }
+  .bar-bg { flex:1; height:16px; background:#001800; border:1px solid #195A2D; }
+  .bar-fill { height:100%; transition:width 0.3s; }
+  .bar-val { width:50px; text-align:right; font-weight:700; font-size:11px; }
+</style></head>
+<body><div class="container">
+<h1>ANALYSE MACRO FOOTYSTATS — Thun (Home) vs Young Boys (Away)</h1>
+<p class="subtitle">Compétition : Switzerland Super League · Stats Home (A) / Away (B) · Coef FIFA : Thun=1.00 · Young Boys=1.00</p>
+
+<h2>ANALYSE MACRO — Stats saison</h2>
+<table>
+  <tr><th></th><th>Thun</th><th>Moy combinée</th><th>Young Boys</th></tr>
+  <tr><td class="label">Moy buts dans matchs</td><td class="center-val">3.5</td><td class="center-val">3.69</td><td class="center-val">3.89</td></tr>
+  <tr><td class="label">Wins %</td><td>67%</td><td class="empty"></td><td>28%</td></tr>
+  <tr><td class="label">Draws %</td><td>11%</td><td class="empty"></td><td>28%</td></tr>
+  <tr><td class="label">Losses %</td><td>22%</td><td class="empty"></td><td>44%</td></tr>
+  <tr><td class="label">Buts marqués / match</td><td style="background:#00FF66;color:#000;font-weight:400">2.33</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">1.61</td></tr>
+  <tr><td class="label">xG créé / match</td><td style="background:#00FF66;color:#000;font-weight:400">1.97</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.46</td></tr>
+  <tr><td class="label">Ratio buts/xG (efficacité)</td><td style="background:#00FF66;color:#000;font-weight:400">1.18</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">1.1</td></tr>
+  <tr><td class="label">xG concédé / match</td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.66</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.66</td></tr>
+  <tr><td class="label">Buts encaissés / match</td><td style="background:#FFC000;color:#000;font-weight:400">1.17</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">2.28</td></tr>
+  <tr><td class="label">Indice domination défensive</td><td style="background:#00FF66;color:#000;font-weight:400">0.7</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.37</td></tr>
+  <tr><td class="label">Buts attendus</td><td class="center-val">5.31</td><td class="center-val">3.43</td><td class="center-val">1.88</td></tr>
+  <tr><td class="label">Indice domination GLOBALE</td><td style="background:#00FF66;color:#000;font-weight:600">2.07</td><td class="center-val">1.55</td><td style="background:#FF1B1B;color:#FFF;font-weight:600">0.52</td></tr>
+</table>
+
+<div class="verdict" style="background:#00B0F0;color:#FFF">
+  Attaque performante vs gardien faible → avantage attaque
+</div>
+
+<h2>SYNTHÈSE</h2>
+<table>
+  <tr><th>Thun</th><th>ANALYSE</th><th>Young Boys</th></tr>
+  <tr><td style="background:#00FF66;color:#000;font-weight:600">Bonne Attaque</td><td class="center-val">Attaque<br>buts attendus : 5.31 vs 1.88</td><td style="background:#00FF66;color:#000;font-weight:600">Bonne Attaque</td></tr>
+  <tr><td style="background:#FFC000;color:#000;font-weight:600">Défense Moyenne</td><td class="center-val">Vainqueur : <b style="color:#00FF66">Thun</b></td><td style="background:#FF1B1B;color:#FFF;font-weight:600">Mauvaise Défense</td></tr>
+  <tr><td class="empty"></td><td class="center-val">Moyenne buts attendus : <b>5.45</b></td><td class="empty"></td></tr>
+</table>
+
+<h2>VERDICTS</h2>
+<div class="verdict" style="background:#FFC000;color:#FFF;font-size:16px">
+  ❌ Pas de prono double chance
+</div>
+<div class="verdict" style="background:#00FF66;color:#000;font-size:16px;margin-top:10px">
+  ✅ Victoire Thun + Over 1,5
+</div>
+
+
+        <h2>TIMING DES BUTS</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>1ère vs 2e mi-temps (% buts marqués)</h3>
+            <table class="timing-table">
+              <tr><th></th><th>1ère MT</th><th>2e MT</th></tr>
+              <tr><td>Thun</td><td>40.5%</td><td>59.5%</td></tr>
+              <tr><td>Young Boys</td><td>37.9%</td><td>62.1%</td></tr>
+              <tr class="avg"><td>MOYENNE</td><td>39.2%</td><td>60.8%</td></tr>
+            </table>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Buts plutôt EN 2e MI-TEMPS (60.8%)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Distribution intervalles 10 min (croisement)</h3>
+            
+            <div class="bar-row">
+              <span class="bar-label">0-10 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:21%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">4.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">11-20 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:43%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">8.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">21-30 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:61%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">11.7%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">31-40 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:55%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">10.6%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">41-50 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:58%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">11.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">51-60 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:100%;background:#00FF66"></div></div>
+              <span class="bar-val" style="color:#00FF66">19.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">61-70 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:91%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">17.5%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">71-80 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:21%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">4.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">81-90 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:70%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">13.5%</span>
+            </div>
+            <div class="verdict" style="background:#00FF66;color:#000;margin-top:10px">
+              Pic de buts attendus : 51-60 min (19.2%)
+            </div>
+          </div>
+        </div>
+        
+
+
+        <h2>HISTORIQUE H2H</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>Bilan all-time</h3>
+            <p><b>36</b> confrontations</p>
+            <p>Thun : <b>8</b> V (22.2%)</p>
+            <p>Young Boys : <b>21</b> V (58.3%)</p>
+            <p>Nuls : <b>7</b> (19.4%)</p>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Équipe dominante : Young Boys (MODÉRÉE)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Tendance buts</h3>
+            <p>Moy buts/match : <b>3.44</b></p>
+            <p>Over 1.5 : <b>83%</b></p>
+            <p>Over 2.5 : <b>75%</b></p>
+            <p>Over 3.5 : <b>53%</b></p>
+            <p>BTTS : <b>64%</b></p>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Tendance OVER 2.5 (FORTE)
+            </div>
+          </div>
+        </div>
+        
+
+</div></body></html>
