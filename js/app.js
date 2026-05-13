@@ -67,49 +67,104 @@ function _noise(dur, vol = 0.12, freq = 800) {
   src.stop(t + dur + 0.02);
 }
 
+// Helper : beep avec scheduling absolu (time = ctx.currentTime + offset)
+function _beepAt(time, freq, duration, gain = 0.18) {
+  const ctx = _ensureAudio();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(freq, time);
+  g.gain.setValueAtTime(0, time);
+  g.gain.linearRampToValueAtTime(gain, time + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, time + duration);
+  osc.connect(g);
+  g.connect(_audioGainMaster);
+  osc.start(time);
+  osc.stop(time + duration + 0.02);
+}
+
+// Helper : burst de noise blanc filtré (style "data corruption")
+function _noiseBurstAt(time, duration = 0.08) {
+  const ctx = _ensureAudio();
+  if (!ctx) return;
+  const bufferSize = Math.floor(ctx.sampleRate * duration);
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+  const src = ctx.createBufferSource();
+  const filter = ctx.createBiquadFilter();
+  const g = ctx.createGain();
+  src.buffer = buffer;
+  filter.type = "bandpass";
+  filter.frequency.value = 1800;
+  filter.Q.value = 8;
+  g.gain.value = 0.25;
+  src.connect(filter);
+  filter.connect(g);
+  g.connect(_audioGainMaster);
+  src.start(time);
+}
+
 function playSplashSound() {
   const ctx = _ensureAudio();
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
 
-  // === STYLE INFORMATIQUE INQUIÉTANT ===
-  // Drone sub-bass continu + gamme descendante + intervalles tendus
+  // === HACKING ALERT ===
+  // Pattern de bips alternants en 2 phases (aigu 880/1320 puis grave 660/990)
+  // + bursts de noise + drone sawtooth 110Hz modulé par LFO 7Hz (tremolo inquiétant)
 
-  // DRONE sub-bass continu (atmosphère sombre, durée totale)
-  _beep(55, 4.0, "sine", 0.10);     // A1 très grave (basse menaçante)
-  _beep(82.4, 4.0, "sine", 0.07);   // E2 quinte grave
-  _beep(110, 4.0, "triangle", 0.04); // A2 — léger renfort
+  const now = ctx.currentTime + 0.05;
 
-  // Phase 1 (0-550ms) : data stream — bips secs alternant aigus/graves dissonants
-  const keyFreqs = [1400, 800, 1250, 900, 1100, 750, 1350, 850, 1200, 720, 1450, 950];
-  for (let i = 0; i < 12; i++) {
-    setTimeout(() => _beep(keyFreqs[i], 0.025, "square", 0.14), 10 + i * 45);
+  const pattern = [
+    [0.00, 880],
+    [0.12, 1320],
+    [0.24, 880],
+    [0.36, 1320],
+    [0.60, 660],
+    [0.72, 990],
+    [0.84, 660],
+    [0.96, 990],
+  ];
+
+  // 3 boucles (3 × 1.25s = 3.75s) pour matcher splash 4s
+  for (let loop = 0; loop < 3; loop++) {
+    const offset = loop * 1.25;
+    pattern.forEach(([t, f]) => {
+      _beepAt(now + offset + t, f, 0.08, 0.18);
+    });
+    _noiseBurstAt(now + offset + 0.52);
+    _noiseBurstAt(now + offset + 1.08);
   }
 
-  // Phase 2 (700-2100ms) : log scan — gamme DESCENDANTE (sensation de chute)
-  const logTimings = [700, 920, 1140, 1390, 1650, 1900];
-  const scanFreqs = [880, 740, 659, 587, 523, 466]; // descente progressive
-  logTimings.forEach((t, i) => {
-    setTimeout(() => _beep(scanFreqs[i], 0.04, "square", 0.20), t);
-    // "ack" en tritone (intervalle de tension)
-    setTimeout(() => _beep(scanFreqs[i] * 1.414, 0.025, "triangle", 0.10), t + 50);
-  });
+  // Drone sawtooth modulé par LFO — atmosphère sombre tremolo
+  const drone = ctx.createOscillator();
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  const gain = ctx.createGain();
 
-  // Phase 3 (~2150ms) : READY — bip GRAVE long (pas aigu joyeux) + click aigu
-  setTimeout(() => _beep(220, 0.20, "square", 0.22), 2150);  // A3 grave
-  setTimeout(() => _beep(311, 0.03, "triangle", 0.13), 2330); // Eb4 tritone
+  drone.type = "sawtooth";
+  drone.frequency.value = 110;
+  lfo.type = "sine";
+  lfo.frequency.value = 7;
+  lfoGain.gain.value = 35;
 
-  // Phase 4 (~2900ms) : BeTime — DESCENTE inquiétante (chute finale)
-  setTimeout(() => _beep(660, 0.05, "square", 0.20), 2900);
-  setTimeout(() => _beep(523, 0.05, "square", 0.20), 2970);
-  setTimeout(() => _beep(415, 0.12, "square", 0.24), 3040);  // Ab4 — ton sombre final
+  lfo.connect(lfoGain);
+  lfoGain.connect(drone.frequency);
 
-  // Glitch sawtooth aléatoires (très courts, ambiance hostile)
-  for (let i = 0; i < 4; i++) {
-    setTimeout(() => {
-      _beep(1700 + Math.random() * 1000, 0.012, "sawtooth", 0.09);
-    }, 350 + i * 700 + Math.random() * 150);
-  }
+  gain.gain.setValueAtTime(0.06, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 4);
+
+  drone.connect(gain);
+  gain.connect(_audioGainMaster);
+
+  lfo.start(now);
+  drone.start(now);
+  lfo.stop(now + 4);
+  drone.stop(now + 4);
 }
 
 // Alias pour compat
