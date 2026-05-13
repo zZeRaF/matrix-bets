@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-x";
+      var APP_VERSION = "20260513-y";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -72,7 +72,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-x</div>
+      <div class="splash-version" id="splash-version">build 20260513-y</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -199,16 +199,7 @@
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         // updateViaCache: 'none' force le navigateur à toujours vérifier sw.js
-        // sur le serveur (sans utiliser son cache HTTP) → mise à jour rapide
         navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).catch(() => {});
-      });
-      // SW peut demander un reload quand une nouvelle version s'active
-      let _reloading = false;
-      navigator.serviceWorker.addEventListener("message", (e) => {
-        if (e.data && e.data.type === "RELOAD_FOR_UPDATE" && !_reloading) {
-          _reloading = true;
-          window.location.reload();
-        }
       });
     }
   </script>

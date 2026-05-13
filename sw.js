@@ -4,7 +4,7 @@
 //   - data/*.json : NETWORK-FIRST
 //   - reste (CSS/JS/icons) : CACHE-FIRST avec bumping de version
 
-const CACHE_NAME = "betime-v7";
+const CACHE_NAME = "betime-v8";
 const STATIC_ASSETS = [
   "./manifest.webmanifest",
   "./styles/matrix.css",
@@ -33,23 +33,15 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     Promise.all([
-      // Supprime tous les anciens caches
       caches.keys().then((names) =>
         Promise.all(
           names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))
         )
       ),
-      // Prend immédiatement le contrôle des clients (onglets ouverts)
       self.clients.claim(),
-    ]).then(() => {
-      // Si un SW remplaçait un ancien SW actif, on notifie les clients de reload
-      // pour qu'ils prennent la nouvelle version sans attendre un refresh manuel
-      return self.clients.matchAll({ type: "window" }).then((clients) => {
-        clients.forEach((client) => {
-          client.postMessage({ type: "RELOAD_FOR_UPDATE", cache: CACHE_NAME });
-        });
-      });
-    })
+    ])
+    // PAS de reload forcé des clients : le fetch handler network-first sur le HTML
+    // suffit à servir la dernière version au prochain chargement naturel.
   );
 });
 
