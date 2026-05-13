@@ -118,7 +118,7 @@ function app() {
       // Total       : 7000ms
 
       // Typewriter du titre
-      const title = "MATRIX BETS";
+      const title = "$MATRIX BETS$";
       for (let i = 1; i <= title.length; i++) {
         this.splashTitle = title.slice(0, i);
         await sleep(80);
