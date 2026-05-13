@@ -6,7 +6,7 @@
 
 const CACHE_NAME = "betime-v25";
 const STATIC_ASSETS = [
-  "./manifest.webmanifest",
+  "./manifest-v3.webmanifest",
   "./styles/matrix.css",
   "./js/app.js",
   "./icons/app-icon-192-v3.png",
