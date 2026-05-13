@@ -595,7 +595,7 @@ body {
 .lucarne-target {
   stroke: var(--mx-orange);
   fill: none;
-  animation: lucarne-blink 2s linear infinite, lucarne-zoom 20s infinite;
+  animation: lucarne-blink 2s linear infinite, lucarne-zoom 7s infinite;
 }
 .lucarne-inner {
   animation: lucarne-inner-pulse 0.7s steps(2) infinite;
@@ -618,7 +618,7 @@ body {
 /* ── FILET ── ondulation à l'impact (phase but : 80-90%) */
 .goal-net {
   transform-origin: 200px 95px;
-  animation: net-shake 20s infinite;
+  animation: net-shake 7s infinite;
 }
 @keyframes net-shake {
   0%, 80%   { transform: none; opacity: 0.5; }
@@ -633,7 +633,7 @@ body {
 /* ── FLASH IMPACT LUCARNE ── (à 80%) */
 .lucarne-flash {
   opacity: 0;
-  animation: lucarne-flash-impact 20s infinite;
+  animation: lucarne-flash-impact 7s infinite;
 }
 @keyframes lucarne-flash-impact {
   0%, 79.5%  { opacity: 0; r: 0; }
@@ -655,7 +655,7 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: robot-action 20s infinite cubic-bezier(.4, .1, .6, .9);
+  animation: robot-action 7s infinite cubic-bezier(.4, .1, .6, .9);
   transform-origin: center bottom;
 }
 .scene-robot {
@@ -664,7 +664,7 @@ body {
   max-height: 100%;
   object-fit: contain;
   object-position: bottom center;
-  animation: robot-charge 20s infinite;
+  animation: robot-charge 7s infinite;
 }
 /* Aura FLUIDE PERMANENTE pendant toute l'action */
 .electric-aura {
@@ -673,7 +673,7 @@ body {
   background: radial-gradient(ellipse at center, rgba(0, 255, 102, 0.5) 0%, transparent 60%);
   filter: blur(10px);
   opacity: 0.5;
-  animation: aura-fluid 20s infinite;
+  animation: aura-fluid 7s infinite;
   pointer-events: none;
 }
 /* Éclairs CONTINUS (pulse fluide) */
@@ -683,7 +683,7 @@ body {
   width: 100%;
   height: 100%;
   opacity: 0.6;
-  animation: bolts-fluid 20s infinite;
+  animation: bolts-fluid 7s infinite;
   pointer-events: none;
 }
 .bolt {
@@ -808,7 +808,7 @@ body {
 /* ── DÉFENSEUR 1 — devant le but, dribblé entre 30-40% ── */
 .defender-robot {
   transform-origin: 200px 175px;
-  animation: defender1-action 20s infinite cubic-bezier(.3, .2, .7, .9);
+  animation: defender1-action 7s infinite cubic-bezier(.3, .2, .7, .9);
 }
 @keyframes defender1-action {
   /* Visible dès que le robot s'approche, puis dribblé */
@@ -828,7 +828,7 @@ body {
 /* ── DÉFENSEUR 2 — apparaît plus proche du but, dribblé entre 52.5-62.5% ── */
 .defender-robot-2 {
   transform-origin: 200px 175px;
-  animation: defender2-action 20s infinite cubic-bezier(.3, .2, .7, .9);
+  animation: defender2-action 7s infinite cubic-bezier(.3, .2, .7, .9);
 }
 @keyframes defender2-action {
   0%, 47%        { opacity: 0; transform: scale(0.6) translateY(20px); }
@@ -847,7 +847,7 @@ body {
 /* ── GARDIEN — plonge à droite (le ballon va en lucarne haut-gauche) entre 70-80% ── */
 .keeper-robot {
   transform-origin: 200px 95px;
-  animation: keeper-dive 20s infinite cubic-bezier(.5, .2, .7, .9);
+  animation: keeper-dive 7s infinite cubic-bezier(.5, .2, .7, .9);
 }
 @keyframes keeper-dive {
   0%, 70%        { transform: none; }
@@ -858,8 +858,8 @@ body {
   90%            { transform: translateX(28px) translateY(22px) rotate(75deg); }
   96%, 100%      { transform: none; }
 }
-.keeper-arm-l { transform-origin: 188px 91px; animation: keeper-arm-l 20s infinite; }
-.keeper-arm-r { transform-origin: 211px 91px; animation: keeper-arm-r 20s infinite; }
+.keeper-arm-l { transform-origin: 188px 91px; animation: keeper-arm-l 7s infinite; }
+.keeper-arm-r { transform-origin: 211px 91px; animation: keeper-arm-r 7s infinite; }
 @keyframes keeper-arm-l {
   0%, 70%, 96%, 100% { transform: none; }
   76%, 90%           { transform: rotate(-20deg); }
@@ -872,7 +872,7 @@ body {
 /* ── BALLON ── reste au pied pendant course/dribbles, décolle à la frappe ── */
 .scene-ball-anim {
   filter: drop-shadow(0 0 6px rgba(0, 255, 102, 0.9));
-  animation: ball-action 20s infinite cubic-bezier(.3, .1, .7, .9);
+  animation: ball-action 7s infinite cubic-bezier(.3, .1, .7, .9);
   transform-origin: 200px 232px;
 }
 @keyframes ball-action {
@@ -927,7 +927,7 @@ body {
   stroke-dasharray: 400;
   stroke-dashoffset: 400;
   filter: drop-shadow(0 0 6px rgba(0, 255, 102, 0.9));
-  animation: trail-draw 20s infinite cubic-bezier(.3, 0, .7, 1);
+  animation: trail-draw 7s infinite cubic-bezier(.3, 0, .7, 1);
 }
 @keyframes trail-draw {
   0%, 69%        { stroke-dashoffset: 400; opacity: 0; }
@@ -940,10 +940,10 @@ body {
 
 /* ── LIGNES DE VITESSE — actives pendant les phases de course (17-30%, 40-52%) ── */
 .speed-lines line { opacity: 0; }
-.sl-1 { animation: speed-line 20s infinite; animation-delay: 0s; }
-.sl-2 { animation: speed-line 20s infinite; animation-delay: 0.1s; }
-.sl-3 { animation: speed-line 20s infinite; animation-delay: 0.05s; }
-.sl-4 { animation: speed-line 20s infinite; animation-delay: 0.15s; }
+.sl-1 { animation: speed-line 7s infinite; animation-delay: 0s; }
+.sl-2 { animation: speed-line 7s infinite; animation-delay: 0.1s; }
+.sl-3 { animation: speed-line 7s infinite; animation-delay: 0.05s; }
+.sl-4 { animation: speed-line 7s infinite; animation-delay: 0.15s; }
 @keyframes speed-line {
   /* Pulse pendant course #1, course #2 et course #3 (pénétration) */
   0%, 17%        { opacity: 0; transform: translateX(0); }
@@ -970,7 +970,7 @@ body {
   letter-spacing: 0.3em;
   text-shadow: 0 0 16px var(--mx-green-bright), 0 0 32px rgba(0, 255, 102, 0.6);
   opacity: 0;
-  animation: goal-text-pop 20s infinite;
+  animation: goal-text-pop 7s infinite;
   pointer-events: none;
 }
 @keyframes goal-text-pop {
