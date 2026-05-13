@@ -82,19 +82,21 @@ h2 { border-bottom-color: #216037 !important; }
   background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important;
 }
 
-/* Bars / pills */
+/* Bars / pills — règle MATRIX : tout fond vif → texte noir */
 .bar-container { background: #001800 !important; border: 1px solid #195A2D !important; }
 .bar-home { background: #00FF66 !important; color: #000 !important; }
 .bar-away { background: #FFC000 !important; color: #000 !important; }
 .match-pill.W { background: #00FF66 !important; color: #000 !important; }
 .match-pill.D { background: #FFC000 !important; color: #000 !important; }
-.match-pill.L { background: #FF1B1B !important; color: #FFF !important; }
-.status-absent { background: #FF1B1B !important; color: #FFF !important; }
+.match-pill.L { background: #FF1B1B !important; color: #000 !important; }
+.match-pill .score { color: #000 !important; opacity: 0.75 !important; }
+.status-absent { background: #FF1B1B !important; color: #000 !important; }
 .status-incertain { background: #FFC000 !important; color: #000 !important; }
 
-/* Tables (héritées) */
+/* Tables (héritées) — PAS de color !important sur td (sinon override les color:#000 inline des fonds vifs).
+   La couleur par défaut #FFF reste portée par le CSS d'origine du template sur fond sombre. */
 table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
-table td { color: #FFF !important; border-color: #195A2D !important; }
+table td { border-color: #195A2D !important; }
 
 /* Tags */
 .tag { color: #00FF66 !important; }
