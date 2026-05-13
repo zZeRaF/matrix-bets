@@ -16,6 +16,32 @@
 </head>
 <body x-data="app()" x-init="init()">
 
+  <!-- ─── SPLASH SCREEN (style MATRIX) ─── -->
+  <div id="splash" class="splash" :class="{ 'splash-fade': splashFading }" x-show="showSplash" x-cloak>
+    <canvas id="matrix-rain"></canvas>
+    <div class="splash-content">
+      <div class="splash-logo">
+        <span class="splash-prompt">$_</span>
+        <span class="splash-brand">
+          <span class="splash-typewriter" x-text="splashTitle"></span><span class="cursor"></span>
+        </span>
+      </div>
+      <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
+      <ul class="splash-log">
+        <template x-for="(line, idx) in splashLog" :key="idx">
+          <li class="splash-log-line">
+            <span class="splash-log-arrow">&gt;</span>
+            <span class="splash-log-text" x-text="line.text"></span>
+            <span class="splash-log-status" :class="line.status" x-text="line.status === 'ok' ? '[ OK ]' : '[…]'"></span>
+          </li>
+        </template>
+      </ul>
+      <div class="splash-progress">
+        <div class="splash-progress-bar" :style="{ width: splashProgress + '%' }"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── HEADER STICKY : Bankroll + date ─── -->
   <header class="topbar">
     <div class="brand">
