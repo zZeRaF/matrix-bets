@@ -216,20 +216,20 @@ def _matrix_ball(size_px: int) -> Image.Image:
 
 
 def _draw_orbit_rings(img: Image.Image, cx: int, cy: int, ball_diam: int) -> None:
-    """Anneaux elliptiques inclinés autour du ballon — style orbite planétaire / traînée
-    de vitesse. Mélange vert MATRIX + touche rouge sombre pour harmonie subtile."""
+    """Anneaux elliptiques inclinés autour du ballon — style traînée vitesse / orbite.
+    Boostés (épaisseur + alpha) pour rester lisibles à 180×180 (apple-touch-icon)."""
     # Spec : (rx_mult, ry_mult, angle°, width, alpha, blur, RGB)
     rings = [
-        (1.55, 0.40, -32, 4, 200, 5, (0, 220, 90)),    # large vert vif, fort blur
-        (1.40, 0.34, -22, 3, 175, 3, (0, 190, 75)),    # moyen vert
-        (1.25, 0.28, -12, 3, 160, 2, (60, 200, 100)),  # serré vert pastel
-        (1.50, 0.38, -28, 2, 110, 4, (80, 15, 15)),    # touche rouge sombre
-        (1.60, 0.42, -36, 2, 90,  6, (40, 170, 70)),   # halo diffus extérieur
+        (1.85, 0.45, -32, 7, 255, 2, (0, 230, 100)),   # gros anneau vert vif, peu de blur
+        (1.65, 0.38, -22, 6, 240, 1, (0, 200, 80)),    # moyen vert net
+        (1.40, 0.30, -12, 5, 230, 1, (80, 220, 110)),  # serré vert pastel net
+        (1.75, 0.42, -28, 5, 200, 3, (120, 30, 30)),   # rouge sombre plus visible
+        (1.95, 0.48, -38, 4, 180, 4, (40, 180, 80)),   # halo diffus extérieur
     ]
     for (rx_mult, ry_mult, angle, width, alpha, blur, color) in rings:
         rx = int(ball_diam * rx_mult / 2)
         ry = int(ball_diam * ry_mult / 2)
-        margin = max(rx, ry) + 24
+        margin = max(rx, ry) + 32
         layer = Image.new("RGBA", (margin * 2, margin * 2), (0, 0, 0, 0))
         ld = ImageDraw.Draw(layer)
         ld.ellipse([margin - rx, margin - ry, margin + rx, margin + ry],
@@ -243,12 +243,12 @@ def _draw_orbit_rings(img: Image.Image, cx: int, cy: int, ball_diam: int) -> Non
 
 
 def _paste_matrix_ball(img: Image.Image) -> None:
-    """Colle anneaux d'orbite (derrière) puis ballon Matrix (devant).
-    Position bas-gauche, diamètre = S × 0.15."""
+    """Anneaux d'orbite (derrière) puis ballon Matrix (devant).
+    Diamètre augmenté à S × 0.22 pour rester visible à 180px."""
     S = img.size[0]
-    cx = int(S * 0.18)
-    cy = int(S * 0.78)
-    diam = int(S * 0.15)
+    cx = int(S * 0.20)
+    cy = int(S * 0.76)
+    diam = int(S * 0.22)
     _draw_orbit_rings(img, cx, cy, diam)
     ball = _matrix_ball(diam)
     img.alpha_composite(ball, (cx - diam // 2, cy - diam // 2))
