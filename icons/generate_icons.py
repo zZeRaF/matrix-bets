@@ -197,28 +197,59 @@ def _draw_hud_frame(img: Image.Image) -> None:
 
 
 def _matrix_ball(size_px: int) -> Image.Image:
-    """Charge le ballon photoréaliste électrique (bleu) et le retourne en ton vert MATRIX
-    via rotation hue HSV. L'aura électrique source est préservée, juste recoloriée."""
+    """Charge le ballon photoréaliste électrique (bleu) → ton vert MATRIX désaturé
+    pour s'harmoniser avec le vert global de l'image (juste un peu différencié)."""
     src = Image.open(SOURCE_BALL).convert("RGBA")
     src = src.resize((size_px, size_px), Image.LANCZOS)
     r, g, b, a = src.split()
     rgb = Image.merge("RGB", (r, g, b))
     hsv = rgb.convert("HSV")
     h, s, v = hsv.split()
-    # Bleu hue ~170/255 → Vert hue ~85/255 : rotation de -85 (cyan-vert MATRIX)
+    # Bleu hue ~170/255 → Vert hue ~85/255 : rotation de -85
     h_shifted = h.point(lambda x: (x - 85) % 256)
     rgb_green = Image.merge("HSV", (h_shifted, s, v)).convert("RGB")
     r2, g2, b2 = rgb_green.split()
-    return Image.merge("RGBA", (r2, g2, b2, a))
+    out = Image.merge("RGBA", (r2, g2, b2, a))
+    # Désaturation pour rapprocher du vert global (qui est moins saturé que le bleu source)
+    out = ImageEnhance.Color(out).enhance(0.6)
+    return out
+
+
+def _draw_orbit_rings(img: Image.Image, cx: int, cy: int, ball_diam: int) -> None:
+    """Anneaux elliptiques inclinés autour du ballon — style orbite planétaire / traînée
+    de vitesse. Mélange vert MATRIX + touche rouge sombre pour harmonie subtile."""
+    # Spec : (rx_mult, ry_mult, angle°, width, alpha, blur, RGB)
+    rings = [
+        (1.55, 0.40, -32, 4, 200, 5, (0, 220, 90)),    # large vert vif, fort blur
+        (1.40, 0.34, -22, 3, 175, 3, (0, 190, 75)),    # moyen vert
+        (1.25, 0.28, -12, 3, 160, 2, (60, 200, 100)),  # serré vert pastel
+        (1.50, 0.38, -28, 2, 110, 4, (80, 15, 15)),    # touche rouge sombre
+        (1.60, 0.42, -36, 2, 90,  6, (40, 170, 70)),   # halo diffus extérieur
+    ]
+    for (rx_mult, ry_mult, angle, width, alpha, blur, color) in rings:
+        rx = int(ball_diam * rx_mult / 2)
+        ry = int(ball_diam * ry_mult / 2)
+        margin = max(rx, ry) + 24
+        layer = Image.new("RGBA", (margin * 2, margin * 2), (0, 0, 0, 0))
+        ld = ImageDraw.Draw(layer)
+        ld.ellipse([margin - rx, margin - ry, margin + rx, margin + ry],
+                   outline=(*color, alpha), width=width)
+        layer = layer.rotate(angle, resample=Image.BICUBIC)
+        if blur:
+            layer = layer.filter(ImageFilter.GaussianBlur(radius=blur))
+        paste_x = cx - layer.size[0] // 2
+        paste_y = cy - layer.size[1] // 2
+        img.alpha_composite(layer, (paste_x, paste_y))
 
 
 def _paste_matrix_ball(img: Image.Image) -> None:
-    """Colle le ballon Matrix à la position de l'ancien dessin (bas-gauche).
-    Diamètre = 2 × ancien r = S × 0.15 (= dimension du rond actuel)."""
+    """Colle anneaux d'orbite (derrière) puis ballon Matrix (devant).
+    Position bas-gauche, diamètre = S × 0.15."""
     S = img.size[0]
     cx = int(S * 0.18)
     cy = int(S * 0.78)
     diam = int(S * 0.15)
+    _draw_orbit_rings(img, cx, cy, diam)
     ball = _matrix_ball(diam)
     img.alpha_composite(ball, (cx - diam // 2, cy - diam // 2))
 
