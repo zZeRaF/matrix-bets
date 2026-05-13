@@ -102,9 +102,9 @@ def _enhance_eyes(img: Image.Image) -> Image.Image:
     out = img.convert("RGBA")
     w, h = out.size
 
-    # Coordonnées des yeux — décalées de +10% vers la droite à la demande utilisateur
-    eye_left = (int(w * 0.616), int(h * 0.218))   # +0.10 en x
-    eye_right = (int(w * 0.765), int(h * 0.225))  # +0.10 en x
+    # Ajustement final : œil gauche -3% en x, œil droit -5% en x (rapprochés)
+    eye_left = (int(w * 0.586), int(h * 0.218))
+    eye_right = (int(w * 0.715), int(h * 0.225))
 
     # Couche 1 : Halo très large vert (atmosphère)
     halo_far = Image.new("RGBA", (w, h), (0, 0, 0, 0))
