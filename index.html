@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-s";
+      var APP_VERSION = "20260513-t";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -64,15 +64,7 @@
     <div class="splash-error">! SYSTEM CORRUPTED !</div>
     <!-- Flash WARNING orange -->
     <div class="splash-warning">⚠ ANOMALY DETECTED</div>
-    <!-- Bouton SKIP (apparaît après 3s) -->
-    <button class="splash-skip" x-show="splashSkipAvailable" @click="skipSplash()">
-      SKIP <span class="skip-arrow">→</span>
-    </button>
-    <!-- Bouton AUDIO (apparaît au lancement, ou tap n'importe où sur le splash) -->
-    <button class="splash-audio-toggle" x-show="!audioStarted && audioAvailable" @click.stop="enableAudio()">
-      <span class="audio-icon">▶</span> <span>TAP POUR LE SON</span>
-    </button>
-    <!-- Audio element (source ajoutée dynamiquement si présent) -->
+    <!-- (Boutons SKIP et SON retirés — tap n'importe où sur le splash active l'audio) -->
     <audio id="splash-audio" preload="auto"></audio>
     <div class="splash-content">
       <div class="splash-logo">
@@ -81,7 +73,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-s</div>
+      <div class="splash-version" id="splash-version">build 20260513-t</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">

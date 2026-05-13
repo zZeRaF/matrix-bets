@@ -70,38 +70,44 @@ function playHackSequence() {
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
 
-  // Phase 1 (0-600ms) : typewriter — 12 bips aigus rapides (1 par lettre du titre)
-  for (let i = 0; i < 12; i++) {
+  // === SONS AIGUS INQUIÉTANTS STYLE HACKER MOVIE ===
+  // Sawtooth métallique + fréquences 1800-4200 Hz + intervalles dissonants
+
+  // Phase 1 (0-600ms) : rafale de bips aigus pendant le typewriter
+  for (let i = 0; i < 14; i++) {
     setTimeout(() => {
-      const f = 1100 + (Math.random() - 0.5) * 400;
-      _beep(f, 0.025, "square", 0.04);
-    }, 30 + i * 50);
+      const f = 2200 + Math.random() * 1500;
+      _beep(f, 0.018 + Math.random() * 0.015, "sawtooth", 0.035);
+    }, 20 + i * 42);
   }
 
-  // Phase 2 (700-2100ms) : 6 log lines — chaque ligne = beep mid + "static"
+  // Phase 2 (700-2100ms) : log lines — bips dissonants (intervalles non-harmoniques)
   const logTimings = [700, 920, 1140, 1390, 1650, 1900];
-  const logFreqs = [520, 580, 640, 700, 760, 880];
+  const logFreqs = [1800, 2100, 1950, 2300, 2050, 2500];
   logTimings.forEach((t, i) => {
-    setTimeout(() => {
-      _beep(logFreqs[i], 0.06, "square", 0.05);
-      _noise(0.05, 0.018, 1500 + i * 200);
-    }, t);
-    // "OK" beep aigu 50ms plus tard
-    setTimeout(() => _beep(logFreqs[i] * 2.4, 0.04, "sine", 0.035), t + 60);
+    setTimeout(() => _beep(logFreqs[i], 0.05, "sawtooth", 0.04), t);
+    // Echo aigu décalé (tritone-ish) pour ambiance malaise
+    setTimeout(() => _beep(logFreqs[i] * 1.41, 0.035, "triangle", 0.025), t + 28);
   });
 
-  // Phase 3 (~2100ms) : READY confirmé — slide ascendant majeur
-  setTimeout(() => _beep(440, 0.18, "square", 0.07, 1320), 2100);
-  setTimeout(() => _beep(880, 0.12, "sine", 0.05), 2280);
+  // Phase 3 (~2100ms) : READY — alerte ascendante rapide
+  setTimeout(() => _beep(1500, 0.08, "sawtooth", 0.05, 2800), 2100);
+  setTimeout(() => _beep(3200, 0.05, "triangle", 0.04), 2200);
 
-  // Phase 4 (~2900ms) : "BeTime" apparaît — accord harmonique
-  setTimeout(() => _beep(523, 0.25, "sine", 0.05), 2900);    // do
-  setTimeout(() => _beep(659, 0.25, "sine", 0.045), 2950);   // mi
-  setTimeout(() => _beep(784, 0.30, "sine", 0.04), 3000);    // sol
+  // Phase 4 (~2900ms) : $BeTime$ — accord tendu (tritone dissonant)
+  setTimeout(() => _beep(2000, 0.22, "sawtooth", 0.038), 2900);
+  setTimeout(() => _beep(2828, 0.22, "triangle", 0.028), 2920);
 
-  // Background : static de fond tout le long (4s)
-  for (let i = 0; i < 8; i++) {
-    setTimeout(() => _noise(0.4, 0.008, 600 + Math.random() * 800), i * 500);
+  // Bips de surprise aléatoires (style "system intrusion detected")
+  setTimeout(() => _beep(4100, 0.035, "sine", 0.055), 1450);
+  setTimeout(() => _beep(3800, 0.04, "sine", 0.05), 2380);
+  setTimeout(() => _beep(3500, 0.03, "triangle", 0.045), 3400);
+
+  // Static crackling aléatoire de fond (atmosphère)
+  for (let i = 0; i < 14; i++) {
+    setTimeout(() => {
+      _noise(0.06 + Math.random() * 0.04, 0.011, 2200 + Math.random() * 1800);
+    }, Math.random() * 3800);
   }
 }
 
