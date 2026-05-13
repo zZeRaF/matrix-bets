@@ -224,6 +224,9 @@ function app() {
       this.splashFading = true;
       await sleep(600);
       this.showSplash = false;
+      // Force-hide en plus de x-show au cas où Alpine traîne
+      const splashEl = document.getElementById("splash");
+      if (splashEl) splashEl.style.display = "none";
       if (this._splashStopRain) this._splashStopRain();
       if (window.stopThreeScene) window.stopThreeScene();
     },

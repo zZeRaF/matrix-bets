@@ -2,7 +2,7 @@
 // Stratégie : network-first pour les JSON data (toujours fresh),
 // cache-first pour les assets statiques (HTML/CSS/JS/icons).
 
-const CACHE_NAME = "matrix-bets-v3";
+const CACHE_NAME = "matrix-bets-v4";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
@@ -19,9 +19,15 @@ const STATIC_ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll(STATIC_ASSETS).catch(() => {
-        // tolère si certains assets ne sont pas encore présents
-      })
+      // cache.add individuel + catch par asset : si un fichier 404,
+      // on ignore juste celui-là (au lieu de bloquer toute l'install).
+      Promise.all(
+        STATIC_ASSETS.map((url) =>
+          cache.add(url).catch((e) => {
+            console.warn("[sw] skip cache for", url, e.message);
+          })
+        )
+      )
     )
   );
   self.skipWaiting();
