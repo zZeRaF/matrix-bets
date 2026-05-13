@@ -237,13 +237,19 @@ function saveStoredState(state) {
 }
 
 // ─── Matrix Rain (canvas) ───
-function startMatrixRain(canvas) {
+// useClientSize=true : remplit le canvas selon sa taille DOM (pas fullscreen)
+function startMatrixRain(canvas, useClientSize = false) {
   const ctx = canvas.getContext("2d");
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
+  const getSize = () => useClientSize
+    ? [canvas.clientWidth || 1, canvas.clientHeight || 1]
+    : [window.innerWidth, window.innerHeight];
+  let [w, h] = getSize();
+  canvas.width = w;
+  canvas.height = h;
   const onResize = () => {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
+    [w, h] = getSize();
+    canvas.width = w;
+    canvas.height = h;
   };
   window.addEventListener("resize", onResize);
 
@@ -458,9 +464,25 @@ function app() {
       this.closeSplash();
     },
 
+    startSideRains() {
+      // Démarre les 2 pluies latérales (cachées en CSS sur mobile, donc skip si pas affiché)
+      const left = document.getElementById("rain-left");
+      const right = document.getElementById("rain-right");
+      if (left && left.clientWidth > 0 && !left._rainStarted) {
+        startMatrixRain(left, true);
+        left._rainStarted = true;
+      }
+      if (right && right.clientWidth > 0 && !right._rainStarted) {
+        startMatrixRain(right, true);
+        right._rainStarted = true;
+      }
+    },
+
     async closeSplash() {
       if (this.splashFading) return;
       this.splashFading = true;
+      // Lance les pluies latérales pendant que le splash fade out
+      this.startSideRains();
 
       // Fade out audio via volume property (sync avec fade visuel 600ms)
       const audio = document.getElementById("splash-audio");

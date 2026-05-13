@@ -1291,3 +1291,32 @@ body {
     transform: translateX(-50%);
   }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   PLUIES MATRIX LATÉRALES — décor permanent autour du contenu
+   Cachées sur mobile (pas de place hors de la zone paris)
+   ════════════════════════════════════════════════════════════════ */
+.side-rain {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: calc((100vw - 720px) / 2);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.side-rain-left  { left: 0; }
+.side-rain-right { right: 0; }
+
+@media (min-width: 900px) {
+  .side-rain { display: block; }
+}
+/* Au-delà de ~1200px : largeur des bandes augmente naturellement, mais on garde
+   le contenu central à 720px max. On bride à 200px max par côté pour éviter
+   un fond trop chargé sur très grands écrans. */
+@media (min-width: 1120px) {
+  .side-rain { width: 200px; }
+  .side-rain-right { right: calc(50% - 360px - 200px); right: clamp(0px, calc(50% - 560px), 1000px); }
+  .side-rain-left  { left: 0; }
+}
