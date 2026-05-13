@@ -345,8 +345,8 @@ function app() {
 
     async detectAudio() {
       this.audioAvailable = !!(window.AudioContext || window.webkitAudioContext);
-      // Cache-buster basé sur la date du jour pour forcer rechargement quotidien
-      const bust = Math.floor(Date.now() / 1000 / 3600); // change chaque heure
+      this._audioDetectionDone = false;
+      const bust = Math.floor(Date.now() / 1000 / 3600);
       const extensions = ["mp3", "m4a", "wav", "aac", "ogg"];
       for (const ext of extensions) {
         const url = `audio/intro.${ext}?v=${bust}`;
@@ -359,18 +359,25 @@ function app() {
           }
         } catch {}
       }
+      this._audioDetectionDone = true;
     },
 
-    enableAudio() {
+    async enableAudio() {
       if (this.audioStarted) return;
+      // Attendre que la détection du fichier audio soit terminée (max 1.5s)
+      // pour éviter de fallback sur le Codex synthétisé alors que le fichier
+      // perso est en cours de détection.
+      for (let i = 0; i < 30; i++) {
+        if (this._audioDetectionDone) break;
+        await sleep(50);
+      }
       const audio = document.getElementById("splash-audio");
       if (audio && audio.src) {
-        // Lecture HTMLAudioElement direct (pas de routing Web Audio qui peut
-        // muter l'audio si AudioContext est suspendu)
         audio.volume = 1.0;
         audio.play().then(() => {
           this.audioStarted = true;
-        }).catch(() => {
+        }).catch((e) => {
+          console.warn("Audio play failed:", e);
           this._playSynthSound();
         });
         return;
