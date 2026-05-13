@@ -423,8 +423,8 @@ function app() {
       }
       this.splashProgress = 100;
 
-      // Pause finale (montre "BeTime" sous la progression)
-      await sleep(1300);
+      // Pause finale (montre "BeTime" + laisse le pattern audio finir)
+      await sleep(2500);
       if (this._splashCancelled) return;
 
       this.closeSplash();
