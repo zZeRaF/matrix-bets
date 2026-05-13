@@ -429,6 +429,138 @@ body {
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* ============================================================
+   SCÈNE FOOT — robots qui dribblent + tir lucarne + plongeon
+   Cycle complet : 2.6s, joué 2 fois sur les ~5.2s du splash
+   ============================================================ */
+.splash-scene {
+  width: min(92vw, 380px);
+  height: clamp(120px, 28vw, 180px);
+  margin: 4px 0 -4px;
+  position: relative;
+}
+.scene-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 102, 0.4));
+}
+.scene-svg * { stroke: var(--mx-green-bright); fill: none; }
+.scene-svg .pitch-lines line { stroke-width: 1; }
+.scene-svg .goal line { fill: none; }
+.scene-svg rect { fill: rgba(0, 255, 102, 0.18); stroke-width: 1.5; }
+.scene-svg polygon { fill: var(--mx-green-bright); }
+.scene-svg .led { fill: var(--mx-green-bright); stroke: none; animation: led-blink 1.2s steps(2) infinite; }
+.scene-svg .goal-text {
+  fill: var(--mx-green-bright);
+  stroke: var(--mx-green-bright);
+  stroke-width: 0.3;
+  font-family: var(--mx-mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 102, 0.8));
+  animation: goal-text-flash 2.6s infinite;
+}
+.scene-svg .goal-flash {
+  fill: var(--mx-green-bright);
+  opacity: 0;
+  animation: goal-flash 2.6s infinite;
+}
+
+/* Attaquant : la jambe droite kick à t=1.0s */
+.attacker-kick-leg {
+  transform-origin: 87px 118px;
+  animation: kick 2.6s infinite cubic-bezier(.4, 0, .6, 1);
+}
+/* Défenseur : tourne sur lui-même quand attaquant le passe */
+.defender {
+  transform-origin: 202px 110px;
+  animation: defender-spin 2.6s infinite;
+}
+/* Gardien : plonge à droite (depuis la cage côté droite, plonge vers gauche écran) */
+.keeper {
+  transform-origin: 352px 100px;
+  animation: keeper-dive 2.6s infinite cubic-bezier(.5, .2, .7, .9);
+}
+.keeper-arm-left, .keeper-arm-right {
+  transform-origin: 352px 100px;
+}
+/* Ballon : dribble puis trajectoire courbe vers la lucarne haut-droite */
+.ball-wrapper {
+  animation: ball-path 2.6s infinite cubic-bezier(.3, .1, .7, .9);
+  filter: drop-shadow(0 0 4px rgba(0, 255, 102, 0.9));
+}
+.ball-wrapper .ball {
+  animation: ball-spin 0.4s linear infinite;
+  transform-origin: 105px 138px;
+}
+
+@keyframes kick {
+  0%, 30%   { transform: rotate(0deg); }
+  38%       { transform: rotate(-55deg); }
+  46%       { transform: rotate(-10deg); }
+  60%, 100% { transform: rotate(0deg); }
+}
+@keyframes defender-spin {
+  0%, 30%   { transform: rotate(0deg); }
+  45%       { transform: rotate(-180deg) scale(0.95); }
+  60%       { transform: rotate(-360deg) scale(1); }
+  100%      { transform: rotate(-360deg); }
+}
+@keyframes keeper-dive {
+  0%, 38%   { transform: translate(0, 0) rotate(0deg); }
+  55%       { transform: translate(-26px, 18px) rotate(-55deg); }
+  78%       { transform: translate(-26px, 18px) rotate(-55deg); }
+  92%, 100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes ball-path {
+  /* Dribble */
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-4px, -2px); }
+  20%  { transform: translate(4px, 0); }
+  30%  { transform: translate(0, 0); }
+  /* Frappe : trajectoire courbe vers la lucarne (haut-droite) */
+  38%  { transform: translate(50px, -30px); }
+  46%  { transform: translate(110px, -55px); }
+  54%  { transform: translate(180px, -75px); }
+  62%  { transform: translate(245px, -85px); }
+  /* Ballon dans la cage */
+  70%  { transform: translate(265px, -80px); }
+  90%  { transform: translate(265px, -80px); }
+  /* Reset position pour la boucle suivante */
+  100% { transform: translate(0, 0); }
+}
+@keyframes ball-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes goal-flash {
+  0%, 64% { opacity: 0; }
+  68%     { opacity: 0.9; }
+  74%     { opacity: 0.3; }
+  78%     { opacity: 0.7; }
+  88%     { opacity: 0.2; }
+  100%    { opacity: 0; }
+}
+@keyframes goal-text-flash {
+  0%, 66%  { opacity: 0; transform: scale(0.8); }
+  72%      { opacity: 1; transform: scale(1.15); }
+  80%      { opacity: 1; transform: scale(1); }
+  92%      { opacity: 0.8; }
+  100%     { opacity: 0; transform: scale(1); }
+}
+@keyframes led-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0.3; }
+}
+
+/* Pas d'animation si l'utilisateur préfère réduire les mouvements */
+@media (prefers-reduced-motion: reduce) {
+  .splash-scene { display: none; }
+}
+
 /* ─── DESKTOP RESPONSIVE ─── */
 @media (min-width: 720px) {
   body {

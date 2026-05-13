@@ -110,21 +110,28 @@ function app() {
         this._splashStopRain = startMatrixRain(canvas);
       }
 
+      // ── BUDGET TOTAL : 7000ms ──
+      // Typewriter title : 11 chars × 80ms = 880ms
+      // Steps log : 4400ms (cumul ci-dessous)
+      // Pause READY  : 1120ms
+      // Fade out    : 600ms
+      // Total       : 7000ms
+
       // Typewriter du titre
       const title = "MATRIX BETS";
       for (let i = 1; i <= title.length; i++) {
         this.splashTitle = title.slice(0, i);
-        await sleep(70);
+        await sleep(80);
       }
 
       // Log lines successives + progress
       const steps = [
-        { text: "INITIALISATION SHELL...", delay: 250 },
-        { text: "CONNEXION GITHUB PAGES...", delay: 250 },
-        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 350 },
-        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 350 },
-        { text: "CALCUL KELLY /4...", delay: 250 },
-        { text: "READY.", delay: 200 },
+        { text: "INITIALISATION SHELL...", delay: 700 },
+        { text: "CONNEXION GITHUB PAGES...", delay: 700 },
+        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 800 },
+        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 900 },
+        { text: "CALCUL KELLY /4...", delay: 700 },
+        { text: "READY.", delay: 600 },
       ];
       for (let i = 0; i < steps.length; i++) {
         this.splashLog.push({ text: steps[i].text, status: "wait" });
@@ -133,7 +140,7 @@ function app() {
         this.splashLog[i].status = "ok";
       }
       this.splashProgress = 100;
-      await sleep(400);
+      await sleep(1120);
 
       // Fade out + stop rain
       this.splashFading = true;

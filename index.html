@@ -27,6 +27,88 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
+
+      <!-- ── SCÈNE FOOT EN MODE ROBOT MATRIX ── -->
+      <div class="splash-scene" aria-hidden="true">
+        <svg viewBox="0 0 400 180" class="scene-svg" preserveAspectRatio="xMidYMid meet">
+          <!-- Lignes de terrain (perspective) -->
+          <g class="pitch-lines">
+            <line x1="0" y1="170" x2="400" y2="170" />
+            <line x1="0" y1="155" x2="400" y2="155" stroke-dasharray="4 4" opacity="0.5" />
+            <line x1="0" y1="140" x2="400" y2="140" stroke-dasharray="2 6" opacity="0.3" />
+          </g>
+
+          <!-- Cage de but (à droite) -->
+          <g class="goal">
+            <line x1="368" y1="40" x2="368" y2="170" stroke-width="2.5" />
+            <line x1="368" y1="40" x2="396" y2="40" stroke-width="2.5" />
+            <line x1="396" y1="40" x2="396" y2="170" stroke-width="2.5" />
+            <!-- Filet -->
+            <line x1="372" y1="45" x2="372" y2="170" opacity="0.4" />
+            <line x1="380" y1="45" x2="380" y2="170" opacity="0.4" />
+            <line x1="388" y1="45" x2="388" y2="170" opacity="0.4" />
+            <line x1="368" y1="55" x2="396" y2="55" opacity="0.4" />
+            <line x1="368" y1="85" x2="396" y2="85" opacity="0.4" />
+            <line x1="368" y1="115" x2="396" y2="115" opacity="0.4" />
+            <line x1="368" y1="145" x2="396" y2="145" opacity="0.4" />
+          </g>
+
+          <!-- Flash GOAL (apparaît à la fin du cycle) -->
+          <rect class="goal-flash" x="370" y="42" width="24" height="40" />
+
+          <!-- GARDIEN robot -->
+          <g class="keeper">
+            <!-- Tête robot avec antenne -->
+            <rect x="345" y="80" width="14" height="14" />
+            <rect x="349" y="76" width="6" height="4" />
+            <circle cx="349" cy="86" r="1" class="led" />
+            <circle cx="355" cy="86" r="1" class="led" />
+            <!-- Corps -->
+            <rect x="343" y="95" width="18" height="22" />
+            <!-- Bras (gants) -->
+            <rect x="335" y="98" width="10" height="5" class="keeper-arm-left" />
+            <rect x="359" y="98" width="10" height="5" class="keeper-arm-right" />
+            <!-- Jambes -->
+            <rect x="345" y="118" width="5" height="14" />
+            <rect x="354" y="118" width="5" height="14" />
+          </g>
+
+          <!-- DÉFENSEUR robot -->
+          <g class="defender">
+            <rect x="195" y="80" width="14" height="14" />
+            <rect x="199" y="76" width="6" height="4" />
+            <circle cx="199" cy="86" r="1" class="led" />
+            <circle cx="205" cy="86" r="1" class="led" />
+            <rect x="193" y="95" width="18" height="22" />
+            <rect x="187" y="98" width="8" height="5" />
+            <rect x="211" y="98" width="8" height="5" />
+            <rect x="195" y="118" width="5" height="14" />
+            <rect x="204" y="118" width="5" height="14" />
+          </g>
+
+          <!-- ATTAQUANT robot -->
+          <g class="attacker">
+            <rect x="75" y="80" width="14" height="14" />
+            <rect x="79" y="76" width="6" height="4" />
+            <circle cx="79" cy="86" r="1" class="led" />
+            <circle cx="85" cy="86" r="1" class="led" />
+            <rect x="73" y="95" width="18" height="22" />
+            <rect x="67" y="98" width="8" height="5" />
+            <rect x="91" y="98" width="8" height="5" />
+            <rect x="75" y="118" width="5" height="14" />
+            <rect class="attacker-kick-leg" x="84" y="118" width="5" height="14" />
+          </g>
+
+          <!-- BALLON -->
+          <g class="ball-wrapper">
+            <polygon class="ball" points="100,135 105,131 110,135 110,141 105,145 100,141" />
+          </g>
+
+          <!-- Texte GOAL (apparaît à la fin) -->
+          <text class="goal-text" x="270" y="30" text-anchor="middle">GOAL.</text>
+        </svg>
+      </div>
+
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
           <li class="splash-log-line">
