@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<title>Kobe vs Kyoto — Analyse micro 5 zones</title>
+<style>
+:root {
+  --navy:#0E1A2C; --navy-deep:#070D17; --gold:#D4A340; --gold-dark:#B18329; --gold-light:#F4E5B8;
+  --success:#2EA04F; --warning:#E59A1B; --risk:#C7283D;
+  --paper:#FBFAF7; --ink:#1B1F26; --sub:#5C6573;
+  --home:#C8102E; --away:#0E3A8A;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Calibri,-apple-system,sans-serif}
+body{background:var(--paper);color:var(--ink);padding:24px;max-width:1280px;margin:auto;line-height:1.5}
+
+/* Cover */
+.cover{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-deep) 100%);color:white;padding:36px 32px;border-radius:14px;margin-bottom:28px;position:relative;overflow:hidden}
+.cover::after{content:'';position:absolute;right:0;top:0;width:8px;height:100%;background:var(--gold)}
+.eyebrow{color:var(--gold);font-weight:bold;font-size:12px;text-transform:uppercase;letter-spacing:1.4px}
+.cover h1{font-size:48px;margin:10px 0 6px;font-weight:800;line-height:1.05}
+.cover .subtitle{color:var(--gold);font-size:20px;margin-bottom:14px}
+.cover .meta{color:var(--gold-light);margin-top:12px;font-size:14px}
+.cover .vs{color:var(--gold)}
+
+/* Sections */
+h2{font-size:22px;margin:32px 0 14px;color:var(--navy);border-bottom:3px solid var(--gold);padding-bottom:8px;display:flex;align-items:center;gap:10px}
+h2 .step{background:var(--gold);color:var(--navy);padding:2px 10px;border-radius:4px;font-size:13px;font-weight:bold}
+
+/* Pitch image (compositions sur le terrain) */
+.pitch-image-wrap{background:#0B1424;padding:14px;border-radius:12px;text-align:center;color:white}
+.pitch-image-wrap .pitch-subtitle{color:var(--gold-light);font-style:italic;font-size:13px;margin-bottom:10px}
+.pitch-image-wrap img{max-width:100%;height:auto;border-radius:8px}
+
+/* Heatmap */
+.heatmap-wrap{background:white;padding:16px;border-radius:12px;border:1px solid #e5e0d3;text-align:center}
+.heatmap-wrap img{max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto}
+.heatmap-subtitle{font-size:13px;color:var(--sub);font-style:italic;margin-bottom:10px}
+.heatmap-legend{font-size:12px;color:var(--sub);margin-top:8px;font-style:italic}
+
+/* Verdict */
+.verdict-card{background:white;padding:24px;border-radius:12px;border-left:8px solid var(--gold);margin:14px 0;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.verdict-card.fav-home{border-left-color:var(--success);background:#F0FAF3}
+.verdict-card.fav-away{border-left-color:var(--risk);background:#FDF2F4}
+.verdict-card.neutral{border-left-color:var(--warning);background:#FFFBED}
+.verdict-card h3{font-size:24px;color:var(--navy);margin-bottom:6px}
+.verdict-card .conf{color:var(--sub);margin:6px 0 10px}
+.verdict-card .scores{font-size:14px}
+.verdict-card .detail{font-size:12px;color:var(--sub);margin-top:8px}
+
+/* 5 zones */
+.zones-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+.zone{display:grid;grid-template-columns:240px 1fr 90px;gap:14px;padding:14px;background:white;border-radius:8px;border-left:8px solid #ddd;align-items:center}
+.zone.win-home{border-left-color:var(--success);background:#F0FAF3}
+.zone.win-away{border-left-color:var(--risk);background:#FDF2F4}
+.zone.neutre{border-left-color:var(--warning);background:#FFFBED}
+.zone h3{font-size:15px;color:var(--navy);margin-bottom:3px}
+.zone .desc{font-size:11px;color:var(--sub)}
+.score-pill{padding:5px 10px;border-radius:6px;font-weight:bold;text-align:center;color:white;font-size:13px}
+.score-pill.home{background:var(--home)}
+.score-pill.away{background:var(--away)}
+.zone .scores{display:flex;justify-content:center;gap:6px;align-items:center;font-size:11px;color:var(--sub)}
+.zone .winner-tag{font-weight:bold;text-align:center;font-size:13px}
+.zone.win-home .winner-tag{color:var(--success)}
+.zone.win-away .winner-tag{color:var(--risk)}
+.zone.neutre .winner-tag{color:var(--warning)}
+
+/* Match openness */
+.openness-card{background:white;padding:20px;border-radius:12px;margin:14px 0;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.openness-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--gold)}
+.openness-header .verdict{font-size:20px;font-weight:bold;color:var(--navy)}
+.openness-header .score-circle{background:var(--navy);color:white;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold}
+.openness-recom{font-size:14px;color:var(--sub);margin-bottom:14px}
+.indicators{display:grid;grid-template-columns:1fr;gap:8px}
+.indicator{display:grid;grid-template-columns:1fr 220px 40px;gap:12px;padding:10px 14px;border-radius:6px;background:var(--paper);align-items:center}
+.indicator.active{background:#F0FAF3;border-left:4px solid var(--success)}
+.indicator .label{font-size:13px;color:var(--ink)}
+.indicator .detail{font-size:11px;color:var(--sub)}
+.indicator .check{font-size:20px;font-weight:bold;text-align:center}
+.indicator.active .check{color:var(--success)}
+.indicator:not(.active) .check{color:#bbb}
+
+/* Top 3 décisifs */
+.top3-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.top3-team{background:white;border-radius:10px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.top3-team.home{border-top:5px solid var(--home)}
+.top3-team.away{border-top:5px solid var(--away)}
+.top3-team h3{font-size:13px;color:var(--gold-dark);font-weight:bold;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.top3-team h4{font-size:18px;color:var(--navy);margin-bottom:12px}
+.top3-player{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid #eee;align-items:center}
+.top3-player:last-child{border-bottom:none}
+.top3-player .photo-wrap{width:60px;height:60px;border-radius:50%;background:#eee;overflow:hidden;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center}
+.top3-player .photo-wrap img{width:100%;height:100%;object-fit:cover}
+.top3-player .photo-wrap.no-photo{font-size:18px;color:var(--sub);font-weight:bold}
+.top3-player .info{display:flex;flex-direction:column}
+.top3-player .name{font-weight:bold;color:var(--ink);font-size:15px}
+.top3-player .pos{color:var(--sub);font-size:11px}
+.top3-player .stats{font-size:12px;color:var(--ink);margin-top:3px}
+.top3-player .profile{font-size:11px;color:var(--gold-dark);font-style:italic;margin-top:2px}
+
+/* Méthode */
+.method-section{background:white;padding:16px 22px;margin:10px 0;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.method-section h3{color:var(--gold-dark);font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.method-section p{font-size:13px;color:var(--ink)}
+
+@media print{body{padding:8px;max-width:100%}.cover{box-shadow:none}}
+</style><style>
+/* === MATRIX OVERLAY (injection PWA) === */
+:root {
+  --paper: #001000 !important; --ink: #82FFB4 !important;
+  --navy: #00FF66 !important; --navy-deep: #000800 !important;
+  --sub: #5D8C6E !important; --gold-light: #82FFB4 !important;
+  --success: #00FF66 !important; --warning: #FFC000 !important; --risk: #FF1B1B !important;
+  --home: #00FF66 !important; --away: #FFC000 !important;
+}
+html, body {
+  background: #001000 !important;
+  color: #82FFB4 !important;
+  font-family: Consolas, "Courier New", monospace, -apple-system !important;
+}
+h1, h2, h3, h4, h5 { color: #00FF66 !important; }
+h2 { border-bottom-color: #216037 !important; }
+.cover { background: linear-gradient(135deg,#001a08 0%,#000800 100%) !important; }
+.eyebrow, .subtitle, .cover .meta { color: #D4A340 !important; }
+
+/* Cartes / blocs : fond foncé matrix */
+.verdict-card, .indicator, .article-card, .unavail-card,
+.method-section, .heatmap-wrap, .pitch-image-wrap,
+.matrix .row, .bar-row, .tag {
+  background: rgba(0, 26, 8, 0.95) !important;
+  color: #82FFB4 !important;
+  border-color: #216037 !important;
+}
+.verdict-card { box-shadow: 0 2px 8px rgba(0, 255, 102, 0.08) !important; }
+.matrix .row { border-left-color: #216037 !important; }
+.matrix .row.active { background: rgba(80, 56, 0, 0.4) !important; border-left-color: #D4A340 !important; }
+
+/* Cells favorabilité */
+.cat-grid.win-home, .verdict-card.fav-home {
+  background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important;
+}
+.cat-grid.win-away, .verdict-card.fav-away {
+  background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important;
+}
+.cat-grid.neutre, .verdict-card.neutral {
+  background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important;
+}
+
+/* Bars / pills — règle MATRIX : tout fond vif → texte noir */
+.bar-container { background: #001800 !important; border: 1px solid #195A2D !important; }
+.bar-home { background: #00FF66 !important; color: #000 !important; }
+.bar-away { background: #FFC000 !important; color: #000 !important; }
+.match-pill.W { background: #00FF66 !important; color: #000 !important; }
+.match-pill.D { background: #FFC000 !important; color: #000 !important; }
+.match-pill.L { background: #FF1B1B !important; color: #000 !important; }
+.match-pill .score { color: #000 !important; opacity: 0.75 !important; }
+.status-absent { background: #FF1B1B !important; color: #000 !important; }
+.status-incertain { background: #FFC000 !important; color: #000 !important; }
+
+/* Tables (héritées) — PAS de color !important sur td (sinon override les color:#000 inline des fonds vifs).
+   La couleur par défaut #FFF reste portée par le CSS d'origine du template sur fond sombre. */
+table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
+table td { border-color: #195A2D !important; }
+
+/* Tags */
+.tag { color: #00FF66 !important; }
+
+/* Force texte blanc/foncé hardcodé → vert */
+[style*="color:#5C6573"], [style*="color: #5C6573"] { color: #5D8C6E !important; }
+[style*="color:#1B1F26"], [style*="color: #1B1F26"] { color: #82FFB4 !important; }
+[style*="color:#0E1A2C"], [style*="color: #0E1A2C"] { color: #00FF66 !important; }
+[style*="background:white"], [style*="background: white"],
+[style*="background:#fff"], [style*="background: #fff"],
+[style*="background:#FFF"], [style*="background: #FFF"] {
+  background: rgba(0, 26, 8, 0.95) !important;
+}
+</style></head><body>
+
+<div class="cover">
+  <div class="eyebrow">EQUIPE AGENT IA FOOT · ANALYSE MICRO FOTMOB · 5 ZONES TACTIQUES</div>
+  <h1>Kobe <span class="vs">vs</span> Kyoto</h1>
+  <div class="subtitle">Rapport de force tactique sur le terrain</div>
+  <div>Zones maîtrisées · <strong>Kobe 1 - 0 Kyoto</strong> (écart 1)</div>
+  <div class="meta">Source XI : Flashscore · Stats joueurs : FotMob (NEXT_DATA) · Heatmap : matplotlib gaussian smooth</div>
+</div>
+
+
+<h2><span class="step">01</span> Formation · Compositions probables Flashscore</h2>
+<div class="pitch-image-wrap">
+  <div class="pitch-subtitle">Kobe        vs        Kyoto</div>
+  <img src="pitch.png" alt="Compositions sur le terrain">
+</div>
+
+
+
+<h2><span class="step">02</span> 5 blocs tactiques · Lecture déséquilibre par zone</h2>
+<div class="heatmap-wrap">
+  <div class="heatmap-subtitle">ROUGE = Kobe domine la zone · BLEU = Kyoto domine la zone · Δ catégories gagnées par bloc</div>
+  <img src="heatmap.png" alt="Heatmap tactique 5 zones">
+  <div class="heatmap-legend">Convention : Kobe attaque vers la droite. Numéros = joueurs. Heatmap = 5 zones tactiques (A/B = défense vs attaque, C/D = couloirs, E = milieu créateur).</div>
+</div>
+
+
+<h2><span class="step">03</span> Verdict pari 1X2</h2>
+<div class="verdict-card fav-home">
+  <h3>REMBOURSÉ SI NUL KOBE (DNB)</h3>
+  <div class="conf">Confiance : <strong>PRUDENTE</strong></div>
+  <div class="scores">Zones maîtrisées : <strong>Kobe 1</strong> · <strong>Kyoto 0</strong> · égalités 4</div>
+  <div class="detail">Modèle : note FotMob moyenne par joueur normalisée par baseline du rôle dans le match (1.0 = joueur moyen pour son poste)</div>
+</div>
+
+
+<h2><span class="step">04</span> Match ouvert ? (Over / Under)</h2>
+<div class="openness-card">
+  <div class="openness-header">
+    <div class="verdict">MATCH POTENTIELLEMENT FERMÉ — Under 2.5 possible</div>
+    <div class="score-circle">0/4</div>
+  </div>
+  <div class="openness-recom">Pari à cibler : <strong>Under 2.5 ou nul vierge</strong> · Confiance : à confirmer meso</div>
+  <div class="indicators">
+    
+    <div class="indicator">
+      <div class="label">1. Chaque équipe a au moins UN bloc fort (Δ ≥ 3 catégories)</div>
+      <div class="detail">Kobe : 0 zone(s) · Kyoto : 0 zone(s)</div>
+      <div class="check">✗</div>
+    </div>
+    
+    <div class="indicator">
+      <div class="label">2. Chaque équipe a un attaquant à 2+ profils confluents</div>
+      <div class="detail">Kobe max : 2 · Kyoto max : 1</div>
+      <div class="check">✗</div>
+    </div>
+    
+    <div class="indicator">
+      <div class="label">3. Les DEUX défenses cèdent (blocs A et B remportés par l'attaque)</div>
+      <div class="detail">Défense Kobe cède : non · Défense Kyoto cède : non</div>
+      <div class="check">✗</div>
+    </div>
+    
+    <div class="indicator">
+      <div class="label">4. Aucune égalité dans les blocs (match disputé partout)</div>
+      <div class="detail">Au moins une égalité</div>
+      <div class="check">✗</div>
+    </div>
+    
+  </div>
+</div>
+
+
+<h2><span class="step">05</span> Les 5 zones de confrontation</h2>
+<div class="zones-grid">
+
+<div class="zone neutre">
+  <div>
+    <h3>A · Défense Kobe</h3>
+    <div class="desc">Défense de Kobe contre l'attaque de Kyoto</div>
+  </div>
+  <div class="scores">
+    <span class="score-pill home">1.00</span>
+    <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
+    <span class="score-pill away">0.98</span>
+  </div>
+  <div class="winner-tag">équilibre · équilibre (Δ +0.026)</div>
+</div>
+
+<div class="zone neutre">
+  <div>
+    <h3>B · Défense Kyoto</h3>
+    <div class="desc">Défense de Kyoto contre l'attaque de Kobe</div>
+  </div>
+  <div class="scores">
+    <span class="score-pill home">1.02</span>
+    <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
+    <span class="score-pill away">1.00</span>
+  </div>
+  <div class="winner-tag">équilibre · équilibre (Δ +0.027)</div>
+</div>
+
+<div class="zone win-home">
+  <div>
+    <h3>C · Couloir droit</h3>
+    <div class="desc">Couloir droit (binôme latéral + ailier)</div>
+  </div>
+  <div class="scores">
+    <span class="score-pill home">1.04</span>
+    <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
+    <span class="score-pill away">0.98</span>
+  </div>
+  <div class="winner-tag">Kobe domine · léger avantage (Δ +0.061)</div>
+</div>
+
+<div class="zone neutre">
+  <div>
+    <h3>D · Couloir gauche</h3>
+    <div class="desc">Couloir gauche (binôme)</div>
+  </div>
+  <div class="scores">
+    <span class="score-pill home">1.02</span>
+    <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
+    <span class="score-pill away">1.00</span>
+  </div>
+  <div class="winner-tag">équilibre · équilibre (Δ +0.023)</div>
+</div>
+
+<div class="zone neutre">
+  <div>
+    <h3>E · Milieu créateur</h3>
+    <div class="desc">Milieu créateur central</div>
+  </div>
+  <div class="scores">
+    <span class="score-pill home">1.00</span>
+    <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
+    <span class="score-pill away">1.00</span>
+  </div>
+  <div class="winner-tag">équilibre · équilibre (Δ +0.006)</div>
+</div>
+
+</div>
+
+
+<h2><span class="step">06</span> Top 3 joueurs décisifs par équipe</h2>
+<div class="top3-grid">
+  <div class="top3-team home">
+    <h3>Kobe</h3>
+    <h4>Joueurs décisifs</h4>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/z5IENaLt.png" alt="Sasaki D.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#13 Sasaki D.</div>
+        <div class="pos">Attaquant gauche</div>
+        <div class="stats">Note <strong>7.44</strong> · 2B / 3P en 11 matchs</div>
+        <div class="profile">Profil : Volume tirs · Créateur</div>
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/SW0AgYx7.png" alt="Nagato K.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#41 Nagato K.</div>
+        <div class="pos">Défenseur gauche</div>
+        <div class="stats">Note <strong>7.39</strong> · 3B / 1P en 15 matchs</div>
+        <div class="profile">Profil : Créateur</div>
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/8bbTIqDq.png" alt="Muto Y.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#11 Muto Y.</div>
+        <div class="pos">Attaquant droit</div>
+        <div class="stats">Note <strong>7.22</strong> · 3B / 0P en 10 matchs</div>
+        <div class="profile">Profil : Volume tirs</div>
+      </div>
+    </div>
+    
+    
+  </div>
+  <div class="top3-team away">
+    <h3>Kyoto</h3>
+    <h4>Joueurs décisifs</h4>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/Sns4FCZL.png" alt="Marco Tulio">
+        
+      </div>
+      <div class="info">
+        <div class="name">#11 Marco Tulio</div>
+        <div class="pos">Attaquant droit</div>
+        <div class="stats">Note <strong>7.25</strong> · 5B / 1P en 13 matchs</div>
+        <div class="profile">Profil : Volume tirs</div>
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/Qql5fVOO.png" alt="Henrique Trevisan">
+        
+      </div>
+      <div class="info">
+        <div class="name">#34 Henrique Trevisan</div>
+        <div class="pos">Défenseur central</div>
+        <div class="stats">Note <strong>7.40</strong> · 2B / 2P en 12 matchs</div>
+        
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/xS8Qrq94.png" alt="Joao Pedro">
+        
+      </div>
+      <div class="info">
+        <div class="name">#6 Joao Pedro</div>
+        <div class="pos">Milieu droit</div>
+        <div class="stats">Note <strong>6.96</strong> · 2B / 1P en 14 matchs</div>
+        <div class="profile">Profil : Volume tirs</div>
+      </div>
+    </div>
+    
+    
+  </div>
+</div>
+
+
+<h2><span class="step">07</span> Méthode</h2>
+<div class="method-section">
+  <h3>Modèle 5 zones tactiques (agnostique de la formation)</h3>
+  <p>S'adapte à toute formation (4-3-3, 4-2-3-1, 3-4-2-1, 3-5-2, 4-4-2…). Pour chaque zone, agrégation Σ stats + moyenne /90 sur les joueurs du groupe, comparaison domaine par domaine (Frappe / Passes / Possession / Défense / Discipline).</p>
+</div>
+<div class="method-section">
+  <h3>Source data</h3>
+  <p>XI résolus via API Flashscore (hash dlie2) + matchDetails FotMob via faille __NEXT_DATA__. Cross-référence par numéro maillot + fuzzy nom. Stats joueurs : 70+ stats par joueur (xG, xA, tirs, tacles, interceptions, etc.).</p>
+</div>
+<div class="method-section">
+  <h3>Échelle de pari 1X2</h3>
+  <p>5-0 : victoire écrasante · Δ ≥ 3 : victoire probable · Δ = 2 sans égalité : double chance · Δ = 1 : DNB · Δ = 0 : pas de pari.</p>
+</div>
+
+</body></html>

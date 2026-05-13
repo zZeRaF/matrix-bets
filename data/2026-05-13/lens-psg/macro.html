@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Macro Footystats — Lens vs PSG</title>
+<style>
+  body { background:#001000; color:#82FFB4; font-family:Consolas, monospace; margin:0; padding:0; }
+  .container { max-width:1100px; margin:0 auto; padding:20px; }
+  h1 { color:#00FF66; text-align:center; border:2px solid #216037; padding:12px; background:#002000; margin-top:0; font-size:18px; }
+  h2 { color:#00FF66; border-bottom:2px solid #216037; padding-bottom:4px; margin-top:22px; font-size:15px; }
+  h3 { color:#D4A340; margin-top:0; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin:6px 0; font-size:12px; }
+  th, td { border:1px solid #195A2D; padding:5px 7px; text-align:center; color:#FFF; }
+  th { background:#002000; color:#00FF66; }
+  td.label { text-align:right; color:#82FFB4; font-weight:600; }
+  td.center-val { background:#002000; color:#FFF; font-weight:700; }
+  td.empty { background:#001000; border:none; }
+  .subtitle { text-align:center; color:#93BB7D; font-style:italic; margin-bottom:14px; font-size:11px; }
+  .verdict { padding:8px; text-align:center; font-weight:700; font-size:13px; margin-top:8px; border-radius:4px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .block { background:#001800; padding:10px; border:1px solid #216037; }
+  .block p { margin:3px 0; color:#FFF; font-size:12px; }
+  .timing-table tr.avg td { background:#002000; color:#00FF66; font-weight:700; }
+  .bar-row { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .bar-label { width:60px; color:#82FFB4; font-weight:600; font-size:11px; }
+  .bar-bg { flex:1; height:16px; background:#001800; border:1px solid #195A2D; }
+  .bar-fill { height:100%; transition:width 0.3s; }
+  .bar-val { width:50px; text-align:right; font-weight:700; font-size:11px; }
+</style><style>
+/* === MATRIX OVERLAY (injection PWA) === */
+:root {
+  --paper: #001000 !important; --ink: #82FFB4 !important;
+  --navy: #00FF66 !important; --navy-deep: #000800 !important;
+  --sub: #5D8C6E !important; --gold-light: #82FFB4 !important;
+  --success: #00FF66 !important; --warning: #FFC000 !important; --risk: #FF1B1B !important;
+  --home: #00FF66 !important; --away: #FFC000 !important;
+}
+html, body {
+  background: #001000 !important;
+  color: #82FFB4 !important;
+  font-family: Consolas, "Courier New", monospace, -apple-system !important;
+}
+h1, h2, h3, h4, h5 { color: #00FF66 !important; }
+h2 { border-bottom-color: #216037 !important; }
+.cover { background: linear-gradient(135deg,#001a08 0%,#000800 100%) !important; }
+.eyebrow, .subtitle, .cover .meta { color: #D4A340 !important; }
+
+/* Cartes / blocs : fond foncé matrix */
+.verdict-card, .indicator, .article-card, .unavail-card,
+.method-section, .heatmap-wrap, .pitch-image-wrap,
+.matrix .row, .bar-row, .tag {
+  background: rgba(0, 26, 8, 0.95) !important;
+  color: #82FFB4 !important;
+  border-color: #216037 !important;
+}
+.verdict-card { box-shadow: 0 2px 8px rgba(0, 255, 102, 0.08) !important; }
+.matrix .row { border-left-color: #216037 !important; }
+.matrix .row.active { background: rgba(80, 56, 0, 0.4) !important; border-left-color: #D4A340 !important; }
+
+/* Cells favorabilité */
+.cat-grid.win-home, .verdict-card.fav-home {
+  background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important;
+}
+.cat-grid.win-away, .verdict-card.fav-away {
+  background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important;
+}
+.cat-grid.neutre, .verdict-card.neutral {
+  background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important;
+}
+
+/* Bars / pills — règle MATRIX : tout fond vif → texte noir */
+.bar-container { background: #001800 !important; border: 1px solid #195A2D !important; }
+.bar-home { background: #00FF66 !important; color: #000 !important; }
+.bar-away { background: #FFC000 !important; color: #000 !important; }
+.match-pill.W { background: #00FF66 !important; color: #000 !important; }
+.match-pill.D { background: #FFC000 !important; color: #000 !important; }
+.match-pill.L { background: #FF1B1B !important; color: #000 !important; }
+.match-pill .score { color: #000 !important; opacity: 0.75 !important; }
+.status-absent { background: #FF1B1B !important; color: #000 !important; }
+.status-incertain { background: #FFC000 !important; color: #000 !important; }
+
+/* Tables (héritées) — PAS de color !important sur td (sinon override les color:#000 inline des fonds vifs).
+   La couleur par défaut #FFF reste portée par le CSS d'origine du template sur fond sombre. */
+table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
+table td { border-color: #195A2D !important; }
+
+/* Tags */
+.tag { color: #00FF66 !important; }
+
+/* Force texte blanc/foncé hardcodé → vert */
+[style*="color:#5C6573"], [style*="color: #5C6573"] { color: #5D8C6E !important; }
+[style*="color:#1B1F26"], [style*="color: #1B1F26"] { color: #82FFB4 !important; }
+[style*="color:#0E1A2C"], [style*="color: #0E1A2C"] { color: #00FF66 !important; }
+[style*="background:white"], [style*="background: white"],
+[style*="background:#fff"], [style*="background: #fff"],
+[style*="background:#FFF"], [style*="background: #FFF"] {
+  background: rgba(0, 26, 8, 0.95) !important;
+}
+</style></head>
+<body><div class="container">
+<h1>ANALYSE MACRO FOOTYSTATS — Lens (Home) vs PSG (Away)</h1>
+<p class="subtitle">Compétition : France Ligue 1 · Stats Home (A) / Away (B) · Coef FIFA : Lens=1.00 · PSG=1.00</p>
+
+<h2>ANALYSE MACRO — Stats saison</h2>
+<table>
+  <tr><th></th><th>Lens</th><th>Moy combinée</th><th>PSG</th></tr>
+  <tr><td class="label">Moy buts dans matchs</td><td class="center-val">2.88</td><td class="center-val">2.94</td><td class="center-val">3.0</td></tr>
+  <tr><td class="label">Wins %</td><td>88%</td><td class="empty"></td><td>67%</td></tr>
+  <tr><td class="label">Draws %</td><td>0%</td><td class="empty"></td><td>13%</td></tr>
+  <tr><td class="label">Losses %</td><td>12%</td><td class="empty"></td><td>20%</td></tr>
+  <tr><td class="label">Buts marqués / match</td><td style="background:#00FF66;color:#000;font-weight:400">2.19</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">2.0</td></tr>
+  <tr><td class="label">xG créé / match</td><td style="background:#00FF66;color:#000;font-weight:400">1.94</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">1.93</td></tr>
+  <tr><td class="label">Ratio buts/xG (efficacité)</td><td style="background:#00FF66;color:#000;font-weight:400">1.13</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">1.04</td></tr>
+  <tr><td class="label">xG concédé / match</td><td style="background:#FFC000;color:#000;font-weight:400">1.12</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">0.97</td></tr>
+  <tr><td class="label">Buts encaissés / match</td><td style="background:#00FF66;color:#000;font-weight:400">0.69</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.0</td></tr>
+  <tr><td class="label">Indice domination défensive</td><td style="background:#00FF66;color:#000;font-weight:400">0.62</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.03</td></tr>
+  <tr><td class="label">Buts attendus</td><td class="center-val">2.19</td><td class="center-val">0.81</td><td class="center-val">1.38</td></tr>
+  <tr><td class="label">Indice domination GLOBALE</td><td style="background:#00FF66;color:#000;font-weight:600">1.41</td><td class="center-val">0.64</td><td style="background:#FF1B1B;color:#FFF;font-weight:600">0.77</td></tr>
+</table>
+
+<div class="verdict" style="background:#00B0F0;color:#FFF">
+  Avantage attaque
+</div>
+
+<h2>SYNTHÈSE</h2>
+<table>
+  <tr><th>Lens</th><th>ANALYSE</th><th>PSG</th></tr>
+  <tr><td style="background:#00FF66;color:#000;font-weight:600">Bonne Attaque</td><td class="center-val">Attaque<br>buts attendus : 2.19 vs 1.38</td><td style="background:#00FF66;color:#000;font-weight:600">Bonne Attaque</td></tr>
+  <tr><td style="background:#00FF66;color:#000;font-weight:600">Bonne Défense</td><td class="center-val">Vainqueur : <b style="color:#00FF66">Équilibré</b></td><td style="background:#FFC000;color:#000;font-weight:600">Défense Moyenne</td></tr>
+  <tr><td class="empty"></td><td class="center-val">Moyenne buts attendus : <b>3.25</b></td><td class="empty"></td></tr>
+</table>
+
+<h2>VERDICTS</h2>
+<div class="verdict" style="background:#FFC000;color:#FFF;font-size:16px">
+  ❌ Pas de prono double chance
+</div>
+<div class="verdict" style="background:#FFC000;color:#FFF;font-size:16px;margin-top:10px">
+  ❌ Pas de prono victoire
+</div>
+
+
+        <h2>TIMING DES BUTS</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>1ère vs 2e mi-temps (% buts marqués)</h3>
+            <table class="timing-table">
+              <tr><th></th><th>1ère MT</th><th>2e MT</th></tr>
+              <tr><td>Lens</td><td>37.1%</td><td>62.9%</td></tr>
+              <tr><td>PSG</td><td>50.0%</td><td>50.0%</td></tr>
+              <tr class="avg"><td>MOYENNE</td><td>43.5%</td><td>56.5%</td></tr>
+            </table>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Buts plutôt EN 2e MI-TEMPS (56.5%)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Distribution intervalles 10 min (croisement)</h3>
+            
+            <div class="bar-row">
+              <span class="bar-label">0-10 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:57%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">7.8%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">11-20 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:43%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">5.9%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">21-30 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:68%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">9.3%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">31-40 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:96%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">13.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">41-50 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:100%;background:#00FF66"></div></div>
+              <span class="bar-val" style="color:#00FF66">13.6%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">51-60 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:98%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">13.3%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">61-70 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:90%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">12.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">71-80 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:90%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">12.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">81-90 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:93%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">12.6%</span>
+            </div>
+            <div class="verdict" style="background:#00FF66;color:#000;margin-top:10px">
+              Pic de buts attendus : 41-50 min (13.6%)
+            </div>
+          </div>
+        </div>
+        
+
+
+        <h2>HISTORIQUE H2H</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>Bilan all-time</h3>
+            <p><b>19</b> confrontations</p>
+            <p>Lens : <b>2</b> V (10.5%)</p>
+            <p>PSG : <b>11</b> V (57.9%)</p>
+            <p>Nuls : <b>6</b> (31.6%)</p>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Équipe dominante : PSG (MODÉRÉE)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Tendance buts</h3>
+            <p>Moy buts/match : <b>2.68</b></p>
+            <p>Over 1.5 : <b>84%</b></p>
+            <p>Over 2.5 : <b>42%</b></p>
+            <p>Over 3.5 : <b>32%</b></p>
+            <p>BTTS : <b>68%</b></p>
+            <div class="verdict" style="background:#FFC000;color:#FFF">
+              Match ÉQUILIBRÉ (—)
+            </div>
+          </div>
+        </div>
+        
+
+</div></body></html>

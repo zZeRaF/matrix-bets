@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Macro Footystats — Rangers vs Hibernian</title>
+<style>
+  body { background:#001000; color:#82FFB4; font-family:Consolas, monospace; margin:0; padding:0; }
+  .container { max-width:1100px; margin:0 auto; padding:20px; }
+  h1 { color:#00FF66; text-align:center; border:2px solid #216037; padding:12px; background:#002000; margin-top:0; font-size:18px; }
+  h2 { color:#00FF66; border-bottom:2px solid #216037; padding-bottom:4px; margin-top:22px; font-size:15px; }
+  h3 { color:#D4A340; margin-top:0; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin:6px 0; font-size:12px; }
+  th, td { border:1px solid #195A2D; padding:5px 7px; text-align:center; color:#FFF; }
+  th { background:#002000; color:#00FF66; }
+  td.label { text-align:right; color:#82FFB4; font-weight:600; }
+  td.center-val { background:#002000; color:#FFF; font-weight:700; }
+  td.empty { background:#001000; border:none; }
+  .subtitle { text-align:center; color:#93BB7D; font-style:italic; margin-bottom:14px; font-size:11px; }
+  .verdict { padding:8px; text-align:center; font-weight:700; font-size:13px; margin-top:8px; border-radius:4px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .block { background:#001800; padding:10px; border:1px solid #216037; }
+  .block p { margin:3px 0; color:#FFF; font-size:12px; }
+  .timing-table tr.avg td { background:#002000; color:#00FF66; font-weight:700; }
+  .bar-row { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .bar-label { width:60px; color:#82FFB4; font-weight:600; font-size:11px; }
+  .bar-bg { flex:1; height:16px; background:#001800; border:1px solid #195A2D; }
+  .bar-fill { height:100%; transition:width 0.3s; }
+  .bar-val { width:50px; text-align:right; font-weight:700; font-size:11px; }
+</style><style>
+/* === MATRIX OVERLAY (injection PWA) === */
+:root {
+  --paper: #001000 !important; --ink: #82FFB4 !important;
+  --navy: #00FF66 !important; --navy-deep: #000800 !important;
+  --sub: #5D8C6E !important; --gold-light: #82FFB4 !important;
+  --success: #00FF66 !important; --warning: #FFC000 !important; --risk: #FF1B1B !important;
+  --home: #00FF66 !important; --away: #FFC000 !important;
+}
+html, body {
+  background: #001000 !important;
+  color: #82FFB4 !important;
+  font-family: Consolas, "Courier New", monospace, -apple-system !important;
+}
+h1, h2, h3, h4, h5 { color: #00FF66 !important; }
+h2 { border-bottom-color: #216037 !important; }
+.cover { background: linear-gradient(135deg,#001a08 0%,#000800 100%) !important; }
+.eyebrow, .subtitle, .cover .meta { color: #D4A340 !important; }
+
+/* Cartes / blocs : fond foncé matrix */
+.verdict-card, .indicator, .article-card, .unavail-card,
+.method-section, .heatmap-wrap, .pitch-image-wrap,
+.matrix .row, .bar-row, .tag {
+  background: rgba(0, 26, 8, 0.95) !important;
+  color: #82FFB4 !important;
+  border-color: #216037 !important;
+}
+.verdict-card { box-shadow: 0 2px 8px rgba(0, 255, 102, 0.08) !important; }
+.matrix .row { border-left-color: #216037 !important; }
+.matrix .row.active { background: rgba(80, 56, 0, 0.4) !important; border-left-color: #D4A340 !important; }
+
+/* Cells favorabilité */
+.cat-grid.win-home, .verdict-card.fav-home {
+  background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important;
+}
+.cat-grid.win-away, .verdict-card.fav-away {
+  background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important;
+}
+.cat-grid.neutre, .verdict-card.neutral {
+  background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important;
+}
+
+/* Bars / pills — règle MATRIX : tout fond vif → texte noir */
+.bar-container { background: #001800 !important; border: 1px solid #195A2D !important; }
+.bar-home { background: #00FF66 !important; color: #000 !important; }
+.bar-away { background: #FFC000 !important; color: #000 !important; }
+.match-pill.W { background: #00FF66 !important; color: #000 !important; }
+.match-pill.D { background: #FFC000 !important; color: #000 !important; }
+.match-pill.L { background: #FF1B1B !important; color: #000 !important; }
+.match-pill .score { color: #000 !important; opacity: 0.75 !important; }
+.status-absent { background: #FF1B1B !important; color: #000 !important; }
+.status-incertain { background: #FFC000 !important; color: #000 !important; }
+
+/* Tables (héritées) — PAS de color !important sur td (sinon override les color:#000 inline des fonds vifs).
+   La couleur par défaut #FFF reste portée par le CSS d'origine du template sur fond sombre. */
+table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
+table td { border-color: #195A2D !important; }
+
+/* Tags */
+.tag { color: #00FF66 !important; }
+
+/* Force texte blanc/foncé hardcodé → vert */
+[style*="color:#5C6573"], [style*="color: #5C6573"] { color: #5D8C6E !important; }
+[style*="color:#1B1F26"], [style*="color: #1B1F26"] { color: #82FFB4 !important; }
+[style*="color:#0E1A2C"], [style*="color: #0E1A2C"] { color: #00FF66 !important; }
+[style*="background:white"], [style*="background: white"],
+[style*="background:#fff"], [style*="background: #fff"],
+[style*="background:#FFF"], [style*="background: #FFF"] {
+  background: rgba(0, 26, 8, 0.95) !important;
+}
+</style></head>
+<body><div class="container">
+<h1>ANALYSE MACRO FOOTYSTATS — Rangers (Home) vs Hibernian (Away)</h1>
+<p class="subtitle">Compétition : Scotland Premiership · Stats Home (A) / Away (B) · Coef FIFA : Rangers=1.00 · Hibernian=1.00</p>
+
+<h2>ANALYSE MACRO — Stats saison</h2>
+<table>
+  <tr><th></th><th>Rangers</th><th>Moy combinée</th><th>Hibernian</th></tr>
+  <tr><td class="label">Moy buts dans matchs</td><td class="center-val">3.17</td><td class="center-val">2.92</td><td class="center-val">2.66</td></tr>
+  <tr><td class="label">Wins %</td><td>61%</td><td class="empty"></td><td>33%</td></tr>
+  <tr><td class="label">Draws %</td><td>28%</td><td class="empty"></td><td>33%</td></tr>
+  <tr><td class="label">Losses %</td><td>11%</td><td class="empty"></td><td>33%</td></tr>
+  <tr><td class="label">Buts marqués / match</td><td style="background:#00FF66;color:#000;font-weight:400">2.11</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.33</td></tr>
+  <tr><td class="label">xG créé / match</td><td style="background:#00FF66;color:#000;font-weight:400">1.99</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.22</td></tr>
+  <tr><td class="label">Ratio buts/xG (efficacité)</td><td style="background:#00FF66;color:#000;font-weight:400">1.06</td><td class="empty"></td><td style="background:#00FF66;color:#000;font-weight:400">1.09</td></tr>
+  <tr><td class="label">xG concédé / match</td><td style="background:#FFC000;color:#000;font-weight:400">1.05</td><td class="empty"></td><td style="background:#FF1B1B;color:#FFF;font-weight:400">1.46</td></tr>
+  <tr><td class="label">Buts encaissés / match</td><td style="background:#FFC000;color:#000;font-weight:400">1.06</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">1.33</td></tr>
+  <tr><td class="label">Indice domination défensive</td><td style="background:#FFC000;color:#000;font-weight:400">1.01</td><td class="empty"></td><td style="background:#FFC000;color:#000;font-weight:400">0.91</td></tr>
+  <tr><td class="label">Buts attendus</td><td class="center-val">2.81</td><td class="center-val">1.4</td><td class="center-val">1.41</td></tr>
+  <tr><td class="label">Indice domination GLOBALE</td><td style="background:#00FF66;color:#000;font-weight:600">1.69</td><td class="center-val">1.01</td><td style="background:#FF1B1B;color:#FFF;font-weight:600">0.69</td></tr>
+</table>
+
+<div class="verdict" style="background:#00B0F0;color:#FFF">
+  Avantage attaque
+</div>
+
+<h2>SYNTHÈSE</h2>
+<table>
+  <tr><th>Rangers</th><th>ANALYSE</th><th>Hibernian</th></tr>
+  <tr><td style="background:#00FF66;color:#000;font-weight:600">Bonne Attaque</td><td class="center-val">Attaque<br>buts attendus : 2.81 vs 1.41</td><td style="background:#FFC000;color:#000;font-weight:600">Attaque Moyenne</td></tr>
+  <tr><td style="background:#FFC000;color:#000;font-weight:600">Défense Moyenne</td><td class="center-val">Vainqueur : <b style="color:#00FF66">Rangers</b></td><td style="background:#FFC000;color:#000;font-weight:600">Défense Moyenne</td></tr>
+  <tr><td class="empty"></td><td class="center-val">Moyenne buts attendus : <b>3.57</b></td><td class="empty"></td></tr>
+</table>
+
+<h2>VERDICTS</h2>
+<div class="verdict" style="background:#00FF66;color:#000;font-size:16px">
+  🔁 Double chance + Over 1,5 (Rangers)
+</div>
+<div class="verdict" style="background:#FFC000;color:#FFF;font-size:16px;margin-top:10px">
+  ❌ Pas de prono victoire
+</div>
+
+
+        <h2>TIMING DES BUTS</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>1ère vs 2e mi-temps (% buts marqués)</h3>
+            <table class="timing-table">
+              <tr><th></th><th>1ère MT</th><th>2e MT</th></tr>
+              <tr><td>Rangers</td><td>39.5%</td><td>60.5%</td></tr>
+              <tr><td>Hibernian</td><td>58.3%</td><td>41.7%</td></tr>
+              <tr class="avg"><td>MOYENNE</td><td>48.9%</td><td>51.1%</td></tr>
+            </table>
+            <div class="verdict" style="background:#FFC000;color:#FFF">
+              Équilibré (48.9% / 51.1%)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Distribution intervalles 10 min (croisement)</h3>
+            
+            <div class="bar-row">
+              <span class="bar-label">0-10 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:46%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">10.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">11-20 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:36%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">8.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">21-30 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:55%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">12.3%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">31-40 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:67%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">14.9%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">41-50 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:27%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">6.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">51-60 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:64%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">14.2%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">61-70 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:18%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">4.0%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">71-80 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:36%;background:#4FA05C"></div></div>
+              <span class="bar-val" style="color:#FFF">8.1%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">81-90 min</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:100%;background:#00FF66"></div></div>
+              <span class="bar-val" style="color:#00FF66">22.2%</span>
+            </div>
+            <div class="verdict" style="background:#00FF66;color:#000;margin-top:10px">
+              Pic de buts attendus : 81-90 min (22.2%)
+            </div>
+          </div>
+        </div>
+        
+
+
+        <h2>HISTORIQUE H2H</h2>
+        <div class="grid-2">
+          <div class="block">
+            <h3>Bilan all-time</h3>
+            <p><b>45</b> confrontations</p>
+            <p>Rangers : <b>27</b> V (60.0%)</p>
+            <p>Hibernian : <b>9</b> V (20.0%)</p>
+            <p>Nuls : <b>9</b> (20.0%)</p>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Équipe dominante : Rangers (FORTE)
+            </div>
+          </div>
+          <div class="block">
+            <h3>Tendance buts</h3>
+            <p>Moy buts/match : <b>3.2</b></p>
+            <p>Over 1.5 : <b>78%</b></p>
+            <p>Over 2.5 : <b>60%</b></p>
+            <p>Over 3.5 : <b>40%</b></p>
+            <p>BTTS : <b>56%</b></p>
+            <div class="verdict" style="background:#00FF66;color:#000">
+              Tendance OVER 2.5 (MODÉRÉE)
+            </div>
+          </div>
+        </div>
+        
+
+</div></body></html>
