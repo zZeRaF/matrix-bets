@@ -154,35 +154,33 @@ function app() {
         this._splashStopRain = startMatrixRain(canvas);
       }
 
-      // ── BUDGET TOTAL : 7 000ms ──
-      // Typewriter title          : 520ms (13 chars × 40ms)
-      // Log lines (6 steps)        : 2 880ms cumul
-      // Pause + scène 3D termine  : ~3 000ms
-      // Fade out                  : 600ms
-      // Bouton SKIP visible dès   : 2 000ms
+      // ── BUDGET TOTAL : 3 500ms ──
+      // Typewriter title  : 300ms (6 chars × 50ms)
+      // Log lines (6)     : 1 500ms cumul
+      // Pause finale      : 1 100ms
+      // Fade out          : 600ms
+      // SKIP visible dès  : 1 200ms
 
-      // Active le bouton SKIP après 2s
-      setTimeout(() => { this.splashSkipAvailable = true; }, 2000);
-
-      // Three.js désactivé — la scène SVG (.scene-galactik) prend le relais via CSS keyframes
+      // Active le bouton SKIP après 1.2s
+      setTimeout(() => { this.splashSkipAvailable = true; }, 1200);
 
       // Typewriter du titre
       const title = "BeTime";
       for (let i = 1; i <= title.length; i++) {
         if (this._splashCancelled) return;
         this.splashTitle = title.slice(0, i);
-        await sleep(90);
+        await sleep(50);
       }
       if (this._splashCancelled) return;
 
-      // 6 log lines compressées sur ~2.9s
+      // 6 log lines compressées sur 1.5s (250ms par ligne)
       const steps = [
-        { text: "INITIALISATION SHELL...", delay: 400 },
-        { text: "CONNEXION GITHUB PAGES...", delay: 400 },
-        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 480 },
-        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 500 },
-        { text: "CALCUL KELLY /4...", delay: 480 },
-        { text: "READY.", delay: 620 },
+        { text: "INIT SHELL...", delay: 220 },
+        { text: "CONNEXION GITHUB...", delay: 220 },
+        { text: "FETCH TOP_DU_JOUR...", delay: 250 },
+        { text: "PARSE ANALYSES 4 COUCHES...", delay: 260 },
+        { text: "CALCUL KELLY /4...", delay: 250 },
+        { text: "READY.", delay: 300 },
       ];
       for (let i = 0; i < steps.length; i++) {
         if (this._splashCancelled) return;
@@ -193,8 +191,8 @@ function app() {
       }
       this.splashProgress = 100;
 
-      // Pause finale pendant que la scène 3D finit (~3s restantes)
-      await sleep(2980);
+      // Pause finale
+      await sleep(1100);
       if (this._splashCancelled) return;
 
       this.closeSplash();
