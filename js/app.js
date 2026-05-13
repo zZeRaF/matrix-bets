@@ -582,8 +582,12 @@ function app() {
       if (!layerKey || !this.data || !this.selectedMatchSlug) return "";
       const date = this.data.date;
       const slug = this.selectedMatchSlug;
-      const v = this.data.generated_at ? encodeURIComponent(this.data.generated_at) : Date.now();
-      return `data/${date}/${slug}/${layerKey}.html?v=${v}`;
+      // Cache-buster fort : combine pivot generated_at + Date.now() pour forcer
+      // un fetch réseau à chaque ouverture (les iframes Chrome ont un cache HTTP
+      // très tenace qui ignore parfois les bumps de service worker).
+      const pivot_v = this.data.generated_at ? encodeURIComponent(this.data.generated_at) : "0";
+      const t = Date.now();
+      return `data/${date}/${slug}/${layerKey}.html?v=${pivot_v}&t=${t}`;
     },
 
     layerLabel(key) {

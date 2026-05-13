@@ -4,7 +4,7 @@
 //   - data/*.json : NETWORK-FIRST
 //   - reste (CSS/JS/icons) : CACHE-FIRST avec bumping de version
 
-const CACHE_NAME = "betime-v15";
+const CACHE_NAME = "betime-v16";
 const STATIC_ASSETS = [
   "./manifest.webmanifest",
   "./styles/matrix.css",
@@ -48,17 +48,21 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // HTML root + index.html : NETWORK-FIRST (jamais de cache servi en priorité)
+  // HTML root + index.html + sub-frame HTML (data/.../*.html) : NETWORK-FIRST + no-store
+  // (les iframes Chrome ont un cache HTTP très agressif qui ignore le SW classique)
   const isHtml =
     url.pathname === "/" ||
     url.pathname.endsWith("/") ||
     url.pathname.endsWith(".html");
   if (isHtml) {
     event.respondWith(
-      fetch(event.request, { cache: "no-store" })
+      fetch(event.request, { cache: "no-store", credentials: "same-origin" })
         .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          // Ne PAS mettre en cache les HTML de layers (data/.../*.html) — toujours frais
+          if (!url.pathname.includes("/data/")) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(event.request))
