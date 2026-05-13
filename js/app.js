@@ -299,31 +299,13 @@ function app() {
 
       setTimeout(() => { this.splashSkipAvailable = true; }, 1500);
 
-      // Effet SCRAMBLE / DECODER : les lettres défilent en chars aléatoires
-      // puis se stabilisent sur le vrai titre (style intro hack)
+      // Typewriter simple stable
       const title = "$MATRIX BET$";
-      const scrambleChars = "!@#$%&*()_+-=[]{}|;:,.<>?/~`^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      const totalScrambleDur = 700;
-      const stepDur = 35;
-      const steps = Math.floor(totalScrambleDur / stepDur);
-      for (let s = 0; s < steps; s++) {
+      for (let i = 1; i <= title.length; i++) {
         if (this._splashCancelled) return;
-        // Probabilité qu'une lettre soit verrouillée augmente avec le temps
-        const lockProgress = s / (steps - 1);
-        let text = "";
-        for (let i = 0; i < title.length; i++) {
-          // Les premières lettres se verrouillent d'abord (effet "decryptage de gauche à droite")
-          const lockThreshold = (i + 1) / title.length;
-          if (lockProgress > lockThreshold || Math.random() < lockProgress * 0.85) {
-            text += title[i];
-          } else {
-            text += scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-          }
-        }
-        this.splashTitle = text;
-        await sleep(stepDur);
+        this.splashTitle = title.slice(0, i);
+        await sleep(50);
       }
-      this.splashTitle = title;
       if (this._splashCancelled) return;
 
       // 6 log lines sur 1.5s
