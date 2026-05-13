@@ -521,6 +521,13 @@ function app() {
         if (!res.ok) throw new Error("HTTP " + res.status);
         const json = await res.json();
         this.data = json;
+        // Pré-initialise coteInputs avec une string vide pour chaque pari du TOP
+        // (Alpine ne tracke pas les clés de dict ajoutées dynamiquement après init)
+        const newCotes = {};
+        (json.top || []).forEach((p) => {
+          newCotes[p.rank] = (p.cote_reelle || p.cote_estimee || "").toString();
+        });
+        this.coteInputs = newCotes;
         this.state = !json.top || json.top.length === 0 ? "empty" : "ok";
       } catch (e) {
         this.state = "error";
