@@ -231,12 +231,21 @@ def _draw_orbit_rings(img: Image.Image, cx: int, cy: int, ball_diam: int) -> Non
         (1.95, 0.48, 38, 4, 180, 4, (46, 207, 92)),    # halo diffus extérieur
     ]
     for (rx_mult, ry_mult, angle, width, alpha, blur, color) in rings:
-        rx = int(ball_diam * rx_mult / 2)
-        ry = int(ball_diam * ry_mult / 2)
-        margin = max(rx, ry) + 32
+        rx_full = int(ball_diam * rx_mult / 2)
+        ry_full = int(ball_diam * ry_mult / 2)
+        # Réduit le diamètre côté bas-gauche de 2.5% (côté haut-droite inchangé) :
+        # rayon -2.5% + décalage vers haut-droite de +2.5% × rayon pour aligner bord droit
+        rx = int(rx_full * 0.975)
+        ry = int(ry_full * 0.975)
+        shift_x = rx_full - rx   # = rx_full × 0.025
+        shift_y = ry_full - ry
+        margin = max(rx_full, ry_full) + 32
         layer = Image.new("RGBA", (margin * 2, margin * 2), (0, 0, 0, 0))
         ld = ImageDraw.Draw(layer)
-        ld.ellipse([margin - rx, margin - ry, margin + rx, margin + ry],
+        # Centre de l'ellipse décalé haut-droite dans le layer
+        cx_local = margin + shift_x
+        cy_local = margin - shift_y
+        ld.ellipse([cx_local - rx, cy_local - ry, cx_local + rx, cy_local + ry],
                    outline=(*color, alpha), width=width)
         layer = layer.rotate(angle, resample=Image.BICUBIC)
         if blur:
@@ -251,7 +260,7 @@ def _paste_matrix_ball(img: Image.Image) -> None:
     Diamètre augmenté à S × 0.22 pour rester visible à 180px."""
     S = img.size[0]
     cx = int(S * 0.28)   # +5% supplémentaires droite (0.23 → 0.28)
-    cy = int(S * 0.80)   # remontée -4% (0.84 → 0.80)
+    cy = int(S * 0.79)   # remontée -1% supp (0.80 → 0.79)
     diam = int(S * 0.22)
     _draw_orbit_rings(img, cx, cy, diam)
     ball = _matrix_ball(diam)
