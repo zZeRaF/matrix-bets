@@ -154,26 +154,24 @@ function app() {
         this._splashStopRain = startMatrixRain(canvas);
       }
 
-      // ── BUDGET TOTAL : 3 500ms ──
-      // Typewriter title  : 300ms (6 chars × 50ms)
-      // Log lines (6)     : 1 500ms cumul
-      // Pause finale      : 1 100ms
-      // Fade out          : 600ms
-      // SKIP visible dès  : 1 200ms
+      // ── BUDGET TOTAL : 4 000ms ──
+      // Typewriter "$MATRIX BET$" : 600ms (12 chars × 50ms)
+      // Log lines (6)            : 1 500ms cumul
+      // Pause finale             : 1 300ms
+      // Fade out                 : 600ms
+      // SKIP visible dès         : 1 500ms
 
-      // Active le bouton SKIP après 1.2s
-      setTimeout(() => { this.splashSkipAvailable = true; }, 1200);
+      setTimeout(() => { this.splashSkipAvailable = true; }, 1500);
 
-      // Typewriter du titre
       const title = "$MATRIX BET$";
       for (let i = 1; i <= title.length; i++) {
         if (this._splashCancelled) return;
         this.splashTitle = title.slice(0, i);
-        await sleep(45);
+        await sleep(50);
       }
       if (this._splashCancelled) return;
 
-      // 6 log lines compressées sur 1.5s (250ms par ligne)
+      // 6 log lines sur 1.5s
       const steps = [
         { text: "INIT SHELL...", delay: 220 },
         { text: "CONNEXION GITHUB...", delay: 220 },
@@ -191,8 +189,8 @@ function app() {
       }
       this.splashProgress = 100;
 
-      // Pause finale
-      await sleep(1100);
+      // Pause finale (montre "BeTime" sous la progression)
+      await sleep(1300);
       if (this._splashCancelled) return;
 
       this.closeSplash();
