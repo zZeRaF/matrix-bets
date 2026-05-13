@@ -248,8 +248,8 @@ def _paste_matrix_ball(img: Image.Image) -> None:
     """Anneaux d'orbite (derrière) puis ballon Matrix (devant).
     Diamètre augmenté à S × 0.22 pour rester visible à 180px."""
     S = img.size[0]
-    cx = int(S * 0.20)
-    cy = int(S * 0.76)
+    cx = int(S * 0.23)   # +3% vers la droite (0.20 → 0.23)
+    cy = int(S * 0.82)   # +6% vers le bas (0.76 → 0.82)
     diam = int(S * 0.22)
     _draw_orbit_rings(img, cx, cy, diam)
     ball = _matrix_ball(diam)
