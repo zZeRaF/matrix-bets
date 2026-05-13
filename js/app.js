@@ -464,9 +464,20 @@ function app() {
       this.closeSplash();
     },
 
+    startBgRain() {
+      const canvas = document.getElementById("bg-rain");
+      if (!canvas || canvas._rainStarted) return;
+      startMatrixRain(canvas, false); // false = utilise window.innerWidth/Height
+      canvas._rainStarted = true;
+      // Fade-in opacité une fois l'animation lancée
+      requestAnimationFrame(() => canvas.classList.add("active"));
+    },
+
     async closeSplash() {
       if (this.splashFading) return;
       this.splashFading = true;
+      // Démarre la pluie matrix de fond pendant le fade
+      this.startBgRain();
 
       // Fade out audio via volume property (sync avec fade visuel 600ms)
       const audio = document.getElementById("splash-audio");

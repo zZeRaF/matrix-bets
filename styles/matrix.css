@@ -24,7 +24,11 @@
 [x-cloak] { display: none !important; }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body {
+html {
+  margin: 0; padding: 0;
+  background: var(--mx-bg);
+}
+body {
   margin: 0; padding: 0;
   background: var(--mx-bg);
   color: var(--mx-text);
@@ -32,7 +36,23 @@ html, body {
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  position: relative;
+  z-index: 1;
 }
+
+/* ── Pluie matrix de fond : visible sur les bandes latérales en desktop ── */
+.bg-rain {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease-out 0.3s;
+}
+.bg-rain.active { opacity: 0.55; }
 body {
   min-height: 100dvh;
   padding-top: calc(var(--topbar-h) + env(safe-area-inset-top));

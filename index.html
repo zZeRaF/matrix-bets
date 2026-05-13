@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-ap";
+      var APP_VERSION = "20260513-aq";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -72,7 +72,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-ap</div>
+      <div class="splash-version" id="splash-version">build 20260513-aq</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -89,6 +89,9 @@
       <div class="splash-subtitle">$BeTime$</div>
     </div>
   </div>
+
+  <!-- ─── PLUIE MATRIX EN ARRIÈRE-PLAN (full-screen, sous le body) ─── -->
+  <canvas id="bg-rain" class="bg-rain" aria-hidden="true"></canvas>
 
   <!-- ─── HEADER STICKY : Bankroll + date ─── -->
   <header class="topbar">
