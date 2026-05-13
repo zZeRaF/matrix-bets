@@ -102,8 +102,8 @@ def _enhance_eyes(img: Image.Image) -> Image.Image:
     out = img.convert("RGBA")
     w, h = out.size
 
-    # Ajustement fin : oeil gauche -0.2%x -0.2%y / oeil droit -2.5%x
-    eye_left = (int(w * 0.569), int(h * 0.211))
+    # Œil droit validé. Oeil gauche -0.1%x -0.05%y
+    eye_left = (int(w * 0.568), int(h * 0.2105))
     eye_right = (int(w * 0.650), int(h * 0.225))
 
     # Diamètres réduits de 50% — LEDs plus petites et fines
