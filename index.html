@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-u";
+      var APP_VERSION = "20260513-v";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -64,7 +64,10 @@
     <div class="splash-error">! SYSTEM CORRUPTED !</div>
     <!-- Flash WARNING orange -->
     <div class="splash-warning">⚠ ANOMALY DETECTED</div>
-    <!-- (Boutons SKIP et SON retirés — tap n'importe où sur le splash active l'audio) -->
+    <!-- Indicateur AUDIO ON visible après tap réussi -->
+    <div class="splash-audio-status" x-show="audioStarted">🔊 AUDIO ON</div>
+    <!-- Hint TAP avant que l'utilisateur active -->
+    <div class="splash-audio-hint" x-show="!audioStarted">👆 TAP POUR LE SON</div>
     <audio id="splash-audio" preload="auto"></audio>
     <div class="splash-content">
       <div class="splash-logo">
@@ -73,7 +76,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-u</div>
+      <div class="splash-version" id="splash-version">build 20260513-v</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">

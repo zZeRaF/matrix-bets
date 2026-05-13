@@ -28,15 +28,18 @@ function _beep(freq, dur, type = "square", vol = 0.25, slide = null) {
   const gain = ctx.createGain();
   osc.type = type;
   osc.frequency.setValueAtTime(freq, t);
-  if (slide) osc.frequency.exponentialRampToValueAtTime(slide, t + dur);
-  // Enveloppe ADSR très courte (attack 5ms, decay vers 0 sur dur)
-  gain.gain.setValueAtTime(0.0001, t);
-  gain.gain.exponentialRampToValueAtTime(vol, t + 0.005);
-  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  if (slide) osc.frequency.linearRampToValueAtTime(slide, t + dur);
+  // Enveloppe LINÉAIRE robuste — attack très court, sustain plein vol, release rapide
+  const attack = Math.min(0.003, dur * 0.1);
+  const release = Math.min(0.01, dur * 0.3);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(vol, t + attack);
+  gain.gain.setValueAtTime(vol, t + Math.max(attack, dur - release));
+  gain.gain.linearRampToValueAtTime(0, t + dur);
   osc.connect(gain);
   gain.connect(_audioGainMaster);
   osc.start(t);
-  osc.stop(t + dur + 0.02);
+  osc.stop(t + dur + 0.05);
 }
 
 function _noise(dur, vol = 0.12, freq = 800) {
@@ -235,23 +238,35 @@ function app() {
     },
 
     enableAudio() {
-      if (this.audioStarted) return; // déjà actif
-      // iOS exige que l'AudioContext soit créé DANS un user gesture handler
+      if (this.audioStarted) return;
       try {
         const ctx = _ensureAudio();
-        if (ctx && ctx.state === "suspended") {
-          ctx.resume().then(() => {
-            playHackSequence();
-          }).catch(() => playHackSequence());
+        if (!ctx) {
+          console.warn("[audio] AudioContext indisponible");
+          this.audioAvailable = false;
+          return;
+        }
+        console.log("[audio] context state:", ctx.state);
+        const startSeq = () => {
+          console.log("[audio] starting hack sequence, state:", ctx.state);
+          // BIP DE CONFIRMATION IMMÉDIAT fort et bien audible
+          _beep(880, 0.25, "square", 0.45);
+          _beep(1320, 0.20, "sine", 0.30);
+          setTimeout(() => playHackSequence(), 250);
+        };
+        if (ctx.state === "suspended") {
+          ctx.resume().then(startSeq).catch((e) => {
+            console.warn("[audio] resume failed:", e);
+            startSeq();
+          });
         } else {
-          playHackSequence();
+          startSeq();
         }
         this.audioStarted = true;
       } catch (e) {
-        console.warn("Audio error:", e);
+        console.warn("[audio] error:", e);
         this.audioAvailable = false;
       }
-      // Bonus : si un fichier MP3 est aussi dispo, on le joue en parallèle
       const audio = document.getElementById("splash-audio");
       if (audio && audio.src) {
         audio.volume = 0.7;
