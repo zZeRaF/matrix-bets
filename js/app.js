@@ -68,50 +68,45 @@ function _noise(dur, vol = 0.12, freq = 800) {
   src.stop(t + dur + 0.02);
 }
 
-function playHackSequence() {
+function playSplashSound() {
   const ctx = _ensureAudio();
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
 
-  // === SONS AIGUS INQUIÉTANTS STYLE HACKER MOVIE ===
-  // Sawtooth métallique + fréquences 1800-4200 Hz + intervalles dissonants
+  // === SONS DOUX HARMONIQUES (sine waves, accord majeur Do/Mi/Sol) ===
+  // Style "boot screen ambient" — agréable, montée vers BeTime
 
-  // Phase 1 (0-600ms) : rafale de bips aigus pendant le typewriter
-  for (let i = 0; i < 14; i++) {
-    setTimeout(() => {
-      const f = 2200 + Math.random() * 1500;
-      _beep(f, 0.018 + Math.random() * 0.015, "sawtooth", 0.20);
-    }, 20 + i * 42);
-  }
-
-  // Phase 2 (700-2100ms) : log lines — bips dissonants (intervalles non-harmoniques)
-  const logTimings = [700, 920, 1140, 1390, 1650, 1900];
-  const logFreqs = [1800, 2100, 1950, 2300, 2050, 2500];
-  logTimings.forEach((t, i) => {
-    setTimeout(() => _beep(logFreqs[i], 0.05, "sawtooth", 0.24), t);
-    setTimeout(() => _beep(logFreqs[i] * 1.41, 0.035, "triangle", 0.14), t + 28);
+  // Phase 1 (0-450ms) : arpège ascendant doux pendant le typewriter
+  // Do4, Mi4, Sol4, Do5, Mi5 (pentatonique majeure)
+  const arpeggio = [261.63, 329.63, 392.0, 523.25, 659.25];
+  arpeggio.forEach((freq, i) => {
+    setTimeout(() => _beep(freq, 0.18, "sine", 0.16), i * 90);
   });
 
-  // Phase 3 (~2100ms) : READY — alerte ascendante rapide
-  setTimeout(() => _beep(1500, 0.08, "sawtooth", 0.30, 2800), 2100);
-  setTimeout(() => _beep(3200, 0.05, "triangle", 0.22), 2200);
+  // Phase 2 (700-2100ms) : log lines — notes harmoniques montantes
+  const logTimings = [700, 920, 1140, 1390, 1650, 1900];
+  const logFreqs = [392.0, 523.25, 659.25, 523.25, 783.99, 1046.50];
+  logTimings.forEach((t, i) => {
+    setTimeout(() => _beep(logFreqs[i], 0.18, "sine", 0.14), t);
+    // Petite harmonique douce (quinte juste) pour épaissir
+    setTimeout(() => _beep(logFreqs[i] * 1.5, 0.10, "sine", 0.06), t + 30);
+  });
 
-  // Phase 4 (~2900ms) : $BeTime$ — accord tendu (tritone dissonant)
-  setTimeout(() => _beep(2000, 0.22, "sawtooth", 0.22), 2900);
-  setTimeout(() => _beep(2828, 0.22, "triangle", 0.16), 2920);
+  // Phase 3 (~2150ms) : READY — accord majeur Do/Mi/Sol (résolution apaisante)
+  setTimeout(() => {
+    _beep(261.63, 0.6, "sine", 0.12); // Do4
+    _beep(329.63, 0.6, "sine", 0.10); // Mi4
+    _beep(392.0, 0.6, "sine", 0.10);  // Sol4
+  }, 2150);
 
-  // Bips de surprise aléatoires (style "system intrusion detected")
-  setTimeout(() => _beep(4100, 0.035, "sine", 0.32), 1450);
-  setTimeout(() => _beep(3800, 0.04, "sine", 0.28), 2380);
-  setTimeout(() => _beep(3500, 0.03, "triangle", 0.26), 3400);
-
-  // Static crackling aléatoire de fond
-  for (let i = 0; i < 14; i++) {
-    setTimeout(() => {
-      _noise(0.06 + Math.random() * 0.04, 0.06, 2200 + Math.random() * 1800);
-    }, Math.random() * 3800);
-  }
+  // Phase 4 (~2900ms) : $BeTime$ — montée triomphante Mi5 → Sol5 → Do6
+  setTimeout(() => _beep(659.25, 0.18, "sine", 0.16), 2900);  // Mi5
+  setTimeout(() => _beep(783.99, 0.18, "sine", 0.16), 3000);  // Sol5
+  setTimeout(() => _beep(1046.50, 0.40, "sine", 0.18), 3100); // Do6 (final tenu)
 }
+
+// Alias pour compat
+const playHackSequence = playSplashSound;
 
 
 function loadStoredState() {
@@ -212,11 +207,36 @@ function app() {
         this.peak = saved.peak ?? Math.max(saved.bankroll ?? 100, 100);
         this.history = saved.history ?? [];
       }
-      // Vérifie si un fichier audio/intro.* est déposé dans le repo
       this.detectAudio();
-      // Démarre splash en parallèle du fetch (s'affiche pendant qu'on charge)
+      // Tente d'auto-démarrer l'audio (peut être bloqué selon navigateur)
+      this.tryAutoStartAudio();
+      // Fallback : tout premier geste utilisateur (souris/tap/touche/scroll) → démarre l'audio
+      const triggers = ["pointerdown", "touchstart", "keydown", "mousemove", "wheel"];
+      const fallback = () => {
+        triggers.forEach((ev) => document.removeEventListener(ev, fallback, true));
+        if (!this.audioStarted) this.enableAudio();
+      };
+      triggers.forEach((ev) => document.addEventListener(ev, fallback, true));
       this.startSplash();
-      this.loadData(); // ne await pas — splash et fetch tournent en //
+      this.loadData();
+    },
+
+    tryAutoStartAudio() {
+      // Tente l'autoplay sans interaction (souvent bloqué — fallback existe)
+      try {
+        const ctx = _ensureAudio();
+        if (!ctx) return;
+        const start = () => {
+          if (this.audioStarted) return;
+          playSplashSound();
+          this.audioStarted = true;
+        };
+        if (ctx.state === "suspended") {
+          ctx.resume().then(start).catch(() => {});
+        } else {
+          start();
+        }
+      } catch {}
     },
 
     async detectAudio() {
@@ -241,37 +261,18 @@ function app() {
       if (this.audioStarted) return;
       try {
         const ctx = _ensureAudio();
-        if (!ctx) {
-          console.warn("[audio] AudioContext indisponible");
-          this.audioAvailable = false;
-          return;
-        }
-        console.log("[audio] context state:", ctx.state);
-        const startSeq = () => {
-          console.log("[audio] starting hack sequence, state:", ctx.state);
-          // BIP DE CONFIRMATION IMMÉDIAT fort et bien audible
-          _beep(880, 0.25, "square", 0.45);
-          _beep(1320, 0.20, "sine", 0.30);
-          setTimeout(() => playHackSequence(), 250);
+        if (!ctx) return;
+        const start = () => {
+          if (this.audioStarted) return;
+          playSplashSound();
+          this.audioStarted = true;
         };
         if (ctx.state === "suspended") {
-          ctx.resume().then(startSeq).catch((e) => {
-            console.warn("[audio] resume failed:", e);
-            startSeq();
-          });
+          ctx.resume().then(start).catch(start);
         } else {
-          startSeq();
+          start();
         }
-        this.audioStarted = true;
-      } catch (e) {
-        console.warn("[audio] error:", e);
-        this.audioAvailable = false;
-      }
-      const audio = document.getElementById("splash-audio");
-      if (audio && audio.src) {
-        audio.volume = 0.7;
-        audio.play().catch(() => {});
-      }
+      } catch {}
     },
 
     async startSplash() {
