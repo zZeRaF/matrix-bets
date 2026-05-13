@@ -210,9 +210,10 @@ def _matrix_ball(size_px: int) -> Image.Image:
     rgb_green = Image.merge("HSV", (h_shifted, s, v)).convert("RGB")
     r2, g2, b2 = rgb_green.split()
     out = Image.merge("RGBA", (r2, g2, b2, a))
-    # Désaturation + assombrissement pour mieux intégrer le ballon
+    # Désaturation + assombrissement modéré pour intégrer le ballon
     out = ImageEnhance.Color(out).enhance(0.6)
-    out = ImageEnhance.Brightness(out).enhance(0.75)
+    # Brightness : 0.75 × 1.15 = 0.86 (ré-éclairci de 15% par rapport à la version sombre)
+    out = ImageEnhance.Brightness(out).enhance(0.86)
     return out
 
 
@@ -221,12 +222,13 @@ def _draw_orbit_rings(img: Image.Image, cx: int, cy: int, ball_diam: int) -> Non
     Boostés (épaisseur + alpha) pour rester lisibles à 180×180 (apple-touch-icon)."""
     # Spec : (rx_mult, ry_mult, angle°, width, alpha, blur, RGB)
     # Angles POSITIFS : traînée orientée haut-gauche → bas-droite (sens inversé)
+    # Couleurs RGB éclaircies de +15% par rapport au preset précédent
     rings = [
-        (1.85, 0.45, 32, 7, 255, 2, (0, 230, 100)),    # gros anneau vert vif, peu de blur
-        (1.65, 0.38, 22, 6, 240, 1, (0, 200, 80)),     # moyen vert net
-        (1.40, 0.30, 12, 5, 230, 1, (80, 220, 110)),   # serré vert pastel net
-        (1.75, 0.42, 28, 5, 200, 3, (120, 30, 30)),    # rouge sombre plus visible
-        (1.95, 0.48, 38, 4, 180, 4, (40, 180, 80)),    # halo diffus extérieur
+        (1.85, 0.45, 32, 7, 255, 2, (0, 255, 115)),    # gros anneau vert vif
+        (1.65, 0.38, 22, 6, 240, 1, (0, 230, 92)),     # moyen vert net
+        (1.40, 0.30, 12, 5, 230, 1, (92, 253, 127)),   # serré vert pastel net
+        (1.75, 0.42, 28, 5, 200, 3, (138, 35, 35)),    # rouge sombre plus visible
+        (1.95, 0.48, 38, 4, 180, 4, (46, 207, 92)),    # halo diffus extérieur
     ]
     for (rx_mult, ry_mult, angle, width, alpha, blur, color) in rings:
         rx = int(ball_diam * rx_mult / 2)
