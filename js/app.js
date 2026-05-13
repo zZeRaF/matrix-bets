@@ -464,25 +464,9 @@ function app() {
       this.closeSplash();
     },
 
-    startSideRains() {
-      // Démarre les 2 pluies latérales (cachées en CSS sur mobile, donc skip si pas affiché)
-      const left = document.getElementById("rain-left");
-      const right = document.getElementById("rain-right");
-      if (left && left.clientWidth > 0 && !left._rainStarted) {
-        startMatrixRain(left, true);
-        left._rainStarted = true;
-      }
-      if (right && right.clientWidth > 0 && !right._rainStarted) {
-        startMatrixRain(right, true);
-        right._rainStarted = true;
-      }
-    },
-
     async closeSplash() {
       if (this.splashFading) return;
       this.splashFading = true;
-      // Lance les pluies latérales pendant que le splash fade out
-      this.startSideRains();
 
       // Fade out audio via volume property (sync avec fade visuel 600ms)
       const audio = document.getElementById("splash-audio");
