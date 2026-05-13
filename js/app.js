@@ -72,30 +72,44 @@ function playSplashSound() {
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
 
-  // === STYLE GEEK INFORMATIQUE — BIOS / Terminal / Data transfer ===
-  // Square + triangle, bips courts et secs, rythme rapide, pas d'accord tenu
+  // === STYLE INFORMATIQUE INQUIÉTANT ===
+  // Drone sub-bass continu + gamme descendante + intervalles tendus
 
-  // Phase 1 (0-550ms) : 12 micro-bips type frappe clavier / data stream
-  const keyFreqs = [1200, 950, 1400, 1100, 1300, 880, 1500, 1050, 1250, 950, 1350, 1150];
+  // DRONE sub-bass continu (atmosphère sombre, durée totale)
+  _beep(55, 4.0, "sine", 0.10);     // A1 très grave (basse menaçante)
+  _beep(82.4, 4.0, "sine", 0.07);   // E2 quinte grave
+  _beep(110, 4.0, "triangle", 0.04); // A2 — léger renfort
+
+  // Phase 1 (0-550ms) : data stream — bips secs alternant aigus/graves dissonants
+  const keyFreqs = [1400, 800, 1250, 900, 1100, 750, 1350, 850, 1200, 720, 1450, 950];
   for (let i = 0; i < 12; i++) {
     setTimeout(() => _beep(keyFreqs[i], 0.025, "square", 0.14), 10 + i * 45);
   }
 
-  // Phase 2 (700-2100ms) : bip "scan" + ack pour chaque log line
+  // Phase 2 (700-2100ms) : log scan — gamme DESCENDANTE (sensation de chute)
   const logTimings = [700, 920, 1140, 1390, 1650, 1900];
+  const scanFreqs = [880, 740, 659, 587, 523, 466]; // descente progressive
   logTimings.forEach((t, i) => {
-    setTimeout(() => _beep(660 + i * 50, 0.04, "square", 0.18), t);
-    setTimeout(() => _beep(1320 + i * 100, 0.025, "triangle", 0.11), t + 50);
+    setTimeout(() => _beep(scanFreqs[i], 0.04, "square", 0.20), t);
+    // "ack" en tritone (intervalle de tension)
+    setTimeout(() => _beep(scanFreqs[i] * 1.414, 0.025, "triangle", 0.10), t + 50);
   });
 
-  // Phase 3 (~2150ms) : READY — un long bip "system ready"
-  setTimeout(() => _beep(880, 0.15, "square", 0.22), 2150);
-  setTimeout(() => _beep(1760, 0.035, "triangle", 0.14), 2310);
+  // Phase 3 (~2150ms) : READY — bip GRAVE long (pas aigu joyeux) + click aigu
+  setTimeout(() => _beep(220, 0.20, "square", 0.22), 2150);  // A3 grave
+  setTimeout(() => _beep(311, 0.03, "triangle", 0.13), 2330); // Eb4 tritone
 
-  // Phase 4 (~2900ms) : BeTime — 3 bips rapides ascendants (scan complete)
-  setTimeout(() => _beep(600, 0.05, "square", 0.18), 2900);
-  setTimeout(() => _beep(900, 0.05, "square", 0.18), 2970);
-  setTimeout(() => _beep(1200, 0.10, "square", 0.22), 3040);
+  // Phase 4 (~2900ms) : BeTime — DESCENTE inquiétante (chute finale)
+  setTimeout(() => _beep(660, 0.05, "square", 0.20), 2900);
+  setTimeout(() => _beep(523, 0.05, "square", 0.20), 2970);
+  setTimeout(() => _beep(415, 0.12, "square", 0.24), 3040);  // Ab4 — ton sombre final
+
+  // Glitch sawtooth aléatoires (très courts, ambiance hostile)
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      _beep(1700 + Math.random() * 1000, 0.012, "sawtooth", 0.09);
+    }, 350 + i * 700 + Math.random() * 150);
+  }
 }
 
 // Alias pour compat
