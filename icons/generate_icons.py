@@ -218,41 +218,73 @@ def _matrix_ball(size_px: int) -> Image.Image:
 
 
 def _draw_orbit_rings(img: Image.Image, cx: int, cy: int, ball_diam: int) -> None:
-    """Anneaux elliptiques inclinés autour du ballon — style traînée vitesse / orbite.
-    Boostés (épaisseur + alpha) pour rester lisibles à 180×180 (apple-touch-icon)."""
-    # Spec : (rx_mult, ry_mult, angle°, width, alpha, blur, RGB)
-    # Angles POSITIFS : traînée orientée haut-gauche → bas-droite (sens inversé)
-    # Couleurs RGB éclaircies de +15% par rapport au preset précédent
-    rings = [
-        (1.85, 0.45, 32, 7, 255, 2, (0, 255, 115)),    # gros anneau vert vif
-        (1.65, 0.38, 22, 6, 240, 1, (0, 230, 92)),     # moyen vert net
-        (1.40, 0.30, 12, 5, 230, 1, (92, 253, 127)),   # serré vert pastel net
-        (1.75, 0.42, 28, 5, 200, 3, (138, 35, 35)),    # rouge sombre plus visible
-        (1.95, 0.48, 38, 4, 180, 4, (46, 207, 92)),    # halo diffus extérieur
+    """Nuage galactique : poussière d'étoiles dispersée autour du ballon avec
+    distribution radiale gaussienne (concentration à r ≈ ballon × 1.0, dispersion forte).
+    Effet orbite incliné préservé via aplatissement vertical + rotation globale."""
+    import random
+    rng = random.Random(42)
+
+    # Palette : majorité vert (vif, pastel, sombre), touche rare rouge sombre
+    greens = [
+        (0, 255, 115),
+        (92, 253, 127),
+        (0, 230, 92),
+        (46, 207, 92),
+        (0, 200, 80),
+        (130, 255, 160),  # vert très pâle pour reflets
     ]
-    for (rx_mult, ry_mult, angle, width, alpha, blur, color) in rings:
-        rx_full = int(ball_diam * rx_mult / 2)
-        ry_full = int(ball_diam * ry_mult / 2)
-        # Réduit le diamètre côté bas-gauche de 2.5% (côté haut-droite inchangé) :
-        # rayon -2.5% + décalage vers haut-droite de +2.5% × rayon pour aligner bord droit
-        rx = int(rx_full * 0.975)
-        ry = int(ry_full * 0.975)
-        shift_x = rx_full - rx   # = rx_full × 0.025
-        shift_y = ry_full - ry
-        margin = max(rx_full, ry_full) + 32
-        layer = Image.new("RGBA", (margin * 2, margin * 2), (0, 0, 0, 0))
-        ld = ImageDraw.Draw(layer)
-        # Centre de l'ellipse décalé haut-droite dans le layer
-        cx_local = margin + shift_x
-        cy_local = margin - shift_y
-        ld.ellipse([cx_local - rx, cy_local - ry, cx_local + rx, cy_local + ry],
-                   outline=(*color, alpha), width=width)
-        layer = layer.rotate(angle, resample=Image.BICUBIC)
-        if blur:
-            layer = layer.filter(ImageFilter.GaussianBlur(radius=blur))
-        paste_x = cx - layer.size[0] // 2
-        paste_y = cy - layer.size[1] // 2
-        img.alpha_composite(layer, (paste_x, paste_y))
+    rare_red = (138, 35, 35)
+
+    angle_global = math.radians(28)  # orientation orbite haut-droite → bas-gauche
+    ellipse_flatten = 0.35            # aplatissement vertical (effet orbite vue en perspective)
+
+    margin = int(ball_diam * 1.6)
+    layer = Image.new("RGBA", (margin * 2, margin * 2), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(layer)
+    cx_local, cy_local = margin, margin
+
+    # 1400 particules total — densité élevée pour effet nuage
+    for _ in range(1400):
+        # Distribution radiale : gaussienne centrée sur r = 0.9 × demi-diamètre × 1.8
+        # (correspond à peu près à la zone des anciens anneaux)
+        r_norm = rng.gauss(0.95, 0.28)
+        r_norm = max(0.55, min(1.65, r_norm))  # borne pour rester hors du ballon
+        r = ball_diam / 2 * r_norm * 1.7
+
+        theta = rng.uniform(0, 2 * math.pi)
+        x_e = r * math.cos(theta)
+        y_e = r * math.sin(theta) * ellipse_flatten
+        # Rotation globale
+        xr = x_e * math.cos(angle_global) - y_e * math.sin(angle_global)
+        yr = x_e * math.sin(angle_global) + y_e * math.cos(angle_global)
+        px = cx_local + xr
+        py = cy_local + yr
+
+        # Atténue le côté bas-gauche (cohérence avec préf utilisateur précédente)
+        if xr < -ball_diam * 0.3 and yr > ball_diam * 0.1:
+            if rng.random() < 0.4:
+                continue
+
+        # Tailles : 60% petites (1-2), 30% moyennes (2-3), 10% grosses (3-5)
+        sr = rng.random()
+        if sr < 0.60:
+            size = rng.randint(1, 2)
+        elif sr < 0.90:
+            size = rng.randint(2, 3)
+        else:
+            size = rng.randint(3, 5)
+
+        # Couleur : 92% vert (variation), 8% rouge sombre
+        color = rng.choice(greens) if rng.random() < 0.92 else rare_red
+        alpha = rng.randint(110, 245)
+        ld.ellipse([px - size, py - size, px + size, py + size],
+                   fill=(*color, alpha))
+
+    # Très léger flou pour adoucir la pixellisation
+    layer = layer.filter(ImageFilter.GaussianBlur(radius=0.5))
+    paste_x = cx - margin
+    paste_y = cy - margin
+    img.alpha_composite(layer, (paste_x, paste_y))
 
 
 def _paste_matrix_ball(img: Image.Image) -> None:
