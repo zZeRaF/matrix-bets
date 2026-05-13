@@ -364,7 +364,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  /* padding-top boosté pour décaler la zone vers le bas (mieux centré visuellement) */
+  padding: 18vh 24px 32px;
   gap: 20px;
   background: radial-gradient(circle at center, transparent 0%, rgba(0,16,0,0.6) 60%, rgba(0,7,0,0.9) 100%);
 }
