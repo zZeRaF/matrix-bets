@@ -681,12 +681,30 @@ function app() {
       return f;
     },
 
+    // Kelly théorique non plafonné (pour détecter si le cap agit)
+    computeKellyRaw(proba, cote, divisor = 4) {
+      if (!cote || cote <= 1 || !proba || proba <= 0 || proba >= 1) return 0;
+      const b = cote - 1;
+      const q = 1 - proba;
+      const f_full = (b * proba - q) / b;
+      if (f_full <= 0) return 0;
+      return f_full / divisor;
+    },
+
     // Mise en € calculée selon la cote réelle saisie + bankroll actuelle
     computeMise(pari, coteReelle) {
       if (!pari || !coteReelle) return 0;
       const divisor = pari.rule_id === "R3" ? 8 : 4;
       const f = this.computeKelly(pari.proba_validee, coteReelle, divisor);
       return Math.round(this.bankroll * f * 100) / 100;
+    },
+
+    // True si la mise est plafonnée par le cap 7% (= Kelly théorique > cap)
+    isMiseCapped(pari, coteReelle) {
+      if (!pari || !coteReelle) return false;
+      const divisor = pari.rule_id === "R3" ? 8 : 4;
+      const raw = this.computeKellyRaw(pari.proba_validee, coteReelle, divisor);
+      return raw > 0.07;
     },
 
     // Place un pari → entry history avec status='placed'

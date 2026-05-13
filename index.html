@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-vg";
+      var APP_VERSION = "20260513-wh";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -74,7 +74,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-vg</div>
+      <div class="splash-version" id="splash-version">build 20260513-wh</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -463,8 +463,16 @@
                            class="pari-cote-input">
                   </label>
                   <div class="pari-mise-preview">
-                    <span>Mise calculée (Kelly /<span x-text="pari.rule_id === 'R3' ? '8' : '4'"></span>) :</span>
-                    <strong x-text="fmtEur(computeMise(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle))"></strong>
+                    <div class="pari-mise-row">
+                      <span>Mise calculée (Kelly /<span x-text="pari.rule_id === 'R3' ? '8' : '4'"></span>) :</span>
+                      <strong x-text="fmtEur(computeMise(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle))"></strong>
+                    </div>
+                    <template x-if="isMiseCapped(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle)">
+                      <div class="pari-cap-hint">
+                        🛡️ Mise PLAFONNÉE à 7% bankroll
+                        — Kelly théo : <span x-text="(computeKellyRaw(pari.proba_validee, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle, pari.rule_id === 'R3' ? 8 : 4) * 100).toFixed(1) + '%'"></span>
+                      </div>
+                    </template>
                   </div>
                   <button class="pari-btn-place"
                           @click="placeBet(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle)">

@@ -1959,3 +1959,19 @@ body.layer-open .bottom-nav { display: none; }
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+
+/* Indicateur "mise plafonnée" dans onglet PARI */
+.pari-mise-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pari-cap-hint {
+  color: var(--mx-orange);
+  font-size: 0.7rem;
+  font-style: italic;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--mx-border-thin);
+}
+.pari-cap-hint span { color: var(--mx-green-pastel); font-weight: 700; }
