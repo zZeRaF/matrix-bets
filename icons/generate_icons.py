@@ -212,8 +212,8 @@ def _matrix_ball(size_px: int) -> Image.Image:
     out = Image.merge("RGBA", (r2, g2, b2, a))
     # Désaturation + assombrissement modéré pour intégrer le ballon
     out = ImageEnhance.Color(out).enhance(0.6)
-    # Brightness : 0.75 × 1.15 = 0.86 (ré-éclairci de 15% par rapport à la version sombre)
-    out = ImageEnhance.Brightness(out).enhance(0.86)
+    # Brightness : 0.86 × 1.05 = 0.90 (+5% éclaircissement supplémentaire)
+    out = ImageEnhance.Brightness(out).enhance(0.90)
     return out
 
 
