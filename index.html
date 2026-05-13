@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-qb";
+      var APP_VERSION = "20260513-rc";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -74,7 +74,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-qb</div>
+      <div class="splash-version" id="splash-version">build 20260513-rc</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -377,12 +377,114 @@
           </template>
         </div>
 
-        <!-- ──── ONGLET PARI (placeholder, codé en Push 2) ──── -->
+        <!-- ──── ONGLET PARI ──── -->
         <div class="detail-body" x-show="detailSubtab === 'pari'">
-          <div class="empty">
-            <p class="empty-status">PRISE DE PARI</p>
-            <p class="empty-meta">Onglet en cours de construction. Tu y trouveras la mise Kelly recommandée pré-remplie, saisie cote bookmaker, et l'historique des paris placés.</p>
+          <!-- Bankroll en tête -->
+          <div class="pari-bankroll-banner">
+            <div>
+              <span class="pari-bankroll-lbl">BANKROLL</span>
+              <span class="pari-bankroll-val" x-text="fmtEur(bankroll)"></span>
+            </div>
+            <button class="pari-bankroll-edit" @click="editBankroll()" title="Modifier la bankroll">✎</button>
           </div>
+
+          <!-- Aucun pari recommandé -->
+          <template x-if="selectedMatchBets().length === 0">
+            <div class="empty">
+              <p class="empty-status">AUCUN PARI</p>
+              <p class="empty-meta">Aucun pari recommandé par le moteur pour ce match.</p>
+            </div>
+          </template>
+
+          <!-- Liste des paris recommandés -->
+          <template x-for="pari in selectedMatchBets()" :key="pari.rank">
+            <section class="pari-card" :data-rule="pari.rule_id">
+              <header class="pari-card-header">
+                <span class="pari-rule-badge" x-text="pari.rule_id"></span>
+                <span class="pari-type" x-text="pari.bet_type"></span>
+              </header>
+              <h3 class="pari-verdict" x-text="pari.verdict"></h3>
+              <p class="pari-reasoning" x-text="pari.reasoning"></p>
+
+              <div class="pari-grid">
+                <div class="pari-stat">
+                  <div class="stat-lbl">COTE SUGGÉRÉE</div>
+                  <div class="stat-val" x-text="fmtNum(pari.cote_reelle || pari.cote_estimee)"></div>
+                </div>
+                <div class="pari-stat">
+                  <div class="stat-lbl">PROBA</div>
+                  <div class="stat-val" x-text="fmtPct(pari.proba_validee)"></div>
+                </div>
+                <div class="pari-stat">
+                  <div class="stat-lbl">KELLY</div>
+                  <div class="stat-val" x-text="fmtPct(pari.kelly_fraction)"></div>
+                </div>
+                <div class="pari-stat">
+                  <div class="stat-lbl">EDGE</div>
+                  <div class="stat-val" x-text="fmtPct(pari.edge)"></div>
+                </div>
+              </div>
+
+              <!-- État : pari pas encore placé -->
+              <template x-if="!getBetForPari(pari)">
+                <div class="pari-action">
+                  <label class="pari-input-row">
+                    <span>Cote bookmaker :</span>
+                    <input type="number" step="0.01" min="1.01"
+                           :value="pari.cote_reelle"
+                           x-model.number="pari._coteSaisie"
+                           @input="pari._coteSaisie = parseFloat($event.target.value) || pari.cote_reelle"
+                           class="pari-cote-input">
+                  </label>
+                  <div class="pari-mise-preview">
+                    <span>Mise calculée (Kelly /<span x-text="pari.rule_id === 'R3' ? '8' : '4'"></span>) :</span>
+                    <strong x-text="fmtEur(computeMise(pari, pari._coteSaisie || pari.cote_reelle))"></strong>
+                  </div>
+                  <button class="pari-btn-place"
+                          @click="placeBet(pari, pari._coteSaisie || pari.cote_reelle)">
+                    ⚡ PLACER LE PARI
+                  </button>
+                </div>
+              </template>
+
+              <!-- État : pari placé (en attente résolution) -->
+              <template x-if="getBetForPari(pari) && getBetForPari(pari).status === 'placed'">
+                <div class="pari-placed">
+                  <div class="pari-placed-row">
+                    <span>Placé @ cote <strong x-text="fmtNum(getBetForPari(pari).cote_book)"></strong></span>
+                    <span>Mise <strong x-text="fmtEur(getBetForPari(pari).mise)"></strong></span>
+                  </div>
+                  <div class="pari-placed-row pari-potential">
+                    <span>Gain potentiel :</span>
+                    <strong class="potential-win" x-text="'+' + fmtEur(getBetForPari(pari).mise * (getBetForPari(pari).cote_book - 1))"></strong>
+                  </div>
+                  <div class="pari-resolve-actions">
+                    <button class="pari-btn-won" @click="resolveBet(getBetForPari(pari).id, 'won')">✓ GAGNÉ</button>
+                    <button class="pari-btn-lost" @click="resolveBet(getBetForPari(pari).id, 'lost')">✗ PERDU</button>
+                  </div>
+                  <button class="pari-btn-cancel" @click="cancelBet(getBetForPari(pari).id)">Annuler ce pari</button>
+                </div>
+              </template>
+
+              <!-- État : pari gagné -->
+              <template x-if="getBetForPari(pari) && getBetForPari(pari).status === 'won'">
+                <div class="pari-result pari-result-won">
+                  <span class="result-badge">GAGNÉ ✓</span>
+                  <span>Mise <span x-text="fmtEur(getBetForPari(pari).mise)"></span> @ <span x-text="fmtNum(getBetForPari(pari).cote_book)"></span></span>
+                  <strong class="result-profit" x-text="'+' + fmtEur(getBetForPari(pari).profit)"></strong>
+                </div>
+              </template>
+
+              <!-- État : pari perdu -->
+              <template x-if="getBetForPari(pari) && getBetForPari(pari).status === 'lost'">
+                <div class="pari-result pari-result-lost">
+                  <span class="result-badge">PERDU ✗</span>
+                  <span>Mise <span x-text="fmtEur(getBetForPari(pari).mise)"></span> @ <span x-text="fmtNum(getBetForPari(pari).cote_book)"></span></span>
+                  <strong class="result-profit" x-text="fmtEur(getBetForPari(pari).profit)"></strong>
+                </div>
+              </template>
+            </section>
+          </template>
         </div>
       </div>
     </template>

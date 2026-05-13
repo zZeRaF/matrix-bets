@@ -636,6 +636,111 @@ function app() {
       if (n > this.peak) this.peak = n;
       saveStoredState(this);
     },
+
+    // ═══════════════════════════════════════════════════
+    // GESTION DES PARIS PLACÉS — vue détail onglet PARI
+    // ═══════════════════════════════════════════════════
+
+    // Clé d'identification d'un pari (combinaison match + règle + verdict)
+    _betKey(date, slug, rule_id, verdict) {
+      return `${date}|${slug}|${rule_id}|${verdict}`;
+    },
+
+    // Retourne l'entrée history correspondant à un pari du TOP, ou null
+    getBetForPari(pari) {
+      if (!pari || !this.data) return null;
+      const key = this._betKey(this.data.date, pari.match_slug, pari.rule_id, pari.verdict);
+      return this.history.find((b) => b.key === key) || null;
+    },
+
+    // Kelly recalculé avec une cote saisie utilisateur
+    computeKelly(proba, cote, divisor = 4, cap = 0.07) {
+      if (!cote || cote <= 1 || !proba || proba <= 0 || proba >= 1) return 0;
+      const b = cote - 1;
+      const q = 1 - proba;
+      const f_full = (b * proba - q) / b;
+      if (f_full <= 0) return 0;
+      let f = f_full / divisor;
+      if (f > cap) f = cap;
+      return f;
+    },
+
+    // Mise en € calculée selon la cote réelle saisie + bankroll actuelle
+    computeMise(pari, coteReelle) {
+      if (!pari || !coteReelle) return 0;
+      const divisor = pari.rule_id === "R3" ? 8 : 4;
+      const f = this.computeKelly(pari.proba_validee, coteReelle, divisor);
+      return Math.round(this.bankroll * f * 100) / 100;
+    },
+
+    // Place un pari → entry history avec status='placed'
+    placeBet(pari, coteReelle) {
+      if (!pari || !coteReelle || coteReelle <= 1) {
+        alert("Cote invalide (doit être > 1).");
+        return;
+      }
+      if (this.getBetForPari(pari)) {
+        alert("Ce pari a déjà été placé.");
+        return;
+      }
+      const mise = this.computeMise(pari, coteReelle);
+      if (mise <= 0) {
+        alert("Mise calculée = 0 (cote trop basse ou proba trop faible). Pari non rentable.");
+        return;
+      }
+      const entry = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+        key: this._betKey(this.data.date, pari.match_slug, pari.rule_id, pari.verdict),
+        date: this.data.date,
+        match_slug: pari.match_slug,
+        home: pari.home_team,
+        away: pari.away_team,
+        competition: pari.competition,
+        rule_id: pari.rule_id,
+        rule_label: pari.rule_label,
+        bet_type: pari.bet_type,
+        verdict: pari.verdict,
+        cote_book: coteReelle,
+        proba: pari.proba_validee,
+        mise: mise,
+        kelly_fraction: this.computeKelly(pari.proba_validee, coteReelle,
+                                          pari.rule_id === "R3" ? 8 : 4),
+        status: "placed",
+        profit: 0,
+        placed_at: new Date().toISOString(),
+        resolved_at: null,
+      };
+      this.history.push(entry);
+      saveStoredState(this);
+    },
+
+    // Marque un pari comme gagné ou perdu, ajuste bankroll
+    resolveBet(betId, outcome) {
+      const bet = this.history.find((b) => b.id === betId);
+      if (!bet || bet.status !== "placed") return;
+      if (outcome !== "won" && outcome !== "lost") return;
+      if (outcome === "won") {
+        bet.profit = Math.round(bet.mise * (bet.cote_book - 1) * 100) / 100;
+        this.bankroll = Math.round((this.bankroll + bet.profit) * 100) / 100;
+      } else {
+        bet.profit = -bet.mise;
+        this.bankroll = Math.round((this.bankroll + bet.profit) * 100) / 100;
+      }
+      bet.status = outcome;
+      bet.resolved_at = new Date().toISOString();
+      if (this.bankroll > this.peak) this.peak = this.bankroll;
+      saveStoredState(this);
+    },
+
+    // Annuler un pari placé (avant résolution) — au cas où erreur de saisie
+    cancelBet(betId) {
+      const idx = this.history.findIndex((b) => b.id === betId);
+      if (idx < 0) return;
+      if (this.history[idx].status !== "placed") return;
+      if (!confirm("Annuler ce pari (mise non engagée) ?")) return;
+      this.history.splice(idx, 1);
+      saveStoredState(this);
+    },
   };
 }
 
