@@ -112,35 +112,38 @@ function app() {
         this._splashStopRain = startMatrixRain(canvas);
       }
 
-      // ── BUDGET TOTAL : 20 000ms ──
-      // Typewriter title          : 780ms (13 chars × 60ms)
-      // Pause                     : 200ms
-      // Log lines (6 steps)        : 4 000ms cumul
-      // Scène d'action continue   : 13 500ms (pendant que le reste affiche READY)
+      // ── BUDGET TOTAL : 7 000ms ──
+      // Typewriter title          : 520ms (13 chars × 40ms)
+      // Log lines (6 steps)        : 2 880ms cumul
+      // Pause + scène 3D termine  : ~3 000ms
       // Fade out                  : 600ms
-      // Bouton SKIP visible dès   : 3 000ms
+      // Bouton SKIP visible dès   : 2 000ms
 
-      // Active le bouton SKIP après 3s
-      setTimeout(() => { this.splashSkipAvailable = true; }, 3000);
+      // Active le bouton SKIP après 2s
+      setTimeout(() => { this.splashSkipAvailable = true; }, 2000);
+
+      // Démarre la scène 3D dès maintenant (en parallèle)
+      if (window.startThreeScene) {
+        window.startThreeScene();
+      }
 
       // Typewriter du titre
       const title = "$MATRIX BETS$";
       for (let i = 1; i <= title.length; i++) {
         if (this._splashCancelled) return;
         this.splashTitle = title.slice(0, i);
-        await sleep(60);
+        await sleep(40);
       }
       if (this._splashCancelled) return;
-      await sleep(200);
 
-      // 6 log lines étalées sur 4s, puis scène d'action seule pendant ~13s
+      // 6 log lines compressées sur ~2.9s
       const steps = [
-        { text: "INITIALISATION SHELL...", delay: 580 },
-        { text: "CONNEXION GITHUB PAGES...", delay: 580 },
-        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 700 },
-        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 700 },
-        { text: "CALCUL KELLY /4...", delay: 700 },
-        { text: "READY.", delay: 740 },
+        { text: "INITIALISATION SHELL...", delay: 400 },
+        { text: "CONNEXION GITHUB PAGES...", delay: 400 },
+        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 480 },
+        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 500 },
+        { text: "CALCUL KELLY /4...", delay: 480 },
+        { text: "READY.", delay: 620 },
       ];
       for (let i = 0; i < steps.length; i++) {
         if (this._splashCancelled) return;
@@ -151,8 +154,8 @@ function app() {
       }
       this.splashProgress = 100;
 
-      // Pause pendant que la scène d'action continue (~13.5s)
-      await sleep(13500);
+      // Pause finale pendant que la scène 3D finit (~3s restantes)
+      await sleep(2980);
       if (this._splashCancelled) return;
 
       this.closeSplash();
@@ -169,6 +172,7 @@ function app() {
       await sleep(600);
       this.showSplash = false;
       if (this._splashStopRain) this._splashStopRain();
+      if (window.stopThreeScene) window.stopThreeScene();
     },
 
     async loadData() {

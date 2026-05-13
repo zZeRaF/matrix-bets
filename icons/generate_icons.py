@@ -102,11 +102,11 @@ def _enhance_eyes(img: Image.Image) -> Image.Image:
     out = img.convert("RGBA")
     w, h = out.size
 
-    # Coordonnées des yeux du robot (calibrées sur image debug grille 1024×1024)
-    # Œil gauche du robot (le plus visible, notre droite de l'image inversée) ≈ (555, 150)
-    # Œil droit du robot (partiellement masqué par l'angle 3/4) ≈ (595, 145)
-    eye_left = (int(w * 0.542), int(h * 0.146))
-    eye_right = (int(w * 0.581), int(h * 0.141))
+    # Coordonnées des yeux du robot (calibrées via zoom face 700×600 sur image 1024)
+    # Œil principal visible (côté notre gauche, le robot regarde 3/4) ≈ (535, 190)
+    # Œil partiellement masqué (côté notre droite) ≈ (590, 185)
+    eye_left = (int(w * 0.522), int(h * 0.186))   # (534, 190)
+    eye_right = (int(w * 0.576), int(h * 0.181))  # (590, 185)
 
     # Couche 1 : Halo très large vert (atmosphère)
     halo_far = Image.new("RGBA", (w, h), (0, 0, 0, 0))

@@ -541,7 +541,25 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   SCÈNE MATRIX FULL ACTION
+   SCÈNE 3D Three.js — canvas WebGL plein cadre
+   ════════════════════════════════════════════════════════════════ */
+.scene-3d {
+  position: relative;
+  width: min(96vw, 420px);
+  height: clamp(200px, 50vw, 280px);
+  margin: 4px 0 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(0, 255, 102, 0.25);
+  border-bottom: 1px solid rgba(0, 255, 102, 0.25);
+}
+#three-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SCÈNE SVG FULL ACTION (legacy, masquée si Three.js actif)
    Cycle 20s : entrée → approche → course → dribble1 → course → dribble2
               → charge → frappe → but → roule filet → GOAL → reset
    Découpage temporel (sur 20 000ms) :

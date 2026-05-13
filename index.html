@@ -15,6 +15,14 @@
   <title>Matrix Bets</title>
   <!-- Alpine.js 3.14.x -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+  <!-- Three.js via importmap (chargé par js/three-scene.js) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
 </head>
 <body x-data="app()" x-init="init()">
 
@@ -43,7 +51,13 @@
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
 
-      <!-- ── SCÈNE GALACTIK FACE-AU-BUT : course → dribble → frappe → but ── -->
+      <!-- ── SCÈNE 3D Three.js (canvas WebGL) ── -->
+      <div class="splash-scene scene-3d" aria-hidden="true">
+        <canvas id="three-canvas"></canvas>
+      </div>
+
+      <!-- ── SCÈNE GALACTIK FACE-AU-BUT (fallback SVG, masquée si Three.js actif) ── -->
+      <div class="splash-scene scene-galactik" aria-hidden="true" style="display:none">
       <div class="splash-scene scene-galactik" aria-hidden="true">
         <!-- Vue depuis derrière le joueur, but au fond en perspective convergente.
              Pelouse en perspective forte. Robot photo en bas-centre (proche caméra),
@@ -306,6 +320,7 @@
   </nav>
 
   <script src="js/app.js"></script>
+  <script type="module" src="js/three-scene.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
