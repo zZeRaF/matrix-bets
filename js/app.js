@@ -165,11 +165,11 @@ function app() {
       setTimeout(() => { this.splashSkipAvailable = true; }, 1200);
 
       // Typewriter du titre
-      const title = "BeTime";
+      const title = "$MATRIX BET$";
       for (let i = 1; i <= title.length; i++) {
         if (this._splashCancelled) return;
         this.splashTitle = title.slice(0, i);
-        await sleep(50);
+        await sleep(45);
       }
       if (this._splashCancelled) return;
 

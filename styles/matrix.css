@@ -426,6 +426,16 @@ body {
   opacity: 0.8;
   margin-top: -8px;
 }
+.splash-subtitle {
+  color: var(--mx-green-pastel);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 10px rgba(130, 255, 180, 0.6), 0 0 20px rgba(0, 255, 102, 0.3);
+  font-style: italic;
+  opacity: 0.95;
+  margin-top: -4px;
+}
 .splash-log {
   list-style: none;
   padding: 0;
