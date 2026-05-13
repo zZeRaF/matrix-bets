@@ -89,6 +89,8 @@ function app() {
     splashLog: [],
     splashProgress: 0,
     splashSkipAvailable: false,
+    audioStarted: false,
+    audioAvailable: false,
     _splashStopRain: null,
     _splashCancelled: false,
 
@@ -99,9 +101,49 @@ function app() {
         this.peak = saved.peak ?? Math.max(saved.bankroll ?? 100, 100);
         this.history = saved.history ?? [];
       }
+      // Vérifie si un fichier audio/intro.* est déposé dans le repo
+      this.detectAudio();
       // Démarre splash en parallèle du fetch (s'affiche pendant qu'on charge)
       this.startSplash();
       this.loadData(); // ne await pas — splash et fetch tournent en //
+    },
+
+    async detectAudio() {
+      // Cherche un fichier audio/intro.{mp3,m4a,wav,aac,ogg} déposé par l'utilisateur
+      const extensions = ["mp3", "m4a", "wav", "aac", "ogg"];
+      for (const ext of extensions) {
+        const url = `audio/intro.${ext}`;
+        try {
+          const res = await fetch(url, { method: "HEAD" });
+          if (res.ok) {
+            const audio = document.getElementById("splash-audio");
+            if (audio) {
+              audio.src = url;
+              this.audioAvailable = true;
+              return;
+            }
+          }
+        } catch {}
+      }
+      this.audioAvailable = false;
+    },
+
+    enableAudio() {
+      const audio = document.getElementById("splash-audio");
+      if (!audio || !audio.src) return;
+      audio.volume = 0.95;
+      // Le tap utilisateur autorise la lecture sur iOS
+      const playPromise = audio.play();
+      if (playPromise) {
+        playPromise.then(() => {
+          this.audioStarted = true;
+        }).catch(() => {
+          // En cas de blocage, on désactive l'option pour ne pas re-tenter
+          this.audioAvailable = false;
+        });
+      } else {
+        this.audioStarted = true;
+      }
     },
 
     async startSplash() {

@@ -43,6 +43,12 @@
     <button class="splash-skip" x-show="splashSkipAvailable" @click="skipSplash()">
       SKIP <span class="skip-arrow">→</span>
     </button>
+    <!-- Bouton AUDIO (apparaît au lancement, premier tap = autorise audio + démarre la PWA avec son) -->
+    <button class="splash-audio-toggle" x-show="!audioStarted && audioAvailable" @click="enableAudio()">
+      <span class="audio-icon">▶</span> <span>SON</span>
+    </button>
+    <!-- Audio element (source ajoutée dynamiquement si présent) -->
+    <audio id="splash-audio" preload="auto"></audio>
     <div class="splash-content">
       <div class="splash-logo">
         <span class="splash-brand">
