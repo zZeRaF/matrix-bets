@@ -419,6 +419,13 @@ body {
   opacity: 0.85;
   text-shadow: 0 0 6px rgba(130, 255, 180, 0.4);
 }
+.splash-version {
+  color: var(--mx-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  opacity: 0.8;
+  margin-top: -8px;
+}
 .splash-log {
   list-style: none;
   padding: 0;

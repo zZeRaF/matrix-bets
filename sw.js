@@ -2,7 +2,7 @@
 // Stratégie : network-first pour les JSON data (toujours fresh),
 // cache-first pour les assets statiques (HTML/CSS/JS/icons).
 
-const CACHE_NAME = "matrix-bets-v4";
+const CACHE_NAME = "betime-v5";
 const STATIC_ASSETS = [
   "./",
   "./index.html",

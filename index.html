@@ -13,6 +13,30 @@
   <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
   <link rel="stylesheet" href="styles/matrix.css">
   <title>BeTime</title>
+  <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
+  <script>
+    (function () {
+      var APP_VERSION = "20260513-l";
+      var stored = localStorage.getItem("bt-version");
+      if (stored !== APP_VERSION) {
+        localStorage.setItem("bt-version", APP_VERSION);
+        if (stored !== null && "serviceWorker" in navigator) {
+          // Version a changé : on désinscrit tous les SW et on vide tous les caches, puis reload.
+          // Ne pas boucler : on a déjà mis à jour localStorage, donc au prochain reload on passera.
+          Promise.all([
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              return Promise.all(regs.map(function (r) { return r.unregister(); }));
+            }),
+            (typeof caches !== "undefined" ? caches.keys().then(function (names) {
+              return Promise.all(names.map(function (n) { return caches.delete(n); }));
+            }) : Promise.resolve())
+          ]).then(function () {
+            window.location.reload();
+          });
+        }
+      }
+    })();
+  </script>
   <!-- Alpine.js 3.14.x -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
   <!-- Three.js via importmap (chargé par js/three-scene.js) -->
@@ -56,6 +80,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
+      <div class="splash-version" id="splash-version">build 20260513-l</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
