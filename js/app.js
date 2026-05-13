@@ -67,45 +67,15 @@ function _noise(dur, vol = 0.12, freq = 800) {
   src.stop(t + dur + 0.02);
 }
 
-// Helper : beep avec scheduling absolu (time = ctx.currentTime + offset)
-function _beepAt(time, freq, duration, gain = 0.18) {
-  const ctx = _ensureAudio();
-  if (!ctx) return;
-  const osc = ctx.createOscillator();
-  const g = ctx.createGain();
-  osc.type = "square";
-  osc.frequency.setValueAtTime(freq, time);
-  g.gain.setValueAtTime(0, time);
-  g.gain.linearRampToValueAtTime(gain, time + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.001, time + duration);
-  osc.connect(g);
-  g.connect(_audioGainMaster);
-  osc.start(time);
-  osc.stop(time + duration + 0.02);
-}
-
-// Helper : burst de noise blanc filtré (style "data corruption")
-function _noiseBurstAt(time, duration = 0.08) {
-  const ctx = _ensureAudio();
-  if (!ctx) return;
-  const bufferSize = Math.floor(ctx.sampleRate * duration);
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+// Courbe de distortion (WaveShaper) pour ajouter du grain à l'audio
+function _makeDistortion(amount = 40) {
+  const curve = new Float32Array(44100);
+  const deg = Math.PI / 180;
+  for (let i = 0; i < 44100; i++) {
+    const x = (i * 2) / 44100 - 1;
+    curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
   }
-  const src = ctx.createBufferSource();
-  const filter = ctx.createBiquadFilter();
-  const g = ctx.createGain();
-  src.buffer = buffer;
-  filter.type = "bandpass";
-  filter.frequency.value = 900;
-  filter.Q.value = 6;
-  g.gain.value = 0.25;
-  src.connect(filter);
-  filter.connect(g);
-  g.connect(_audioGainMaster);
-  src.start(time);
+  return curve;
 }
 
 function playSplashSound() {
@@ -113,59 +83,130 @@ function playSplashSound() {
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
 
-  // === HACKING ALERT ===
-  // Pattern de bips alternants en 2 phases (aigu 880/1320 puis grave 660/990)
-  // + bursts de noise + drone sawtooth 110Hz modulé par LFO 7Hz (tremolo inquiétant)
+  // ─── CHAÎNE D'EFFETS : master → distortion → compressor → output
+  //     avec delay/feedback parallèle pour effet "écho hack"
+  const master = ctx.createGain();
+  master.gain.value = 0.75;
 
-  const now = ctx.currentTime + 0.05;
+  const compressor = ctx.createDynamicsCompressor();
+  compressor.threshold.value = -18;
+  compressor.knee.value = 18;
+  compressor.ratio.value = 8;
+  compressor.attack.value = 0.004;
+  compressor.release.value = 0.16;
 
-  // Fréquences divisées par 2 (octave plus bas) — moins aigu, plus sombre
-  const pattern = [
-    [0.00, 440],
-    [0.12, 660],
-    [0.24, 440],
-    [0.36, 660],
-    [0.60, 330],
-    [0.72, 495],
-    [0.84, 330],
-    [0.96, 495],
-  ];
+  const distortion = ctx.createWaveShaper();
+  distortion.curve = _makeDistortion(22);
+  distortion.oversample = "4x";
 
-  // 3 boucles (3 × 1.25s = 3.75s) pour matcher splash 4s
-  for (let loop = 0; loop < 3; loop++) {
-    const offset = loop * 1.25;
-    pattern.forEach(([t, f]) => {
-      _beepAt(now + offset + t, f, 0.08, 0.18);
-    });
-    _noiseBurstAt(now + offset + 0.52);
-    _noiseBurstAt(now + offset + 1.08);
+  const delay = ctx.createDelay();
+  delay.delayTime.value = 0.085;
+  const feedback = ctx.createGain();
+  feedback.gain.value = 0.22;
+  const delayGain = ctx.createGain();
+  delayGain.gain.value = 0.18;
+
+  delay.connect(feedback);
+  feedback.connect(delay);
+  delay.connect(delayGain);
+
+  master.connect(distortion);
+  distortion.connect(compressor);
+  compressor.connect(_audioGainMaster);
+  delayGain.connect(compressor);
+
+  // ─── Helpers locaux (envelope + sources)
+  function envGain(time, dur, peak = 0.3) {
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.exponentialRampToValueAtTime(peak, time + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    return g;
   }
 
-  // Drone sawtooth modulé par LFO — atmosphère sombre tremolo
-  const drone = ctx.createOscillator();
-  const lfo = ctx.createOscillator();
-  const lfoGain = ctx.createGain();
-  const gain = ctx.createGain();
+  function tone(time, freq, dur, type = "square", gain = 0.28) {
+    const osc = ctx.createOscillator();
+    const g = envGain(time, dur, gain);
+    const filter = ctx.createBiquadFilter();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, time);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.92, time + dur);
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(freq * 1.7, time);
+    filter.Q.value = 7;
+    osc.connect(filter);
+    filter.connect(g);
+    g.connect(master);
+    g.connect(delay);
+    osc.start(time);
+    osc.stop(time + dur + 0.02);
+  }
 
-  drone.type = "sawtooth";
-  drone.frequency.value = 110;
-  lfo.type = "sine";
-  lfo.frequency.value = 7;
-  lfoGain.gain.value = 35;
+  function fmHit(time, base = 210, dur = 0.42) {
+    const carrier = ctx.createOscillator();
+    const mod = ctx.createOscillator();
+    const modGain = ctx.createGain();
+    const g = envGain(time, dur, 0.26);
+    const filter = ctx.createBiquadFilter();
+    carrier.type = "sawtooth";
+    mod.type = "square";
+    carrier.frequency.setValueAtTime(base, time);
+    carrier.frequency.exponentialRampToValueAtTime(base * 0.55, time + dur);
+    mod.frequency.value = 38;
+    modGain.gain.setValueAtTime(95, time);
+    modGain.gain.exponentialRampToValueAtTime(8, time + dur);
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(1300, time);
+    filter.frequency.exponentialRampToValueAtTime(360, time + dur);
+    filter.Q.value = 6;
+    mod.connect(modGain);
+    modGain.connect(carrier.frequency);
+    carrier.connect(filter);
+    filter.connect(g);
+    g.connect(master);
+    mod.start(time);
+    carrier.start(time);
+    mod.stop(time + dur);
+    carrier.stop(time + dur);
+  }
 
-  lfo.connect(lfoGain);
-  lfoGain.connect(drone.frequency);
+  function noiseTick(time, dur = 0.055) {
+    const len = Math.floor(ctx.sampleRate * dur);
+    const buffer = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.4);
+    }
+    const src = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const g = envGain(time, dur, 0.18);
+    src.buffer = buffer;
+    filter.type = "bandpass";
+    filter.frequency.value = 2600 + Math.random() * 1200;
+    filter.Q.value = 12;
+    src.connect(filter);
+    filter.connect(g);
+    g.connect(master);
+    g.connect(delay);
+    src.start(time);
+  }
 
-  gain.gain.setValueAtTime(0.06, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 4);
-
-  drone.connect(gain);
-  gain.connect(_audioGainMaster);
-
-  lfo.start(now);
-  drone.start(now);
-  lfo.stop(now + 4);
-  drone.stop(now + 4);
+  // ─── Pattern hacking alert : 5 bars de 0.82s + finale
+  const t = ctx.currentTime + 0.05;
+  for (let bar = 0; bar < 5; bar++) {
+    const o = t + bar * 0.82;
+    tone(o + 0.00, 980, 0.075, "square", 0.26);
+    tone(o + 0.095, 740, 0.075, "square", 0.24);
+    tone(o + 0.19, 980, 0.075, "square", 0.26);
+    noiseTick(o + 0.285, 0.045);
+    fmHit(o + 0.35, 170, 0.34);
+    tone(o + 0.60, 1320, 0.045, "sawtooth", 0.16);
+    noiseTick(o + 0.66, 0.035);
+  }
+  const end = t + 4.35;
+  fmHit(end, 120, 0.7);
+  tone(end + 0.08, 440, 0.35, "sawtooth", 0.18);
+  tone(end + 0.14, 880, 0.28, "square", 0.12);
 }
 
 // Alias pour compat
@@ -346,10 +387,10 @@ function app() {
         this._splashStopRain = startMatrixRain(canvas);
       }
 
-      // ── BUDGET TOTAL : 4 000ms ──
-      // Typewriter "$MATRIX BET$" : 600ms (12 chars × 50ms)
+      // ── BUDGET TOTAL : 5 200ms (matche les 5s du pattern audio + finale) ──
+      // Typewriter "$MATRIX BET$" : 600ms
       // Log lines (6)            : 1 500ms cumul
-      // Pause finale             : 1 300ms
+      // Pause finale             : 2 500ms
       // Fade out                 : 600ms
       // SKIP visible dès         : 1 500ms
 
