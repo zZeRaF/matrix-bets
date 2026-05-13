@@ -251,7 +251,7 @@ def _paste_matrix_ball(img: Image.Image) -> None:
     Diamètre augmenté à S × 0.22 pour rester visible à 180px."""
     S = img.size[0]
     cx = int(S * 0.28)   # +5% supplémentaires droite (0.23 → 0.28)
-    cy = int(S * 0.84)   # +2% supplémentaires bas (0.82 → 0.84)
+    cy = int(S * 0.80)   # remontée -4% (0.84 → 0.80)
     diam = int(S * 0.22)
     _draw_orbit_rings(img, cx, cy, diam)
     ball = _matrix_ball(diam)
