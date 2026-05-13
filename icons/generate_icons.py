@@ -94,39 +94,53 @@ def _matrix_silhouette(img: Image.Image) -> Image.Image:
 
 
 def _enhance_eyes(img: Image.Image) -> Image.Image:
-    """Détecte les pixels TRÈS clairs (yeux + LEDs) et ajoute un halo lumineux."""
-    rgb = img.convert("RGB")
-    w, h = rgb.size
-    # Masque des "yeux" : pixels où R+G+B > 700 (très lumineux après mapping vert)
-    bright_mask = Image.new("L", (w, h), 0)
-    bm = bright_mask.load()
-    px = rgb.load()
-    for y in range(int(h * 0.15), int(h * 0.45)):  # zone haute = visage probable
-        for x in range(w):
-            r, g, b = px[x, y]
-            if (r + g + b) > 600 and g > 200:
-                bm[x, y] = 255
+    """Force 2 LEDs lumineuses aux yeux du robot (coordonnées estimées).
 
-    # Halo en floutant ce masque
-    glow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(glow_layer)
-    # On dessine des cercles lumineux verts là où le masque est blanc
-    bright_data = list(bright_mask.getdata())
-    points = [(i % w, i // w) for i, v in enumerate(bright_data) if v > 0]
-    # Sample pour éviter trop de points (cluster autour des yeux)
-    if points:
-        # Grouper points proches (simple : on prend des centres-de-masse approximés)
-        # Approche simple : on dessine un petit cercle clair sur tous les points → flou ensuite
-        for (x, y) in points:
-            gd.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(140, 255, 180, 180))
-
-    glow_blurred = glow_layer.filter(ImageFilter.GaussianBlur(radius=8))
-    glow_strong = glow_layer.filter(ImageFilter.GaussianBlur(radius=18))
-    # Composer en lighten
+    Le robot dans l'image source est centré-gauche après crop, visage à ~y=28% h.
+    On dessine 2 LEDs vert/blanc avec halo concentrique pour effet badass.
+    """
     out = img.convert("RGBA")
-    out = Image.alpha_composite(out, glow_strong)
-    out = Image.alpha_composite(out, glow_blurred)
-    out = Image.alpha_composite(out, glow_layer)
+    w, h = out.size
+
+    # Coordonnées approximatives des yeux (estimation sur l'image source AVIF)
+    # À ajuster si décalé : ce sont 2 points sur le visage du robot
+    eye_left = (int(w * 0.40), int(h * 0.27))
+    eye_right = (int(w * 0.48), int(h * 0.26))
+
+    # Couche 1 : Halo très large vert (atmosphère)
+    halo_far = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(halo_far)
+    for (cx, cy) in (eye_left, eye_right):
+        for r in range(50, 0, -2):
+            alpha = int(20 * (1 - r / 50))
+            hd.ellipse([cx - r, cy - r, cx + r, cy + r],
+                       fill=(0, 255, 102, max(0, alpha)))
+    halo_far = halo_far.filter(ImageFilter.GaussianBlur(radius=15))
+    out = Image.alpha_composite(out, halo_far)
+
+    # Couche 2 : Halo moyen vert vif
+    halo_mid = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    hmd = ImageDraw.Draw(halo_mid)
+    for (cx, cy) in (eye_left, eye_right):
+        hmd.ellipse([cx - 22, cy - 22, cx + 22, cy + 22],
+                    fill=(0, 255, 102, 180))
+    halo_mid = halo_mid.filter(ImageFilter.GaussianBlur(radius=10))
+    out = Image.alpha_composite(out, halo_mid)
+
+    # Couche 3 : LED principale (vert flashy + cœur blanc)
+    leds = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(leds)
+    for (cx, cy) in (eye_left, eye_right):
+        # Cercle vert vif extérieur
+        ld.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=(0, 255, 102, 255))
+        # Cœur blanc lumineux
+        ld.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(220, 255, 220, 255))
+        # Centre blanc pur
+        ld.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(255, 255, 255, 255))
+    leds_blurred = leds.filter(ImageFilter.GaussianBlur(radius=1.5))
+    out = Image.alpha_composite(out, leds_blurred)
+    out = Image.alpha_composite(out, leds)
+
     return out
 
 
@@ -284,6 +298,20 @@ def build_master() -> Image.Image:
     return img
 
 
+def build_robot_portrait() -> Image.Image:
+    """Variante sans cadre HUD ni ballon : juste le robot avec son halo, pour usage
+    en sprite dans l'animation du splash."""
+    src = Image.open(SOURCE_AVIF).convert("RGB")
+    sq = _crop_square(src).resize((MASTER_SIZE, MASTER_SIZE), Image.LANCZOS)
+    silhouette = _matrix_silhouette(sq)
+    silhouette = _apply_vignette(silhouette, strength=0.95)
+    glowed = _add_glow_layer(silhouette)
+    eyes = _enhance_eyes(glowed)
+    img = eyes if eyes.mode == "RGBA" else eyes.convert("RGBA")
+    # Pas de cadre HUD, pas de ballon, pas de pluie — sprite pur
+    return img
+
+
 def main():
     master = build_master()
     for size, fname in TARGETS:
@@ -291,6 +319,16 @@ def main():
         resized = master.resize((size, size), Image.LANCZOS)
         resized.save(out, "PNG", optimize=True)
         print(f"  → {out.name} ({size}×{size}) {out.stat().st_size // 1024} KB")
+
+    # Robot portrait sans ballon ni cadre, pour utilisation comme sprite dans le splash
+    portrait = build_robot_portrait()
+    # Plus petit : on n'a pas besoin de 1024 pour un sprite splash. 600px suffit.
+    for size in (600,):
+        out = OUT / f"robot-portrait-{size}.png"
+        resized = portrait.resize((size, size), Image.LANCZOS)
+        resized.save(out, "PNG", optimize=True)
+        print(f"  → {out.name} ({size}×{size}) {out.stat().st_size // 1024} KB")
+
     print("\nOK — icônes générées.")
 
 
