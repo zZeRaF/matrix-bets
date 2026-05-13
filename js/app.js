@@ -365,9 +365,8 @@ function app() {
       if (this.audioStarted) return;
       const audio = document.getElementById("splash-audio");
       if (audio && audio.src) {
-        // Branche l'audio à une chaîne Web Audio : EQ + compressor + boost pour
-        // améliorer la qualité perçue (compense la compression WhatsApp).
-        try { this._connectAudioToCtx(audio); } catch (e) { console.warn(e); }
+        // Lecture HTMLAudioElement direct (pas de routing Web Audio qui peut
+        // muter l'audio si AudioContext est suspendu)
         audio.volume = 1.0;
         audio.play().then(() => {
           this.audioStarted = true;
@@ -377,55 +376,6 @@ function app() {
         return;
       }
       this._playSynthSound();
-    },
-
-    _connectAudioToCtx(audio) {
-      if (audio._wired) return;
-      const ctx = _ensureAudio();
-      if (!ctx) return;
-      if (ctx.state === "suspended") ctx.resume();
-      const source = ctx.createMediaElementSource(audio);
-
-      // Filtre passe-haut léger : nettoie les grondements basses parasites
-      const hpf = ctx.createBiquadFilter();
-      hpf.type = "highpass";
-      hpf.frequency.value = 80;
-      hpf.Q.value = 0.7;
-
-      // EQ peaking 2kHz : +3.5dB pour ajouter de la présence/clarté
-      const peak = ctx.createBiquadFilter();
-      peak.type = "peaking";
-      peak.frequency.value = 2200;
-      peak.Q.value = 1.0;
-      peak.gain.value = 3.5;
-
-      // EQ high-shelf 7kHz : +2dB pour rajouter de l'air (compense compression mp4)
-      const air = ctx.createBiquadFilter();
-      air.type = "highshelf";
-      air.frequency.value = 7000;
-      air.gain.value = 2.0;
-
-      // Compresseur léger pour densité
-      const comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -22;
-      comp.knee.value = 12;
-      comp.ratio.value = 3;
-      comp.attack.value = 0.005;
-      comp.release.value = 0.18;
-
-      // Gain master boost
-      const gain = ctx.createGain();
-      gain.gain.value = 1.5;
-
-      source.connect(hpf);
-      hpf.connect(peak);
-      peak.connect(air);
-      air.connect(comp);
-      comp.connect(gain);
-      gain.connect(_audioGainMaster);
-
-      audio._wired = true;
-      audio._fxGain = gain; // référence pour fade out plus tard
     },
 
     _playSynthSound() {
@@ -505,37 +455,24 @@ function app() {
       if (this.splashFading) return;
       this.splashFading = true;
 
-      // Fade out audio en parallèle du fade visuel (600ms)
+      // Fade out audio via volume property (sync avec fade visuel 600ms)
       const audio = document.getElementById("splash-audio");
       const fadeDur = 600;
       if (audio && !audio.paused) {
-        if (audio._fxGain) {
-          // Fade via Web Audio (plus smooth, contrôle exponentiel)
-          const ctx = _ensureAudio();
-          const t = ctx.currentTime;
-          const g = audio._fxGain.gain;
-          g.cancelScheduledValues(t);
-          g.setValueAtTime(g.value, t);
-          g.exponentialRampToValueAtTime(0.001, t + fadeDur / 1000);
-        } else {
-          // Fade via property HTMLAudioElement.volume (fallback)
-          const startVol = audio.volume;
-          const steps = 30;
-          const stepDur = fadeDur / steps;
+        const startVol = audio.volume;
+        const steps = 24;
+        const stepDur = fadeDur / steps;
+        (async () => {
           for (let i = 1; i <= steps; i++) {
             audio.volume = Math.max(0, startVol * (1 - i / steps));
             await sleep(stepDur);
           }
-        }
+          audio.pause();
+          audio.currentTime = 0;
+        })();
       }
 
       await sleep(fadeDur);
-
-      // Stop audio proprement
-      if (audio && !audio.paused) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
 
       this.showSplash = false;
       const splashEl = document.getElementById("splash");
