@@ -99,8 +99,8 @@ function _noiseBurstAt(time, duration = 0.08) {
   const g = ctx.createGain();
   src.buffer = buffer;
   filter.type = "bandpass";
-  filter.frequency.value = 1800;
-  filter.Q.value = 8;
+  filter.frequency.value = 900;
+  filter.Q.value = 6;
   g.gain.value = 0.25;
   src.connect(filter);
   filter.connect(g);
@@ -119,15 +119,16 @@ function playSplashSound() {
 
   const now = ctx.currentTime + 0.05;
 
+  // Fréquences divisées par 2 (octave plus bas) — moins aigu, plus sombre
   const pattern = [
-    [0.00, 880],
-    [0.12, 1320],
-    [0.24, 880],
-    [0.36, 1320],
-    [0.60, 660],
-    [0.72, 990],
-    [0.84, 660],
-    [0.96, 990],
+    [0.00, 440],
+    [0.12, 660],
+    [0.24, 440],
+    [0.36, 660],
+    [0.60, 330],
+    [0.72, 495],
+    [0.84, 330],
+    [0.96, 495],
   ];
 
   // 3 boucles (3 × 1.25s = 3.75s) pour matcher splash 4s
