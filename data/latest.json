@@ -1,7 +1,7 @@
 {
   "version": "1.3",
   "date": "2026-05-14",
-  "generated_at": "2026-05-13T17:40:05",
+  "generated_at": "2026-05-13T18:11:07",
   "n_matches_analysed": 9,
   "n_paris_candidats": 29,
   "scoring_formula": "score_pari = conf_pts × bet_mult + nb_couches_convergentes",
@@ -11268,10 +11268,10 @@
         },
         "micro": {
           "role_baselines": {
-            "GK": 6.4625,
-            "DEF": 6.597412466843501,
-            "MID": 6.653296762914704,
-            "ATT": 7.037225727171379
+            "GK": 6.5357142857142865,
+            "DEF": 6.673680594549129,
+            "MID": 6.674357252201157,
+            "ATT": 7.200788702184051
           },
           "block_results": [
             {
@@ -11304,8 +11304,8 @@
                   "role": "GK",
                   "pos_label": "Gardien",
                   "rating_avg": 6.2,
-                  "baseline_role": 6.463,
-                  "quality_index": 0.959
+                  "baseline_role": 6.536,
+                  "quality_index": 0.949
                 },
                 {
                   "shirt": 8,
@@ -11314,8 +11314,8 @@
                   "role": "DEF",
                   "pos_label": "Défenseur droit",
                   "rating_avg": 6.462,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.979
+                  "baseline_role": 6.674,
+                  "quality_index": 0.968
                 },
                 {
                   "shirt": 23,
@@ -11324,8 +11324,8 @@
                   "role": "DEF",
                   "pos_label": "Défenseur droit",
                   "rating_avg": 6.464,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.98
+                  "baseline_role": 6.674,
+                  "quality_index": 0.969
                 },
                 {
                   "shirt": 28,
@@ -11334,8 +11334,8 @@
                   "role": "DEF",
                   "pos_label": "Défenseur central",
                   "rating_avg": 6.469,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.981
+                  "baseline_role": 6.674,
+                  "quality_index": 0.969
                 },
                 {
                   "shirt": 99,
@@ -11344,54 +11344,54 @@
                   "role": "DEF",
                   "pos_label": "Défenseur gauche",
                   "rating_avg": 6.55,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.993
+                  "baseline_role": 6.674,
+                  "quality_index": 0.981
                 }
               ],
               "away_players": [
                 {
                   "shirt": 11,
                   "name": "Gabriel Pec",
-                  "fm_id": null,
+                  "fm_id": 1090238,
                   "role": "ATT",
                   "pos_label": "Attaquant droit",
-                  "rating_avg": null,
-                  "baseline_role": null,
-                  "quality_index": null
+                  "rating_avg": 7.533,
+                  "baseline_role": 7.201,
+                  "quality_index": 1.046
                 },
                 {
                   "shirt": 28,
                   "name": "Paintsil J.",
-                  "fm_id": 1710667,
+                  "fm_id": 850924,
                   "role": "ATT",
                   "pos_label": "Attaquant central",
-                  "rating_avg": 6.725,
-                  "baseline_role": 7.037,
-                  "quality_index": 0.956
+                  "rating_avg": 7.378,
+                  "baseline_role": 7.201,
+                  "quality_index": 1.025
                 },
                 {
                   "shirt": 26,
                   "name": "Miller H.",
-                  "fm_id": 212867,
+                  "fm_id": 1683714,
                   "role": "ATT",
                   "pos_label": "Attaquant gauche",
-                  "rating_avg": 7.337,
-                  "baseline_role": 7.037,
-                  "quality_index": 1.043
+                  "rating_avg": 7.006,
+                  "baseline_role": 7.201,
+                  "quality_index": 0.973
                 }
               ],
-              "mean_index_home": 0.978,
-              "mean_index_away": 0.999,
-              "delta_index": -0.021,
+              "mean_index_home": 0.967,
+              "mean_index_away": 1.015,
+              "delta_index": -0.047,
               "block_winner": "tie",
               "verdict_strength": "équilibre",
               "category_wins_a": 0,
               "category_wins_b": 0,
               "category_results": [],
-              "_global_verdict_1x2": "DRAW NO BET SPORTING KANSAS CITY (1-0 zones)",
-              "_global_zones_home": 1,
-              "_global_zones_away": 0,
-              "_global_zones_tie": 4
+              "_global_verdict_1x2": "DRAW NO BET LOS ANGELES GALAXY (0-2 zones)",
+              "_global_zones_home": 0,
+              "_global_zones_away": 2,
+              "_global_zones_tie": 3
             },
             {
               "key": "B",
@@ -11422,8 +11422,8 @@
                   "role": "ATT",
                   "pos_label": "Attaquant droit",
                   "rating_avg": 7.038,
-                  "baseline_role": 7.037,
-                  "quality_index": 1.0
+                  "baseline_role": 7.201,
+                  "quality_index": 0.977
                 },
                 {
                   "shirt": 9,
@@ -11432,69 +11432,69 @@
                   "role": "ATT",
                   "pos_label": "Attaquant gauche",
                   "rating_avg": 7.048,
-                  "baseline_role": 7.037,
-                  "quality_index": 1.002
+                  "baseline_role": 7.201,
+                  "quality_index": 0.979
                 }
               ],
               "away_players": [
                 {
                   "shirt": 12,
                   "name": "Marcinkowski J.",
-                  "fm_id": 1710667,
+                  "fm_id": 847987,
                   "role": "GK",
                   "pos_label": "Gardien",
-                  "rating_avg": 6.725,
-                  "baseline_role": 6.463,
-                  "quality_index": 1.041
+                  "rating_avg": 6.871,
+                  "baseline_role": 6.536,
+                  "quality_index": 1.051
                 },
                 {
                   "shirt": 19,
                   "name": "Cuevas M.",
-                  "fm_id": 1520737,
+                  "fm_id": 1079040,
                   "role": "DEF",
                   "pos_label": "Défenseur droit",
-                  "rating_avg": 7.104,
-                  "baseline_role": 6.597,
-                  "quality_index": 1.077
+                  "rating_avg": 6.923,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.037
                 },
                 {
                   "shirt": 5,
                   "name": "Glesnes J.",
-                  "fm_id": 1710667,
+                  "fm_id": 259484,
                   "role": "DEF",
                   "pos_label": "Défenseur droit",
-                  "rating_avg": 6.725,
-                  "baseline_role": 6.597,
-                  "quality_index": 1.019
+                  "rating_avg": 7.079,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.061
                 },
                 {
                   "shirt": 25,
                   "name": "Garces C.",
-                  "fm_id": 1476710,
+                  "fm_id": 1445744,
                   "role": "DEF",
                   "pos_label": "Défenseur central",
-                  "rating_avg": 6.28,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.952
+                  "rating_avg": 6.76,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.013
                 },
                 {
                   "shirt": 14,
                   "name": "Nelson J.",
-                  "fm_id": 1710667,
+                  "fm_id": 1026048,
                   "role": "DEF",
                   "pos_label": "Défenseur gauche",
-                  "rating_avg": 6.725,
-                  "baseline_role": 6.597,
-                  "quality_index": 1.019
+                  "rating_avg": 6.683,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.001
                 }
               ],
-              "mean_index_home": 1.001,
-              "mean_index_away": 1.022,
-              "delta_index": -0.021,
-              "block_winner": "tie",
-              "verdict_strength": "équilibre",
+              "mean_index_home": 0.978,
+              "mean_index_away": 1.033,
+              "delta_index": -0.055,
+              "block_winner": "away",
+              "verdict_strength": "léger avantage",
               "category_wins_a": 0,
-              "category_wins_b": 0,
+              "category_wins_b": 1,
               "category_results": []
             },
             {
@@ -11525,8 +11525,8 @@
                   "role": "DEF",
                   "pos_label": "Défenseur droit",
                   "rating_avg": 6.464,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.98
+                  "baseline_role": 6.674,
+                  "quality_index": 0.969
                 },
                 {
                   "shirt": 4,
@@ -11535,55 +11535,55 @@
                   "role": "MID",
                   "pos_label": "Milieu droit",
                   "rating_avg": 6.739,
-                  "baseline_role": 6.653,
-                  "quality_index": 1.013
+                  "baseline_role": 6.674,
+                  "quality_index": 1.01
                 }
               ],
               "away_players": [
                 {
                   "shirt": 25,
                   "name": "Garces C.",
-                  "fm_id": 1476710,
+                  "fm_id": 1445744,
                   "role": "DEF",
                   "pos_label": "Défenseur central",
-                  "rating_avg": 6.28,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.952
+                  "rating_avg": 6.76,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.013
                 },
                 {
                   "shirt": 14,
                   "name": "Nelson J.",
-                  "fm_id": 1710667,
+                  "fm_id": 1026048,
                   "role": "DEF",
                   "pos_label": "Défenseur gauche",
-                  "rating_avg": 6.725,
-                  "baseline_role": 6.597,
-                  "quality_index": 1.019
+                  "rating_avg": 6.683,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.001
                 },
                 {
                   "shirt": 22,
                   "name": "Wynder E.",
-                  "fm_id": 837974,
+                  "fm_id": 1079298,
                   "role": "MID",
                   "pos_label": "Milieu gauche",
-                  "rating_avg": 7.144,
-                  "baseline_role": 6.653,
-                  "quality_index": 1.074
+                  "rating_avg": 6.561,
+                  "baseline_role": 6.674,
+                  "quality_index": 0.983
                 },
                 {
                   "shirt": 26,
                   "name": "Miller H.",
-                  "fm_id": 212867,
+                  "fm_id": 1683714,
                   "role": "ATT",
                   "pos_label": "Attaquant gauche",
-                  "rating_avg": 7.337,
-                  "baseline_role": 7.037,
-                  "quality_index": 1.043
+                  "rating_avg": 7.006,
+                  "baseline_role": 7.201,
+                  "quality_index": 0.973
                 }
               ],
-              "mean_index_home": 0.996,
-              "mean_index_away": 1.022,
-              "delta_index": -0.026,
+              "mean_index_home": 0.99,
+              "mean_index_away": 0.992,
+              "delta_index": -0.003,
               "block_winner": "tie",
               "verdict_strength": "équilibre",
               "category_wins_a": 0,
@@ -11618,8 +11618,8 @@
                   "role": "DEF",
                   "pos_label": "Défenseur central",
                   "rating_avg": 6.469,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.981
+                  "baseline_role": 6.674,
+                  "quality_index": 0.969
                 },
                 {
                   "shirt": 99,
@@ -11628,8 +11628,8 @@
                   "role": "DEF",
                   "pos_label": "Défenseur gauche",
                   "rating_avg": 6.55,
-                  "baseline_role": 6.597,
-                  "quality_index": 0.993
+                  "baseline_role": 6.674,
+                  "quality_index": 0.981
                 },
                 {
                   "shirt": 16,
@@ -11638,8 +11638,8 @@
                   "role": "MID",
                   "pos_label": "Milieu central",
                   "rating_avg": 6.577,
-                  "baseline_role": 6.653,
-                  "quality_index": 0.988
+                  "baseline_role": 6.674,
+                  "quality_index": 0.985
                 },
                 {
                   "shirt": 93,
@@ -11648,8 +11648,8 @@
                   "role": "MID",
                   "pos_label": "Milieu gauche",
                   "rating_avg": 6.329,
-                  "baseline_role": 6.653,
-                  "quality_index": 0.951
+                  "baseline_role": 6.674,
+                  "quality_index": 0.948
                 },
                 {
                   "shirt": 9,
@@ -11658,29 +11658,29 @@
                   "role": "ATT",
                   "pos_label": "Attaquant gauche",
                   "rating_avg": 7.048,
-                  "baseline_role": 7.037,
-                  "quality_index": 1.002
+                  "baseline_role": 7.201,
+                  "quality_index": 0.979
                 }
               ],
               "away_players": [
                 {
                   "shirt": 5,
                   "name": "Glesnes J.",
-                  "fm_id": 1710667,
+                  "fm_id": 259484,
                   "role": "DEF",
                   "pos_label": "Défenseur droit",
-                  "rating_avg": 6.725,
-                  "baseline_role": 6.597,
-                  "quality_index": 1.019
+                  "rating_avg": 7.079,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.061
                 }
               ],
-              "mean_index_home": 0.983,
-              "mean_index_away": 1.019,
-              "delta_index": -0.036,
-              "block_winner": "tie",
-              "verdict_strength": "équilibre",
+              "mean_index_home": 0.972,
+              "mean_index_away": 1.061,
+              "delta_index": -0.089,
+              "block_winner": "away",
+              "verdict_strength": "léger avantage",
               "category_wins_a": 0,
-              "category_wins_b": 0,
+              "category_wins_b": 1,
               "category_results": []
             },
             {
@@ -11708,50 +11708,50 @@
                   "role": "MID",
                   "pos_label": "Milieu droit",
                   "rating_avg": 6.859,
-                  "baseline_role": 6.653,
-                  "quality_index": 1.031
+                  "baseline_role": 6.674,
+                  "quality_index": 1.028
                 }
               ],
               "away_players": [
                 {
                   "shirt": 8,
                   "name": "Sanabria L.",
-                  "fm_id": 1438379,
+                  "fm_id": 1609838,
                   "role": "MID",
                   "pos_label": "Milieu droit",
-                  "rating_avg": 6.2,
-                  "baseline_role": 6.653,
-                  "quality_index": 0.932
+                  "rating_avg": 6.7,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.004
                 },
                 {
                   "shirt": 15,
                   "name": "Haak J.",
-                  "fm_id": 1710667,
+                  "fm_id": 1026144,
                   "role": "MID",
                   "pos_label": "Milieu central",
-                  "rating_avg": 6.725,
-                  "baseline_role": 6.653,
-                  "quality_index": 1.011
+                  "rating_avg": 6.955,
+                  "baseline_role": 6.674,
+                  "quality_index": 1.042
                 }
               ],
-              "mean_index_home": 1.031,
-              "mean_index_away": 0.972,
-              "delta_index": 0.059,
-              "block_winner": "home",
-              "verdict_strength": "léger avantage",
-              "category_wins_a": 1,
+              "mean_index_home": 1.028,
+              "mean_index_away": 1.023,
+              "delta_index": 0.005,
+              "block_winner": "tie",
+              "verdict_strength": "équilibre",
+              "category_wins_a": 0,
               "category_wins_b": 0,
               "category_results": []
             }
           ],
-          "total_buts_attendus": 0.94,
+          "total_buts_attendus": 1.72,
           "total_buts_attendus_decomp": {
             "home_attack_potential": 0.54,
-            "away_attack_potential": 0.399,
-            "home_def_index": 0.978,
-            "away_def_index": 1.022,
-            "home_expected_goals": 0.53,
-            "away_expected_goals": 0.41
+            "away_attack_potential": 1.162,
+            "home_def_index": 0.967,
+            "away_def_index": 1.033,
+            "home_expected_goals": 0.52,
+            "away_expected_goals": 1.2
           },
           "decisive_players": {
             "home": [
@@ -11762,16 +11762,16 @@
                 "fm_id": 749491,
                 "role": "ATT",
                 "pos_label": "Attaquant gauche",
-                "quality_index": 1.002,
+                "quality_index": 0.979,
                 "goals_per_90": 0.463,
                 "assists_per_90": 0.093,
                 "xg_per_90": 0.292,
                 "xa_per_90": 0.09,
                 "ga_per_90": 0.556,
                 "xgxa_per_90": 0.382,
-                "ga_normalized": 1.065,
-                "xgxa_normalized": 1.32,
-                "score_decisif_brut": 57.8
+                "ga_normalized": 1.521,
+                "xgxa_normalized": 0.91,
+                "score_decisif_brut": 58.2
               },
               {
                 "side": "home",
@@ -11780,34 +11780,16 @@
                 "fm_id": 1035206,
                 "role": "MID",
                 "pos_label": "Milieu droit",
-                "quality_index": 1.013,
+                "quality_index": 1.01,
                 "goals_per_90": 0.141,
                 "assists_per_90": 0,
                 "xg_per_90": 0.047,
                 "xa_per_90": 0.045,
                 "ga_per_90": 0.141,
                 "xgxa_per_90": 0.092,
-                "ga_normalized": 0.968,
-                "xgxa_normalized": 1.36,
-                "score_decisif_brut": 57.1
-              },
-              {
-                "side": "home",
-                "shirt": 7,
-                "name": "Capita",
-                "fm_id": 1187420,
-                "role": "MID",
-                "pos_label": "Milieu droit",
-                "quality_index": 1.031,
-                "goals_per_90": 0,
-                "assists_per_90": 0,
-                "xg_per_90": 0.111,
-                "xa_per_90": 0.021,
-                "ga_per_90": 0,
-                "xgxa_per_90": 0.132,
-                "ga_normalized": 0.0,
-                "xgxa_normalized": 1.951,
-                "score_decisif_brut": 51.6
+                "ga_normalized": 1.389,
+                "xgxa_normalized": 0.749,
+                "score_decisif_brut": 54.2
               },
               {
                 "side": "home",
@@ -11816,16 +11798,34 @@
                 "fm_id": 1710542,
                 "role": "MID",
                 "pos_label": "Milieu central",
-                "quality_index": 0.988,
+                "quality_index": 0.985,
                 "goals_per_90": 0.112,
                 "assists_per_90": 0,
                 "xg_per_90": 0.037,
                 "xa_per_90": 0.034,
                 "ga_per_90": 0.112,
                 "xgxa_per_90": 0.071,
-                "ga_normalized": 0.768,
-                "xgxa_normalized": 1.055,
-                "score_decisif_brut": 49.2
+                "ga_normalized": 1.103,
+                "xgxa_normalized": 0.581,
+                "score_decisif_brut": 47.1
+              },
+              {
+                "side": "home",
+                "shirt": 7,
+                "name": "Capita",
+                "fm_id": 1187420,
+                "role": "MID",
+                "pos_label": "Milieu droit",
+                "quality_index": 1.028,
+                "goals_per_90": 0,
+                "assists_per_90": 0,
+                "xg_per_90": 0.111,
+                "xa_per_90": 0.021,
+                "ga_per_90": 0,
+                "xgxa_per_90": 0.132,
+                "ga_normalized": 0.0,
+                "xgxa_normalized": 1.075,
+                "score_decisif_brut": 38.5
               },
               {
                 "side": "home",
@@ -11834,125 +11834,125 @@
                 "fm_id": 659201,
                 "role": "ATT",
                 "pos_label": "Attaquant droit",
-                "quality_index": 1.0,
+                "quality_index": 0.977,
                 "goals_per_90": 0,
                 "assists_per_90": 0.098,
                 "xg_per_90": 0.015,
                 "xa_per_90": 0.208,
                 "ga_per_90": 0.098,
                 "xgxa_per_90": 0.223,
-                "ga_normalized": 0.188,
-                "xgxa_normalized": 0.768,
-                "score_decisif_brut": 36.3
+                "ga_normalized": 0.269,
+                "xgxa_normalized": 0.53,
+                "score_decisif_brut": 33.7
               }
             ],
             "away": [
               {
                 "side": "away",
-                "shirt": 26,
-                "name": "Miller H.",
-                "fm_id": 212867,
-                "role": "ATT",
-                "pos_label": "Attaquant gauche",
-                "quality_index": 1.043,
-                "goals_per_90": 0,
-                "assists_per_90": 0.813,
-                "xg_per_90": 0.253,
-                "xa_per_90": 0.247,
-                "ga_per_90": 0.813,
-                "xgxa_per_90": 0.499,
-                "ga_normalized": 1.558,
-                "xgxa_normalized": 1.723,
-                "score_decisif_brut": 71.7
+                "shirt": 8,
+                "name": "Sanabria L.",
+                "fm_id": 1609838,
+                "role": "MID",
+                "pos_label": "Milieu droit",
+                "quality_index": 1.004,
+                "goals_per_90": 0.237,
+                "assists_per_90": 0.119,
+                "xg_per_90": 0.205,
+                "xa_per_90": 0.033,
+                "ga_per_90": 0.356,
+                "xgxa_per_90": 0.239,
+                "ga_normalized": 3.508,
+                "xgxa_normalized": 1.948,
+                "score_decisif_brut": 81.3
               },
               {
                 "side": "away",
-                "shirt": 15,
-                "name": "Haak J.",
-                "fm_id": 1710667,
-                "role": "MID",
-                "pos_label": "Milieu central",
-                "quality_index": 1.011,
-                "goals_per_90": 0.621,
-                "assists_per_90": 0,
-                "xg_per_90": 0.014,
-                "xa_per_90": 0.041,
-                "ga_per_90": 0.621,
-                "xgxa_per_90": 0.055,
-                "ga_normalized": 4.264,
-                "xgxa_normalized": 0.812,
-                "score_decisif_brut": 64.3
+                "shirt": 11,
+                "name": "Gabriel Pec",
+                "fm_id": 1090238,
+                "role": "ATT",
+                "pos_label": "Attaquant droit",
+                "quality_index": 1.046,
+                "goals_per_90": 0.286,
+                "assists_per_90": 0.286,
+                "xg_per_90": 0.383,
+                "xa_per_90": 0.254,
+                "ga_per_90": 0.572,
+                "xgxa_per_90": 0.637,
+                "ga_normalized": 1.566,
+                "xgxa_normalized": 1.516,
+                "score_decisif_brut": 68.8
               },
               {
                 "side": "away",
                 "shirt": 28,
                 "name": "Paintsil J.",
-                "fm_id": 1710667,
+                "fm_id": 850924,
                 "role": "ATT",
                 "pos_label": "Attaquant central",
-                "quality_index": 0.956,
-                "goals_per_90": 0.621,
-                "assists_per_90": 0,
-                "xg_per_90": 0.014,
-                "xa_per_90": 0.041,
-                "ga_per_90": 0.621,
-                "xgxa_per_90": 0.055,
-                "ga_normalized": 1.189,
-                "xgxa_normalized": 0.189,
-                "score_decisif_brut": 42.1
+                "quality_index": 1.025,
+                "goals_per_90": 0.3,
+                "assists_per_90": 0.3,
+                "xg_per_90": 0.383,
+                "xa_per_90": 0.2,
+                "ga_per_90": 0.6,
+                "xgxa_per_90": 0.583,
+                "ga_normalized": 1.643,
+                "xgxa_normalized": 1.387,
+                "score_decisif_brut": 67.7
               },
               {
                 "side": "away",
                 "shirt": 22,
                 "name": "Wynder E.",
-                "fm_id": 837974,
+                "fm_id": 1079298,
                 "role": "MID",
                 "pos_label": "Milieu gauche",
-                "quality_index": 1.074,
+                "quality_index": 0.983,
                 "goals_per_90": 0,
                 "assists_per_90": 0,
-                "xg_per_90": 0,
-                "xa_per_90": 0.055,
+                "xg_per_90": 0.115,
+                "xa_per_90": 0.041,
                 "ga_per_90": 0,
-                "xgxa_per_90": 0.055,
+                "xgxa_per_90": 0.157,
                 "ga_normalized": 0.0,
-                "xgxa_normalized": 0.821,
-                "score_decisif_brut": 35.2
+                "xgxa_normalized": 1.278,
+                "score_decisif_brut": 41.0
               },
               {
                 "side": "away",
-                "shirt": 8,
-                "name": "Sanabria L.",
-                "fm_id": 1438379,
-                "role": "MID",
-                "pos_label": "Milieu droit",
-                "quality_index": 0.932,
+                "shirt": 26,
+                "name": "Miller H.",
+                "fm_id": 1683714,
+                "role": "ATT",
+                "pos_label": "Attaquant gauche",
+                "quality_index": 0.973,
                 "goals_per_90": 0,
                 "assists_per_90": 0,
-                "xg_per_90": 0,
-                "xa_per_90": 0,
+                "xg_per_90": 0.072,
+                "xa_per_90": 0.204,
                 "ga_per_90": 0,
-                "xgxa_per_90": 0,
+                "xgxa_per_90": 0.276,
                 "ga_normalized": 0.0,
-                "xgxa_normalized": 0.0,
-                "score_decisif_brut": 21.2
+                "xgxa_normalized": 0.657,
+                "score_decisif_brut": 31.5
               }
             ],
             "role_baselines_decisive": {
               "MID": {
-                "ga_per_90": 0.14555599463849564,
-                "xgxa_per_90": 0.0675005033288755
+                "ga_per_90": 0.10139625632583381,
+                "xgxa_per_90": 0.12257599183638561
               },
               "ATT": {
-                "ga_per_90": 0.5218772730680314,
-                "xgxa_per_90": 0.28973713946781243
+                "ga_per_90": 0.36519002191966904,
+                "xgxa_per_90": 0.42016710451206746
               }
             }
           },
-          "global_verdict_1x2": "DRAW NO BET SPORTING KANSAS CITY (1-0 zones)",
-          "global_zones_home": 1,
-          "global_zones_away": 0,
-          "global_zones_tie": 4
+          "global_verdict_1x2": "DRAW NO BET LOS ANGELES GALAXY (0-2 zones)",
+          "global_zones_home": 0,
+          "global_zones_away": 2,
+          "global_zones_tie": 3
         },
         "news": {
           "n_articles_total": 7,

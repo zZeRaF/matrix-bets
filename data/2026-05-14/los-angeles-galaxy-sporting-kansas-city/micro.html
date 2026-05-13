@@ -29,6 +29,15 @@
   border-color: #216037 !important;
   box-shadow: none !important;
 }
+
+/* Cover (header haut de page) : dégradé MATRIX sombre subtil (jamais vert vif uniforme) */
+.cover {
+  background: linear-gradient(135deg, #001a08 0%, #000800 100%) !important;
+  border: 1px solid #216037 !important;
+}
+.cover h1, .cover .subtitle { color: #00FF66 !important; }
+.cover .eyebrow, .cover .vs, .cover .meta { color: #D4A340 !important; }
+.cover [style*="color:var(--gold)"] { color: #D4A340 !important; }
 .zone.win-home { background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important; }
 .zone.win-away { background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important; }
 .zone.neutre   { background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important; }
@@ -160,25 +169,74 @@ h2 .step{background:var(--gold);color:var(--navy);padding:2px 10px;border-radius
   <div class="eyebrow">EQUIPE AGENT IA FOOT · ANALYSE MICRO FOTMOB · 5 ZONES TACTIQUES</div>
   <h1>Sporting Kansas City <span class="vs">vs</span> Los Angeles Galaxy</h1>
   <div class="subtitle">Rapport de force tactique sur le terrain</div>
-  <div>Zones maîtrisées · <strong>Sporting Kansas City 1 - 0 Los Angeles Galaxy</strong> (écart 1)</div>
+  <div>Zones maîtrisées · <strong>Sporting Kansas City 0 - 2 Los Angeles Galaxy</strong> (écart -2)</div>
   <div class="meta">Source XI : Flashscore · Stats joueurs : FotMob (NEXT_DATA) · Heatmap : matplotlib gaussian smooth</div>
 </div>
 
 
-
-
-
-<h2><span class="step">01</span> Verdict pari 1X2</h2>
-<div class="verdict-card fav-home">
-  <h3>REMBOURSÉ SI NUL SPORTING KANSAS CITY (DNB)</h3>
-  <div class="conf">Confiance : <strong>PRUDENTE</strong></div>
-  <div class="scores">Zones maîtrisées : <strong>Sporting Kansas City 1</strong> · <strong>Los Angeles Galaxy 0</strong> · égalités 4</div>
-  <div class="detail">Modèle : note FotMob moyenne par joueur normalisée par baseline du rôle dans le match (1.0 = joueur moyen pour son poste)</div>
+<h2><span class="step">01</span> Formation · Compositions probables Flashscore</h2>
+<div class="pitch-image-wrap">
+  <div class="pitch-subtitle">Sporting Kansas City        vs        Los Angeles Galaxy</div>
+  <img src="pitch.png" alt="Compositions sur le terrain">
 </div>
 
 
 
-<h2><span class="step">02</span> Les 5 zones de confrontation</h2>
+<h2><span class="step">02</span> 5 blocs tactiques · Lecture déséquilibre par zone</h2>
+<div class="heatmap-wrap">
+  <div class="heatmap-subtitle">ROUGE = Sporting Kansas City domine la zone · BLEU = Los Angeles Galaxy domine la zone · Δ catégories gagnées par bloc</div>
+  <img src="heatmap.png" alt="Heatmap tactique 5 zones">
+  <div class="heatmap-legend">Convention : Sporting Kansas City attaque vers la droite. Numéros = joueurs. Heatmap = 5 zones tactiques (A/B = défense vs attaque, C/D = couloirs, E = milieu créateur).</div>
+</div>
+
+
+<h2><span class="step">03</span> Verdict pari 1X2</h2>
+<div class="verdict-card fav-away">
+  <h3>REMBOURSÉ SI NUL LOS ANGELES GALAXY (DNB)</h3>
+  <div class="conf">Confiance : <strong>PRUDENTE</strong></div>
+  <div class="scores">Zones maîtrisées : <strong>Sporting Kansas City 0</strong> · <strong>Los Angeles Galaxy 2</strong> · égalités 3</div>
+  <div class="detail">Modèle : note FotMob moyenne par joueur normalisée par baseline du rôle dans le match (1.0 = joueur moyen pour son poste)</div>
+</div>
+
+
+<h2><span class="step">04</span> Match ouvert ? (Over / Under)</h2>
+<div class="openness-card">
+  <div class="openness-header">
+    <div class="verdict">MATCH POTENTIELLEMENT FERMÉ — Under 2.5 possible</div>
+    <div class="score-circle">0/4</div>
+  </div>
+  <div class="openness-recom">Pari à cibler : <strong>Under 2.5 ou nul vierge</strong> · Confiance : à confirmer meso</div>
+  <div class="indicators">
+    
+    <div class="indicator">
+      <div class="label">1. Chaque équipe a au moins UN bloc fort (Δ ≥ 3 catégories)</div>
+      <div class="detail">Sporting Kansas City : 0 zone(s) · Los Angeles Galaxy : 0 zone(s)</div>
+      <div class="check">✗</div>
+    </div>
+    
+    <div class="indicator">
+      <div class="label">2. Chaque équipe a un attaquant à 2+ profils confluents</div>
+      <div class="detail">Sporting Kansas City max : 1 · Los Angeles Galaxy max : 2</div>
+      <div class="check">✗</div>
+    </div>
+    
+    <div class="indicator">
+      <div class="label">3. Les DEUX défenses cèdent (blocs A et B remportés par l'attaque)</div>
+      <div class="detail">Défense Sporting Kansas City cède : non · Défense Los Angeles Galaxy cède : non</div>
+      <div class="check">✗</div>
+    </div>
+    
+    <div class="indicator">
+      <div class="label">4. Aucune égalité dans les blocs (match disputé partout)</div>
+      <div class="detail">Au moins une égalité</div>
+      <div class="check">✗</div>
+    </div>
+    
+  </div>
+</div>
+
+
+<h2><span class="step">05</span> Les 5 zones de confrontation</h2>
 <div class="zones-grid">
 
 <div class="zone neutre">
@@ -187,24 +245,24 @@ h2 .step{background:var(--gold);color:var(--navy);padding:2px 10px;border-radius
     <div class="desc">Défense de Sporting Kansas City contre l'attaque de Los Angeles Galaxy</div>
   </div>
   <div class="scores">
-    <span class="score-pill home">0.98</span>
+    <span class="score-pill home">0.97</span>
     <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
-    <span class="score-pill away">1.00</span>
+    <span class="score-pill away">1.01</span>
   </div>
-  <div class="winner-tag">équilibre · équilibre (Δ -0.021)</div>
+  <div class="winner-tag">équilibre · équilibre (Δ -0.047)</div>
 </div>
 
-<div class="zone neutre">
+<div class="zone win-away">
   <div>
     <h3>B · Défense Los Angeles Galaxy</h3>
     <div class="desc">Défense de Los Angeles Galaxy contre l'attaque de Sporting Kansas City</div>
   </div>
   <div class="scores">
-    <span class="score-pill home">1.00</span>
+    <span class="score-pill home">0.98</span>
     <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
-    <span class="score-pill away">1.02</span>
+    <span class="score-pill away">1.03</span>
   </div>
-  <div class="winner-tag">équilibre · équilibre (Δ -0.021)</div>
+  <div class="winner-tag">Los Angeles Galaxy domine · léger avantage (Δ -0.055)</div>
 </div>
 
 <div class="zone neutre">
@@ -213,27 +271,27 @@ h2 .step{background:var(--gold);color:var(--navy);padding:2px 10px;border-radius
     <div class="desc">Couloir droit (binôme latéral + ailier)</div>
   </div>
   <div class="scores">
-    <span class="score-pill home">1.00</span>
+    <span class="score-pill home">0.99</span>
     <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
-    <span class="score-pill away">1.02</span>
+    <span class="score-pill away">0.99</span>
   </div>
-  <div class="winner-tag">équilibre · équilibre (Δ -0.026)</div>
+  <div class="winner-tag">équilibre · équilibre (Δ -0.003)</div>
 </div>
 
-<div class="zone neutre">
+<div class="zone win-away">
   <div>
     <h3>D · Couloir gauche</h3>
     <div class="desc">Couloir gauche (binôme)</div>
   </div>
   <div class="scores">
-    <span class="score-pill home">0.98</span>
+    <span class="score-pill home">0.97</span>
     <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
-    <span class="score-pill away">1.02</span>
+    <span class="score-pill away">1.06</span>
   </div>
-  <div class="winner-tag">équilibre · équilibre (Δ -0.036)</div>
+  <div class="winner-tag">Los Angeles Galaxy domine · léger avantage (Δ -0.089)</div>
 </div>
 
-<div class="zone win-home">
+<div class="zone neutre">
   <div>
     <h3>E · Milieu créateur</h3>
     <div class="desc">Milieu créateur central</div>
@@ -241,16 +299,110 @@ h2 .step{background:var(--gold);color:var(--navy);padding:2px 10px;border-radius
   <div class="scores">
     <span class="score-pill home">1.03</span>
     <span style="color:var(--sub);font-weight:bold">indice qualité moyen</span>
-    <span class="score-pill away">0.97</span>
+    <span class="score-pill away">1.02</span>
   </div>
-  <div class="winner-tag">Sporting Kansas City domine · léger avantage (Δ +0.059)</div>
+  <div class="winner-tag">équilibre · équilibre (Δ +0.005)</div>
 </div>
 
 </div>
 
 
+<h2><span class="step">06</span> Top 3 joueurs décisifs par équipe</h2>
+<div class="top3-grid">
+  <div class="top3-team home">
+    <h3>Sporting Kansas City</h3>
+    <h4>Joueurs décisifs</h4>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/4faWNQ39.png" alt="Joveljic D.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#9 Joveljic D.</div>
+        <div class="pos">Attaquant gauche</div>
+        <div class="stats">Note <strong>6.75</strong> · 5B / 1P en 11 matchs</div>
+        
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/hzhqN3QQ.png" alt="Garcia M.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#6 Garcia M.</div>
+        <div class="pos">Attaquant droit</div>
+        <div class="stats">Note <strong>6.89</strong> · 0B / 1P en 11 matchs</div>
+        <div class="profile">Profil : Créateur</div>
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/2J0JbtUs.png" alt="Johnsen L.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#4 Johnsen L.</div>
+        <div class="pos">Milieu droit</div>
+        <div class="stats">Note <strong>6.74</strong> · 1B / 0P en 8 matchs</div>
+        
+      </div>
+    </div>
+    
+    
+  </div>
+  <div class="top3-team away">
+    <h3>Los Angeles Galaxy</h3>
+    <h4>Joueurs décisifs</h4>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/CIB4H9yg.png" alt="Gabriel Pec">
+        
+      </div>
+      <div class="info">
+        <div class="name">#11 Gabriel Pec</div>
+        <div class="pos">Attaquant droit</div>
+        <div class="stats">Note <strong>7.51</strong> · 3B / 3P en 11 matchs</div>
+        <div class="profile">Profil : Volume tirs · Créateur</div>
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/nwVf51UA.png" alt="Paintsil J.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#28 Paintsil J.</div>
+        <div class="pos">Attaquant central</div>
+        <div class="stats">Note <strong>7.18</strong> · 2B / 2P en 8 matchs</div>
+        <div class="profile">Profil : Volume tirs · Créateur</div>
+      </div>
+    </div>
+    
+    <div class="top3-player">
+      <div class="photo-wrap">
+        <img src="photos/vD26FIin.png" alt="Sanabria L.">
+        
+      </div>
+      <div class="info">
+        <div class="name">#8 Sanabria L.</div>
+        <div class="pos">Milieu droit</div>
+        <div class="stats">Note <strong>6.99</strong> · 2B / 1P en 12 matchs</div>
+        
+      </div>
+    </div>
+    
+    
+  </div>
+</div>
 
-<h2><span class="step">03</span> Méthode</h2>
+
+<h2><span class="step">07</span> Méthode</h2>
 <div class="method-section">
   <h3>Modèle 5 zones tactiques (agnostique de la formation)</h3>
   <p>S'adapte à toute formation (4-3-3, 4-2-3-1, 3-4-2-1, 3-5-2, 4-4-2…). Pour chaque zone, agrégation Σ stats + moyenne /90 sur les joueurs du groupe, comparaison domaine par domaine (Frappe / Passes / Possession / Défense / Discipline).</p>

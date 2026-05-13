@@ -29,6 +29,15 @@
   border-color: #216037 !important;
   box-shadow: none !important;
 }
+
+/* Cover (header haut de page) : dégradé MATRIX sombre subtil (jamais vert vif uniforme) */
+.cover {
+  background: linear-gradient(135deg, #001a08 0%, #000800 100%) !important;
+  border: 1px solid #216037 !important;
+}
+.cover h1, .cover .subtitle { color: #00FF66 !important; }
+.cover .eyebrow, .cover .vs, .cover .meta { color: #D4A340 !important; }
+.cover [style*="color:var(--gold)"] { color: #D4A340 !important; }
 .zone.win-home { background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important; }
 .zone.win-away { background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important; }
 .zone.neutre   { background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important; }
