@@ -2,15 +2,18 @@
 // Stratégie : network-first pour les JSON data (toujours fresh),
 // cache-first pour les assets statiques (HTML/CSS/JS/icons).
 
-const CACHE_NAME = "matrix-bets-v1";
+const CACHE_NAME = "matrix-bets-v3";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./styles/matrix.css",
   "./js/app.js",
+  "./js/three-scene.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png",
+  "./icons/robot-portrait-600.png",
 ];
 
 self.addEventListener("install", (event) => {

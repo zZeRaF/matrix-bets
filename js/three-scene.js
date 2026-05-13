@@ -276,10 +276,14 @@ function buildParticles() {
 // ─── Init ───
 function init() {
   const canvas = document.getElementById("three-canvas");
-  if (!canvas) return false;
+  if (!canvas) {
+    console.warn("[three] #three-canvas not found");
+    return false;
+  }
   const parent = canvas.parentElement;
-  const w = parent.clientWidth || 380;
-  const h = parent.clientHeight || 220;
+  const w = Math.max(parent.clientWidth, 320);
+  const h = Math.max(parent.clientHeight, 200);
+  console.log("[three] init", w, "x", h);
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000700);

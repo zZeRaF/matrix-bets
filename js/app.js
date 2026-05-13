@@ -164,10 +164,21 @@ function app() {
       // Active le bouton SKIP après 2s
       setTimeout(() => { this.splashSkipAvailable = true; }, 2000);
 
-      // Démarre la scène 3D dès maintenant (en parallèle)
-      if (window.startThreeScene) {
-        window.startThreeScene();
-      }
+      // Démarre la scène 3D dès qu'elle est prête (retry max 1.5s)
+      (async () => {
+        for (let i = 0; i < 30; i++) {
+          if (window.startThreeScene) {
+            try {
+              window.startThreeScene();
+            } catch (e) {
+              console.error("Three.js start error:", e);
+            }
+            return;
+          }
+          await sleep(50);
+        }
+        console.warn("Three.js never loaded — fallback SVG used");
+      })();
 
       // Typewriter du titre
       const title = "$MATRIX BETS$";
