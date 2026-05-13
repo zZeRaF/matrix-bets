@@ -1,15 +1,14 @@
-// Service Worker minimal — Matrix Bets
-// Stratégie : network-first pour les JSON data (toujours fresh),
-// cache-first pour les assets statiques (HTML/CSS/JS/icons).
+// Service Worker — Matrix Bets / BeTime
+// Stratégie :
+//   - HTML / index : NETWORK-FIRST (toujours frais, fallback cache)
+//   - data/*.json : NETWORK-FIRST
+//   - reste (CSS/JS/icons) : CACHE-FIRST avec bumping de version
 
-const CACHE_NAME = "betime-v5";
+const CACHE_NAME = "betime-v6";
 const STATIC_ASSETS = [
-  "./",
-  "./index.html",
   "./manifest.webmanifest",
   "./styles/matrix.css",
   "./js/app.js",
-  "./js/three-scene.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
@@ -19,8 +18,6 @@ const STATIC_ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      // cache.add individuel + catch par asset : si un fichier 404,
-      // on ignore juste celui-là (au lieu de bloquer toute l'install).
       Promise.all(
         STATIC_ASSETS.map((url) =>
           cache.add(url).catch((e) => {
@@ -46,7 +43,26 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  // Network-first pour data/*.json (toujours fresh à l'ouverture)
+
+  // HTML root + index.html : NETWORK-FIRST (jamais de cache servi en priorité)
+  const isHtml =
+    url.pathname === "/" ||
+    url.pathname.endsWith("/") ||
+    url.pathname.endsWith(".html");
+  if (isHtml) {
+    event.respondWith(
+      fetch(event.request, { cache: "no-store" })
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // data/*.json : NETWORK-FIRST
   if (url.pathname.includes("/data/") && url.pathname.endsWith(".json")) {
     event.respondWith(
       fetch(event.request)
@@ -59,7 +75,8 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-  // Cache-first pour le reste (assets statiques)
+
+  // Reste (CSS/JS/icons) : CACHE-FIRST
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
