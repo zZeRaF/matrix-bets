@@ -2,13 +2,80 @@
 <html lang="fr"><head><meta charset="UTF-8">
 <title>DC United vs Chicago Fire — Analyse micro 5 zones</title>
 <style>
+
 :root {
-  --navy:#0E1A2C; --navy-deep:#070D17; --gold:#D4A340; --gold-dark:#B18329; --gold-light:#F4E5B8;
-  --success:#2EA04F; --warning:#E59A1B; --risk:#C7283D;
-  --paper:#FBFAF7; --ink:#1B1F26; --sub:#5C6573;
-  --home:#C8102E; --away:#0E3A8A;
+  --navy: #00FF66;
+  --navy-deep: #000800;
+  --gold: #D4A340;
+  --gold-light: #82FFB4;
+  --gold-dark: #B18329;
+  --success: #00FF66;
+  --warning: #FFC000;
+  --risk: #FF1B1B;
+  --paper: #001000;
+  --ink: #82FFB4;
+  --sub: #5D8C6E;
+  --home: #00FF66;
+  --away: #FFC000;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:Calibri,-apple-system,sans-serif}
+
+/* Surcharges Matrix : neutralise les fonds blancs / pâles encore en dur */
+.verdict-card, .indicator, .article-card, .unavail-card,
+.method-section, .heatmap-wrap, .pitch-image-wrap,
+.matrix .row, .bar-row, .preview,
+.zone, .openness-card, .top3-team {
+  background: #001a08 !important;
+  color: #82FFB4 !important;
+  border-color: #216037 !important;
+  box-shadow: none !important;
+}
+
+/* Cover (header haut de page) : dégradé MATRIX sombre subtil (jamais vert vif uniforme) */
+.cover {
+  background: linear-gradient(135deg, #001a08 0%, #000800 100%) !important;
+  border: 1px solid #216037 !important;
+}
+.cover h1, .cover .subtitle { color: #00FF66 !important; }
+.cover .eyebrow, .cover .vs, .cover .meta { color: #D4A340 !important; }
+.cover [style*="color:var(--gold)"] { color: #D4A340 !important; }
+.zone.win-home { background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important; }
+.zone.win-away { background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important; }
+.zone.neutre   { background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important; }
+.indicator.active { background: rgba(0, 64, 24, 0.4) !important; border-left-color: #00FF66 !important; }
+.indicator:not(.active) .check { color: #5D8C6E !important; }
+.openness-header .score-circle { background: #002000 !important; color: #00FF66 !important; border: 2px solid #216037 !important; }
+.score-pill.home { background: #00FF66 !important; color: #000 !important; }
+.score-pill.away { background: #FFC000 !important; color: #000 !important; }
+.top3-team.home { border-top-color: #00FF66 !important; }
+.top3-team.away { border-top-color: #FFC000 !important; }
+.top3-player { border-bottom-color: #195A2D !important; }
+.top3-player .photo-wrap { background: #002000 !important; border-color: #D4A340 !important; }
+.pitch-image-wrap { background: #000800 !important; border: 1px solid #216037 !important; }
+.verdict-card.fav-home { background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important; }
+.verdict-card.fav-away { background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important; }
+.verdict-card.neutral  { background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important; }
+.cat-grid.win-home { background: rgba(0, 64, 24, 0.55) !important; }
+.cat-grid.win-away { background: rgba(64, 28, 0, 0.55) !important; }
+.cat-grid.neutre   { background: rgba(48, 32, 0, 0.55) !important; }
+.matrix .row.active { background: rgba(80, 56, 0, 0.4) !important; border-left-color: #D4A340 !important; }
+.bar-container { background: #001800 !important; border: 1px solid #195A2D !important; }
+.bar-home { background: #00FF66 !important; color: #000 !important; }
+.bar-away { background: #FFC000 !important; color: #000 !important; }
+/* Règle MATRIX universelle : tous les pills / bars sur fonds vifs → texte NOIR */
+.match-pill.W { background: #00FF66 !important; color: #000 !important; }
+.match-pill.D { background: #FFC000 !important; color: #000 !important; }
+.match-pill.L { background: #FF1B1B !important; color: #000 !important; }
+.match-pill .score { color: #000 !important; opacity: 0.75 !important; }
+.bar-fill { color: #000 !important; }
+.status-pill, .status-absent, .status-incertain { color: #000 !important; }
+.status-absent { background: #FF1B1B !important; }
+.status-incertain { background: #FFC000 !important; }
+.tag.fav, .tag.def, .tag.neutre { color: #000 !important; }
+table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
+table td { color: #FFF !important; border-color: #195A2D !important; }
+.tag.fav, .tag.def, .tag.neutre { color: #000 !important; }
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:Consolas,"Courier New",monospace,-apple-system}
 body{background:var(--paper);color:var(--ink);padding:24px;max-width:1280px;margin:auto;line-height:1.5}
 
 /* Cover */
@@ -101,74 +168,6 @@ h2 .step{background:var(--gold);color:var(--navy);padding:2px 10px;border-radius
 .method-section p{font-size:13px;color:var(--ink)}
 
 @media print{body{padding:8px;max-width:100%}.cover{box-shadow:none}}
-</style><style>
-/* === MATRIX OVERLAY (injection PWA) === */
-:root {
-  --paper: #001000 !important; --ink: #82FFB4 !important;
-  --navy: #00FF66 !important; --navy-deep: #000800 !important;
-  --sub: #5D8C6E !important; --gold-light: #82FFB4 !important;
-  --success: #00FF66 !important; --warning: #FFC000 !important; --risk: #FF1B1B !important;
-  --home: #00FF66 !important; --away: #FFC000 !important;
-}
-html, body {
-  background: #001000 !important;
-  color: #82FFB4 !important;
-  font-family: Consolas, "Courier New", monospace, -apple-system !important;
-}
-h1, h2, h3, h4, h5 { color: #00FF66 !important; }
-h2 { border-bottom-color: #216037 !important; }
-.cover { background: linear-gradient(135deg,#001a08 0%,#000800 100%) !important; }
-.eyebrow, .subtitle, .cover .meta { color: #D4A340 !important; }
-
-/* Cartes / blocs : fond foncé matrix */
-.verdict-card, .indicator, .article-card, .unavail-card,
-.method-section, .heatmap-wrap, .pitch-image-wrap,
-.matrix .row, .bar-row, .tag {
-  background: rgba(0, 26, 8, 0.95) !important;
-  color: #82FFB4 !important;
-  border-color: #216037 !important;
-}
-.verdict-card { box-shadow: 0 2px 8px rgba(0, 255, 102, 0.08) !important; }
-.matrix .row { border-left-color: #216037 !important; }
-.matrix .row.active { background: rgba(80, 56, 0, 0.4) !important; border-left-color: #D4A340 !important; }
-
-/* Cells favorabilité */
-.cat-grid.win-home, .verdict-card.fav-home {
-  background: rgba(0, 64, 24, 0.55) !important; border-left-color: #00FF66 !important;
-}
-.cat-grid.win-away, .verdict-card.fav-away {
-  background: rgba(64, 28, 0, 0.55) !important; border-left-color: #FFC000 !important;
-}
-.cat-grid.neutre, .verdict-card.neutral {
-  background: rgba(48, 32, 0, 0.55) !important; border-left-color: #FFC000 !important;
-}
-
-/* Bars / pills */
-.bar-container { background: #001800 !important; border: 1px solid #195A2D !important; }
-.bar-home { background: #00FF66 !important; color: #000 !important; }
-.bar-away { background: #FFC000 !important; color: #000 !important; }
-.match-pill.W { background: #00FF66 !important; color: #000 !important; }
-.match-pill.D { background: #FFC000 !important; color: #000 !important; }
-.match-pill.L { background: #FF1B1B !important; color: #FFF !important; }
-.status-absent { background: #FF1B1B !important; color: #FFF !important; }
-.status-incertain { background: #FFC000 !important; color: #000 !important; }
-
-/* Tables (héritées) */
-table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
-table td { color: #FFF !important; border-color: #195A2D !important; }
-
-/* Tags */
-.tag { color: #00FF66 !important; }
-
-/* Force texte blanc/foncé hardcodé → vert */
-[style*="color:#5C6573"], [style*="color: #5C6573"] { color: #5D8C6E !important; }
-[style*="color:#1B1F26"], [style*="color: #1B1F26"] { color: #82FFB4 !important; }
-[style*="color:#0E1A2C"], [style*="color: #0E1A2C"] { color: #00FF66 !important; }
-[style*="background:white"], [style*="background: white"],
-[style*="background:#fff"], [style*="background: #fff"],
-[style*="background:#FFF"], [style*="background: #FFF"] {
-  background: rgba(0, 26, 8, 0.95) !important;
-}
 </style></head><body>
 
 <div class="cover">
