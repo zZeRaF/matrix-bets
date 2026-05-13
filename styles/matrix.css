@@ -1877,3 +1877,85 @@ body.layer-open .bottom-nav { display: none; }
 @media (max-width: 480px) {
   .pari-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ─── Section "Paris en cours" sur le feed principal ─── */
+.pending-bets-section {
+  margin: 12px;
+  padding: 12px;
+  background: rgba(80, 56, 0, 0.25);
+  border: 1px dashed var(--mx-orange);
+  border-radius: 6px;
+}
+.pending-bets-title {
+  color: var(--mx-orange);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pending-bets-count {
+  background: var(--mx-orange);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 3px;
+}
+.pending-bet-card {
+  background: rgba(0, 16, 8, 0.95);
+  border: 1px solid var(--mx-border-thick);
+  border-left: 4px solid var(--mx-orange);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.pending-bet-card[data-rule="R1"] { border-left-color: var(--mx-green-bright); }
+.pending-bet-card[data-rule="R2"] { border-left-color: var(--mx-blue); }
+.pending-bet-card[data-rule="R3"] { border-left-color: var(--mx-orange); }
+
+.pending-bet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.pending-bet-rule {
+  background: var(--mx-orange);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.1em;
+}
+.pending-bet-card[data-rule="R1"] .pending-bet-rule { background: var(--mx-green-bright); }
+.pending-bet-card[data-rule="R2"] .pending-bet-rule { background: var(--mx-blue); }
+.pending-bet-match {
+  color: var(--mx-green-pastel);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.pending-bet-verdict {
+  color: var(--mx-green-bright);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 4px 0 6px;
+}
+.pending-bet-info {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--mx-green-pastel);
+  margin-bottom: 8px;
+}
+.pending-bet-info strong { color: var(--mx-green-bright); }
+.pending-bet-potential strong { color: var(--mx-orange); }
+.pending-bet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}

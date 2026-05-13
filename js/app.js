@@ -641,6 +641,14 @@ function app() {
     // GESTION DES PARIS PLACÉS — vue détail onglet PARI
     // ═══════════════════════════════════════════════════
 
+    // Liste tous les paris en attente de résolution (status='placed'), du plus récent au plus ancien
+    pendingBets() {
+      return this.history
+        .filter((b) => b.status === "placed")
+        .sort((a, b) => (b.placed_at || "").localeCompare(a.placed_at || ""));
+    },
+
+
     // Clé d'identification d'un pari (combinaison match + règle + verdict)
     _betKey(date, slug, rule_id, verdict) {
       return `${date}|${slug}|${rule_id}|${verdict}`;

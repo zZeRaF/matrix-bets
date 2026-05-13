@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-rc";
+      var APP_VERSION = "20260513-sd";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -74,7 +74,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-rc</div>
+      <div class="splash-version" id="splash-version">build 20260513-sd</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
@@ -139,6 +139,33 @@
 
   <!-- ─── FIL D'ACTUALITÉ DES PARIS ─── -->
   <main class="feed" x-show="state === 'ok' && tab === 'paris' && currentView === 'feed'">
+    <!-- ─── PARIS PLACÉS À RÉSOUDRE ─── -->
+    <template x-if="pendingBets().length > 0">
+      <section class="pending-bets-section">
+        <h2 class="pending-bets-title">
+          ⏳ PARIS EN COURS <span class="pending-bets-count" x-text="pendingBets().length"></span>
+        </h2>
+        <template x-for="bet in pendingBets()" :key="bet.id">
+          <article class="pending-bet-card" :data-rule="bet.rule_id">
+            <div class="pending-bet-head">
+              <span class="pending-bet-rule" x-text="bet.rule_id"></span>
+              <span class="pending-bet-match" x-text="bet.home + ' vs ' + bet.away"></span>
+            </div>
+            <p class="pending-bet-verdict" x-text="bet.verdict"></p>
+            <div class="pending-bet-info">
+              <span>Mise <strong x-text="fmtEur(bet.mise)"></strong></span>
+              <span>@ <strong x-text="fmtNum(bet.cote_book)"></strong></span>
+              <span class="pending-bet-potential">→ +<strong x-text="fmtEur(bet.mise * (bet.cote_book - 1))"></strong></span>
+            </div>
+            <div class="pending-bet-actions">
+              <button class="pari-btn-won" @click.stop="resolveBet(bet.id, 'won')">✓ GAGNÉ</button>
+              <button class="pari-btn-lost" @click.stop="resolveBet(bet.id, 'lost')">✗ PERDU</button>
+            </div>
+          </article>
+        </template>
+      </section>
+    </template>
+
     <template x-for="pari in data.top" :key="pari.rank">
       <article class="bet-card"
                :class="ruleClass(pari.rule_id)"
@@ -430,18 +457,17 @@
                 <div class="pari-action">
                   <label class="pari-input-row">
                     <span>Cote bookmaker :</span>
-                    <input type="number" step="0.01" min="1.01"
-                           :value="pari.cote_reelle"
-                           x-model.number="pari._coteSaisie"
-                           @input="pari._coteSaisie = parseFloat($event.target.value) || pari.cote_reelle"
+                    <input type="number" step="0.01" inputmode="decimal"
+                           x-model="pari._coteSaisie"
+                           :placeholder="pari.cote_reelle ? pari.cote_reelle.toFixed(2) : '1.50'"
                            class="pari-cote-input">
                   </label>
                   <div class="pari-mise-preview">
                     <span>Mise calculée (Kelly /<span x-text="pari.rule_id === 'R3' ? '8' : '4'"></span>) :</span>
-                    <strong x-text="fmtEur(computeMise(pari, pari._coteSaisie || pari.cote_reelle))"></strong>
+                    <strong x-text="fmtEur(computeMise(pari, parseFloat(pari._coteSaisie) || pari.cote_reelle))"></strong>
                   </div>
                   <button class="pari-btn-place"
-                          @click="placeBet(pari, pari._coteSaisie || pari.cote_reelle)">
+                          @click="placeBet(pari, parseFloat(pari._coteSaisie) || pari.cote_reelle)">
                     ⚡ PLACER LE PARI
                   </button>
                 </div>
