@@ -88,7 +88,9 @@ function app() {
     splashTitle: "",
     splashLog: [],
     splashProgress: 0,
+    splashSkipAvailable: false,
     _splashStopRain: null,
+    _splashCancelled: false,
 
     async init() {
       const saved = loadStoredState();
@@ -110,39 +112,59 @@ function app() {
         this._splashStopRain = startMatrixRain(canvas);
       }
 
-      // ── BUDGET TOTAL : 5000ms ──
-      // Typewriter title : 13 chars × 60ms = 780ms
-      // Steps log : 2700ms (cumul ci-dessous)
-      // Pause READY  : 920ms
-      // Fade out    : 600ms
-      // Total       : 5000ms
+      // ── BUDGET TOTAL : 20 000ms ──
+      // Typewriter title          : 780ms (13 chars × 60ms)
+      // Pause                     : 200ms
+      // Log lines (6 steps)        : 4 000ms cumul
+      // Scène d'action continue   : 13 500ms (pendant que le reste affiche READY)
+      // Fade out                  : 600ms
+      // Bouton SKIP visible dès   : 3 000ms
+
+      // Active le bouton SKIP après 3s
+      setTimeout(() => { this.splashSkipAvailable = true; }, 3000);
 
       // Typewriter du titre
       const title = "$MATRIX BETS$";
       for (let i = 1; i <= title.length; i++) {
+        if (this._splashCancelled) return;
         this.splashTitle = title.slice(0, i);
         await sleep(60);
       }
+      if (this._splashCancelled) return;
+      await sleep(200);
 
-      // Log lines successives + progress
+      // 6 log lines étalées sur 4s, puis scène d'action seule pendant ~13s
       const steps = [
-        { text: "INITIALISATION SHELL...", delay: 400 },
-        { text: "CONNEXION GITHUB PAGES...", delay: 400 },
-        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 500 },
-        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 500 },
-        { text: "CALCUL KELLY /4...", delay: 450 },
-        { text: "READY.", delay: 450 },
+        { text: "INITIALISATION SHELL...", delay: 580 },
+        { text: "CONNEXION GITHUB PAGES...", delay: 580 },
+        { text: "FETCH TOP_DU_JOUR.JSON...", delay: 700 },
+        { text: "PARSE ANALYSES MACRO/MESO/MICRO/NEWS...", delay: 700 },
+        { text: "CALCUL KELLY /4...", delay: 700 },
+        { text: "READY.", delay: 740 },
       ];
       for (let i = 0; i < steps.length; i++) {
+        if (this._splashCancelled) return;
         this.splashLog.push({ text: steps[i].text, status: "wait" });
         this.splashProgress = Math.round((i / steps.length) * 100);
         await sleep(steps[i].delay);
         this.splashLog[i].status = "ok";
       }
       this.splashProgress = 100;
-      await sleep(920);
 
-      // Fade out + stop rain
+      // Pause pendant que la scène d'action continue (~13.5s)
+      await sleep(13500);
+      if (this._splashCancelled) return;
+
+      this.closeSplash();
+    },
+
+    skipSplash() {
+      this._splashCancelled = true;
+      this.closeSplash();
+    },
+
+    async closeSplash() {
+      if (this.splashFading) return;
       this.splashFading = true;
       await sleep(600);
       this.showSplash = false;
