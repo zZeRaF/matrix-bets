@@ -16,7 +16,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-p";
+      var APP_VERSION = "20260513-q";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -67,9 +67,9 @@
     <button class="splash-skip" x-show="splashSkipAvailable" @click="skipSplash()">
       SKIP <span class="skip-arrow">→</span>
     </button>
-    <!-- Bouton AUDIO (apparaît au lancement, premier tap = autorise audio + démarre la PWA avec son) -->
+    <!-- Bouton AUDIO (apparaît au lancement, premier tap = autorise audio hack synthétisé) -->
     <button class="splash-audio-toggle" x-show="!audioStarted && audioAvailable" @click="enableAudio()">
-      <span class="audio-icon">▶</span> <span>SON</span>
+      <span class="audio-icon">▶</span> <span>HACK SON</span>
     </button>
     <!-- Audio element (source ajoutée dynamiquement si présent) -->
     <audio id="splash-audio" preload="auto"></audio>
@@ -80,7 +80,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-p</div>
+      <div class="splash-version" id="splash-version">build 20260513-q</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
