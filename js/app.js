@@ -167,11 +167,11 @@ function app() {
       // Three.js désactivé — la scène SVG (.scene-galactik) prend le relais via CSS keyframes
 
       // Typewriter du titre
-      const title = "$MATRIX BETS$";
+      const title = "BeTime";
       for (let i = 1; i <= title.length; i++) {
         if (this._splashCancelled) return;
         this.splashTitle = title.slice(0, i);
-        await sleep(40);
+        await sleep(90);
       }
       if (this._splashCancelled) return;
 

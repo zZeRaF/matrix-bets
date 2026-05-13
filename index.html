@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#00FF66">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Matrix Bets">
+  <meta name="apple-mobile-web-app-title" content="BeTime">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
   <link rel="stylesheet" href="styles/matrix.css">
-  <title>Matrix Bets</title>
+  <title>BeTime</title>
   <!-- Alpine.js 3.14.x -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
   <!-- Three.js via importmap (chargé par js/three-scene.js) -->
@@ -57,157 +57,6 @@
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
 
-      <!-- ── SCÈNE 3D Three.js (DÉSACTIVÉE — retour au SVG) ── -->
-      <div class="splash-scene scene-3d" aria-hidden="true" style="display:none">
-        <canvas id="three-canvas"></canvas>
-      </div>
-
-      <!-- ── SCÈNE SVG (active) — robot photo + défenseur + gardien + ballon ── -->
-      <div class="splash-scene scene-galactik" aria-hidden="true">
-      <div class="splash-scene scene-galactik" aria-hidden="true">
-        <!-- Vue depuis derrière le joueur, but au fond en perspective convergente.
-             Pelouse en perspective forte. Robot photo en bas-centre (proche caméra),
-             défenseur en milieu (perspective), but tout au fond avec gardien dedans. -->
-        <svg class="scene-stage" viewBox="0 0 400 240" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="trail-gradient" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stop-color="#00FF66" stop-opacity="0"/>
-              <stop offset="40%" stop-color="#00FF66" stop-opacity="0.8"/>
-              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="1"/>
-            </linearGradient>
-            <radialGradient id="ball-radial" cx="35%" cy="35%" r="65%">
-              <stop offset="0%" stop-color="#FFFFFF"/>
-              <stop offset="55%" stop-color="#00FF66"/>
-              <stop offset="100%" stop-color="#0A4D2A"/>
-            </radialGradient>
-            <radialGradient id="pitch-fade" cx="50%" cy="40%" r="70%">
-              <stop offset="0%" stop-color="rgba(0, 80, 30, 0.3)"/>
-              <stop offset="100%" stop-color="rgba(0, 7, 0, 0)"/>
-            </radialGradient>
-          </defs>
-
-          <!-- Pelouse perspective forte (lignes convergentes vers le point de fuite central) -->
-          <rect x="0" y="0" width="400" height="240" fill="url(#pitch-fade)"/>
-          <g class="pitch-perspective" stroke="#00FF66" fill="none">
-            <!-- Lignes horizontales qui rétrécissent vers le fond -->
-            <line x1="0"   y1="240" x2="400" y2="240" stroke-width="1.5" opacity="0.6"/>
-            <line x1="30"  y1="200" x2="370" y2="200" stroke-width="1.2" stroke-dasharray="3 5" opacity="0.5"/>
-            <line x1="70"  y1="165" x2="330" y2="165" stroke-width="1" stroke-dasharray="2 6" opacity="0.4"/>
-            <line x1="110" y1="135" x2="290" y2="135" stroke-width="0.8" stroke-dasharray="2 8" opacity="0.3"/>
-            <line x1="145" y1="115" x2="255" y2="115" stroke-width="0.7" stroke-dasharray="2 10" opacity="0.25"/>
-            <!-- Lignes verticales convergentes (rails vers le but) -->
-            <line x1="0"   y1="240" x2="180" y2="100" stroke-width="0.7" stroke-dasharray="2 4" opacity="0.4"/>
-            <line x1="400" y1="240" x2="220" y2="100" stroke-width="0.7" stroke-dasharray="2 4" opacity="0.4"/>
-            <line x1="80"  y1="240" x2="190" y2="100" stroke-width="0.5" stroke-dasharray="1 3" opacity="0.25"/>
-            <line x1="320" y1="240" x2="210" y2="100" stroke-width="0.5" stroke-dasharray="1 3" opacity="0.25"/>
-          </g>
-
-          <!-- BUT au fond, centré horizontalement, vue de face en perspective -->
-          <g class="goal-cage" stroke="#00FF66" fill="none" stroke-width="2.5">
-            <!-- poteau gauche (incliné par perspective) -->
-            <line x1="115" y1="125" x2="130" y2="60"/>
-            <!-- poteau droit -->
-            <line x1="285" y1="125" x2="270" y2="60"/>
-            <!-- barre transversale -->
-            <line x1="130" y1="60" x2="270" y2="60"/>
-            <!-- ligne de fond -->
-            <line x1="115" y1="125" x2="285" y2="125"/>
-            <!-- Cible lucarne haut-gauche -->
-            <circle class="lucarne-target" cx="138" cy="68" r="5" stroke-width="1.5"/>
-            <circle class="lucarne-inner" cx="138" cy="68" r="2" fill="#FFC000" opacity="0.7"/>
-          </g>
-
-          <!-- FILET en perspective -->
-          <g class="goal-net" stroke="#82FFB4" fill="none" stroke-width="0.5" opacity="0.5">
-            <line x1="155" y1="65" x2="155" y2="123"/>
-            <line x1="180" y1="62" x2="180" y2="124"/>
-            <line x1="200" y1="60" x2="200" y2="125"/>
-            <line x1="220" y1="62" x2="220" y2="124"/>
-            <line x1="245" y1="65" x2="245" y2="123"/>
-            <line x1="130" y1="80" x2="270" y2="80"/>
-            <line x1="125" y1="100" x2="275" y2="100"/>
-          </g>
-          <circle class="lucarne-flash" cx="138" cy="68" r="0" fill="#FFFFFF"/>
-
-          <!-- GARDIEN — centré dans le but (perspective, donc petit) -->
-          <g class="keeper-robot">
-            <polygon points="195,72 205,72 209,76 209,84 205,88 195,88 191,84 191,76"
-                     fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.2"/>
-            <rect x="193" y="80" width="14" height="2.5" fill="#00FF66" opacity="0.9"/>
-            <rect x="193" y="88" width="14" height="20" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.2"/>
-            <rect class="keeper-arm-l" x="184" y="89" width="9" height="4" fill="rgba(0,255,102,0.25)" stroke="#00FF66" stroke-width="1"/>
-            <rect class="keeper-arm-r" x="207" y="89" width="9" height="4" fill="rgba(0,255,102,0.25)" stroke="#00FF66" stroke-width="1"/>
-            <rect x="195" y="108" width="3.5" height="13" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1"/>
-            <rect x="201" y="108" width="3.5" height="13" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1"/>
-          </g>
-
-          <!-- DÉFENSEUR 1 — premier obstacle (apparaît phase 4) -->
-          <g class="defender-robot">
-            <polygon points="186,135 214,135 222,145 222,160 214,170 186,170 178,160 178,145"
-                     fill="rgba(0,255,102,0.22)" stroke="#00FF66" stroke-width="1.6"/>
-            <rect x="182" y="151" width="36" height="6" fill="#00FF66" opacity="0.9"/>
-            <circle cx="192" cy="154" r="1.3" fill="#FFFFFF"/>
-            <circle cx="208" cy="154" r="1.3" fill="#FFFFFF"/>
-            <rect x="178" y="170" width="44" height="42" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.6"/>
-            <rect x="166" y="175" width="14" height="8" fill="rgba(0,255,102,0.25)" stroke="#00FF66" stroke-width="1.3"/>
-            <rect x="220" y="175" width="14" height="8" fill="rgba(0,255,102,0.25)" stroke="#00FF66" stroke-width="1.3"/>
-            <rect x="183" y="212" width="10" height="24" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.4"/>
-            <rect x="207" y="212" width="10" height="24" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.4"/>
-          </g>
-
-          <!-- DÉFENSEUR 2 — second obstacle (apparaît phase 6, plus proche du but → plus petit en perspective) -->
-          <g class="defender-robot-2">
-            <polygon points="192,140 210,140 217,148 217,158 210,166 192,166 185,158 185,148"
-                     fill="rgba(0,255,102,0.22)" stroke="#00FF66" stroke-width="1.4"/>
-            <rect x="188" y="153" width="26" height="5" fill="#00FF66" opacity="0.9"/>
-            <circle cx="196" cy="155.5" r="1" fill="#FFFFFF"/>
-            <circle cx="208" cy="155.5" r="1" fill="#FFFFFF"/>
-            <rect x="185" y="166" width="32" height="32" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.4"/>
-            <rect x="175" y="170" width="10" height="6" fill="rgba(0,255,102,0.25)" stroke="#00FF66" stroke-width="1.2"/>
-            <rect x="217" y="170" width="10" height="6" fill="rgba(0,255,102,0.25)" stroke="#00FF66" stroke-width="1.2"/>
-            <rect x="190" y="198" width="7" height="18" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.2"/>
-            <rect x="205" y="198" width="7" height="18" fill="rgba(0,255,102,0.20)" stroke="#00FF66" stroke-width="1.2"/>
-          </g>
-
-          <!-- LIGNES DE VITESSE (course vers le but, qui filent en arrière) -->
-          <g class="speed-lines" stroke="#82FFB4" stroke-width="2" stroke-linecap="round" fill="none">
-            <line class="sl-1" x1="40"  y1="230" x2="120" y2="230"/>
-            <line class="sl-2" x1="320" y1="230" x2="380" y2="230"/>
-            <line class="sl-3" x1="20"  y1="215" x2="90"  y2="215"/>
-            <line class="sl-4" x1="350" y1="215" x2="395" y2="215"/>
-          </g>
-
-          <!-- TRAÎNÉE FLUIDE du ballon (du pied du robot vers la lucarne) -->
-          <path class="ball-trail"
-                d="M200,235 Q200,205 195,180 Q190,150 175,120 Q160,95 145,75"
-                stroke="url(#trail-gradient)" stroke-width="5" fill="none" stroke-linecap="round"/>
-
-          <!-- BALLON -->
-          <g class="scene-ball-anim">
-            <circle class="ball-glow" cx="200" cy="232" r="10" fill="#00FF66" opacity="0.55"/>
-            <circle class="ball-main" cx="200" cy="232" r="5" fill="url(#ball-radial)" stroke="#00FF66" stroke-width="1"/>
-          </g>
-        </svg>
-
-        <!-- ROBOT PHOTORÉALISTE — vu de proche, centré en bas (caméra derrière lui) -->
-        <div class="scene-robot-wrapper">
-          <img class="scene-robot" src="icons/robot-portrait-600.png" alt="" loading="eager">
-          <!-- Aura électrique FLUIDE permanente (pulse continu pendant course + dribble) -->
-          <div class="electric-aura"></div>
-          <!-- Éclairs continus (flux fluide) qui parcourent le robot -->
-          <svg class="electric-bolts" viewBox="0 0 200 200">
-            <path class="bolt bolt-1" d="M40,30 L55,70 L45,85 L70,120 L60,140 L80,170" stroke="#82FFB4" stroke-width="2" fill="none"/>
-            <path class="bolt bolt-2" d="M160,40 L145,75 L155,95 L130,125 L145,150 L125,180" stroke="#FFFFFF" stroke-width="1.5" fill="none"/>
-            <path class="bolt bolt-3" d="M100,20 L90,60 L110,90 L85,130 L100,160 L95,190" stroke="#00FF66" stroke-width="2" fill="none"/>
-            <path class="bolt bolt-4" d="M20,80 L50,95 L35,120 L60,140 L30,170" stroke="#82FFB4" stroke-width="1.5" fill="none"/>
-            <path class="bolt bolt-5" d="M180,90 L150,105 L165,130 L140,150 L170,180" stroke="#FFFFFF" stroke-width="1.5" fill="none"/>
-          </svg>
-        </div>
-
-        <!-- Texte GOAL -->
-        <div class="scene-goal-text">GOAL.</div>
-      </div>
-
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
           <li class="splash-log-line">
@@ -226,7 +75,7 @@
   <!-- ─── HEADER STICKY : Bankroll + date ─── -->
   <header class="topbar">
     <div class="brand">
-      <span class="brand-text">$MATRIX BETS$</span>
+      <span class="brand-text">BeTime</span>
     </div>
     <div class="bankroll" @click="editBankroll()">
       <span class="bankroll-lbl">BANKROLL</span>
