@@ -29,7 +29,6 @@ function _beep(freq, dur, type = "square", vol = 0.25, slide = null) {
   osc.type = type;
   osc.frequency.setValueAtTime(freq, t);
   if (slide) osc.frequency.linearRampToValueAtTime(slide, t + dur);
-  // Enveloppe LINÉAIRE robuste — attack très court, sustain plein vol, release rapide
   const attack = Math.min(0.003, dur * 0.1);
   const release = Math.min(0.01, dur * 0.3);
   gain.gain.setValueAtTime(0, t);
@@ -73,36 +72,30 @@ function playSplashSound() {
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
 
-  // === SONS DOUX HARMONIQUES (sine waves, accord majeur Do/Mi/Sol) ===
-  // Style "boot screen ambient" — agréable, montée vers BeTime
+  // === STYLE GEEK INFORMATIQUE — BIOS / Terminal / Data transfer ===
+  // Square + triangle, bips courts et secs, rythme rapide, pas d'accord tenu
 
-  // Phase 1 (0-450ms) : arpège ascendant doux pendant le typewriter
-  // Do4, Mi4, Sol4, Do5, Mi5 (pentatonique majeure)
-  const arpeggio = [261.63, 329.63, 392.0, 523.25, 659.25];
-  arpeggio.forEach((freq, i) => {
-    setTimeout(() => _beep(freq, 0.18, "sine", 0.16), i * 90);
-  });
+  // Phase 1 (0-550ms) : 12 micro-bips type frappe clavier / data stream
+  const keyFreqs = [1200, 950, 1400, 1100, 1300, 880, 1500, 1050, 1250, 950, 1350, 1150];
+  for (let i = 0; i < 12; i++) {
+    setTimeout(() => _beep(keyFreqs[i], 0.025, "square", 0.14), 10 + i * 45);
+  }
 
-  // Phase 2 (700-2100ms) : log lines — notes harmoniques montantes
+  // Phase 2 (700-2100ms) : bip "scan" + ack pour chaque log line
   const logTimings = [700, 920, 1140, 1390, 1650, 1900];
-  const logFreqs = [392.0, 523.25, 659.25, 523.25, 783.99, 1046.50];
   logTimings.forEach((t, i) => {
-    setTimeout(() => _beep(logFreqs[i], 0.18, "sine", 0.14), t);
-    // Petite harmonique douce (quinte juste) pour épaissir
-    setTimeout(() => _beep(logFreqs[i] * 1.5, 0.10, "sine", 0.06), t + 30);
+    setTimeout(() => _beep(660 + i * 50, 0.04, "square", 0.18), t);
+    setTimeout(() => _beep(1320 + i * 100, 0.025, "triangle", 0.11), t + 50);
   });
 
-  // Phase 3 (~2150ms) : READY — accord majeur Do/Mi/Sol (résolution apaisante)
-  setTimeout(() => {
-    _beep(261.63, 0.6, "sine", 0.12); // Do4
-    _beep(329.63, 0.6, "sine", 0.10); // Mi4
-    _beep(392.0, 0.6, "sine", 0.10);  // Sol4
-  }, 2150);
+  // Phase 3 (~2150ms) : READY — un long bip "system ready"
+  setTimeout(() => _beep(880, 0.15, "square", 0.22), 2150);
+  setTimeout(() => _beep(1760, 0.035, "triangle", 0.14), 2310);
 
-  // Phase 4 (~2900ms) : $BeTime$ — montée triomphante Mi5 → Sol5 → Do6
-  setTimeout(() => _beep(659.25, 0.18, "sine", 0.16), 2900);  // Mi5
-  setTimeout(() => _beep(783.99, 0.18, "sine", 0.16), 3000);  // Sol5
-  setTimeout(() => _beep(1046.50, 0.40, "sine", 0.18), 3100); // Do6 (final tenu)
+  // Phase 4 (~2900ms) : BeTime — 3 bips rapides ascendants (scan complete)
+  setTimeout(() => _beep(600, 0.05, "square", 0.18), 2900);
+  setTimeout(() => _beep(900, 0.05, "square", 0.18), 2970);
+  setTimeout(() => _beep(1200, 0.10, "square", 0.22), 3040);
 }
 
 // Alias pour compat
