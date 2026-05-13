@@ -102,41 +102,39 @@ def _enhance_eyes(img: Image.Image) -> Image.Image:
     out = img.convert("RGBA")
     w, h = out.size
 
-    # Ajustement final : œil gauche -3% en x, œil droit -5% en x (rapprochés)
-    eye_left = (int(w * 0.586), int(h * 0.218))
-    eye_right = (int(w * 0.715), int(h * 0.225))
+    # Ajustement fin : œil gauche -1.5%x -0.5%y / œil droit -4%x
+    eye_left = (int(w * 0.571), int(h * 0.213))
+    eye_right = (int(w * 0.675), int(h * 0.225))
 
+    # Diamètres réduits de 50% — LEDs plus petites et fines
     # Couche 1 : Halo très large vert (atmosphère)
     halo_far = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     hd = ImageDraw.Draw(halo_far)
     for (cx, cy) in (eye_left, eye_right):
-        for r in range(50, 0, -2):
-            alpha = int(20 * (1 - r / 50))
+        for r in range(25, 0, -2):
+            alpha = int(20 * (1 - r / 25))
             hd.ellipse([cx - r, cy - r, cx + r, cy + r],
                        fill=(0, 255, 102, max(0, alpha)))
-    halo_far = halo_far.filter(ImageFilter.GaussianBlur(radius=15))
+    halo_far = halo_far.filter(ImageFilter.GaussianBlur(radius=8))
     out = Image.alpha_composite(out, halo_far)
 
-    # Couche 2 : Halo moyen vert vif
+    # Couche 2 : Halo moyen vert vif (rayon /2)
     halo_mid = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     hmd = ImageDraw.Draw(halo_mid)
     for (cx, cy) in (eye_left, eye_right):
-        hmd.ellipse([cx - 22, cy - 22, cx + 22, cy + 22],
+        hmd.ellipse([cx - 11, cy - 11, cx + 11, cy + 11],
                     fill=(0, 255, 102, 180))
-    halo_mid = halo_mid.filter(ImageFilter.GaussianBlur(radius=10))
+    halo_mid = halo_mid.filter(ImageFilter.GaussianBlur(radius=5))
     out = Image.alpha_composite(out, halo_mid)
 
-    # Couche 3 : LED principale (vert flashy + cœur blanc)
+    # Couche 3 : LED principale (rayons divisés par 2)
     leds = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     ld = ImageDraw.Draw(leds)
     for (cx, cy) in (eye_left, eye_right):
-        # Cercle vert vif extérieur
-        ld.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=(0, 255, 102, 255))
-        # Cœur blanc lumineux
-        ld.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(220, 255, 220, 255))
-        # Centre blanc pur
-        ld.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(255, 255, 255, 255))
-    leds_blurred = leds.filter(ImageFilter.GaussianBlur(radius=1.5))
+        ld.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(0, 255, 102, 255))
+        ld.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(220, 255, 220, 255))
+        ld.ellipse([cx - 1, cy - 1, cx + 2, cy + 2], fill=(255, 255, 255, 255))
+    leds_blurred = leds.filter(ImageFilter.GaussianBlur(radius=1.0))
     out = Image.alpha_composite(out, leds_blurred)
     out = Image.alpha_composite(out, leds)
 
