@@ -19,10 +19,10 @@
   --mx-mono: "SF Mono", "Consolas", "Cascadia Mono", "JetBrains Mono", monospace;
   --topbar-h: 56px;
   --bottomnav-h: 64px;
-  /* Backgrounds harmonisés : laissent passer la pluie matrix mais restent lisibles.
-     Niveau "card" (78% opacité, 22% transparence) appliqué partout (TOP/Paris/Stats). */
-  --mx-card-translucent: rgba(0, 26, 8, 0.78);
-  --mx-cell-translucent: rgba(0, 32, 0, 0.75);
+  /* Backgrounds harmonisés : laissent JUSTE deviner la pluie matrix derrière,
+     mais quasi-opaques pour lisibilité confortable (10% de transparence). */
+  --mx-card-translucent: rgba(0, 26, 8, 0.92);
+  --mx-cell-translucent: rgba(0, 32, 0, 0.90);
 }
 
 [x-cloak] { display: none !important; }
@@ -154,7 +154,7 @@ body {
 
 .bet-card {
   position: relative;
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thin);
   border-left-width: 4px;
   border-radius: 6px;
@@ -2116,7 +2116,7 @@ body.layer-open .bottom-nav { display: none; }
   border-radius: 3px;
 }
 .pending-bet-card {
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2209,7 +2209,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 6px;
   padding: 10px;
   margin-bottom: 16px;
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thick);
   border-radius: 4px;
 }
@@ -2267,7 +2267,7 @@ body.layer-open .bottom-nav { display: none; }
 
 /* Cartes paris résolus */
 .resolved-bet-card {
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2335,7 +2335,7 @@ body.layer-open .bottom-nav { display: none; }
   text-align: center;
   padding: 40px 20px;
   color: var(--mx-green-pastel);
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thin);
   border-radius: 6px;
 }
@@ -2349,7 +2349,7 @@ body.layer-open .bottom-nav { display: none; }
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  background: var(--mx-cell-translucent);
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90));
   border: 1px solid var(--mx-border-thin);
   border-left: 4px solid var(--mx-muted);
   border-radius: 4px;
@@ -2578,13 +2578,13 @@ body.layer-open .bottom-nav { display: none; }
   text-align: center;
   padding: 60px 20px;
   color: var(--mx-green-pastel);
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thin);
   border-radius: 6px;
 }
 
 .stats-section {
-  background: var(--mx-card-translucent);
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
   border: 1px solid var(--mx-border-thin);
   border-radius: 6px;
   padding: 12px;
@@ -2622,7 +2622,7 @@ body.layer-open .bottom-nav { display: none; }
 }
 
 .stats-cell {
-  background: var(--mx-cell-translucent);
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90));
   border: 1px solid var(--mx-border-thin);
   border-radius: 4px;
   padding: 10px 8px;
@@ -2692,7 +2692,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 10px;
 }
 .rule-card {
-  background: var(--mx-cell-translucent);
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90));
   border: 1px solid var(--mx-border-thin);
   border-left: 4px solid var(--mx-muted);
   border-radius: 4px;
