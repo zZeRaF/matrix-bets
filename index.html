@@ -17,7 +17,7 @@
   <title>$MATRIX BET$</title>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-mise-editable-colors";
+    var APP_VERSION = "20260514-colors-tabs-bolt";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -618,7 +618,7 @@
     <!-- Section EN ATTENTE (toutes dates confondues) -->
     <template x-if="pendingBets().length > 0">
       <section class="mp-section">
-        <h2 class="mp-section-title">⏳ EN ATTENTE <span class="mp-count" x-text="pendingBets().length"></span></h2>
+        <h2 class="mp-section-title mp-section-title--pending">⏳ EN ATTENTE <span class="mp-count" x-text="pendingBets().length"></span></h2>
         <template x-for="bet in pendingBets()" :key="bet.id">
           <article class="pending-bet-card" :data-rule="bet.rule_id">
             <div class="pending-bet-head">
@@ -644,7 +644,7 @@
     <!-- Section TERMINÉS -->
     <template x-if="resolvedBets().length > 0">
       <section class="mp-section">
-        <h2 class="mp-section-title">🏆 TERMINÉS <span class="mp-count" x-text="resolvedBets().length"></span></h2>
+        <h2 class="mp-section-title mp-section-title--resolved">🏆 TERMINÉS <span class="mp-count" x-text="resolvedBets().length"></span></h2>
         <template x-for="bet in resolvedBets()" :key="bet.id">
           <article class="resolved-bet-card" :class="'bet-status-' + bet.status" :data-rule="bet.rule_id">
             <div class="resolved-bet-head">
@@ -1016,7 +1016,7 @@
   <!-- ─── BOTTOM NAVIGATION ─── -->
   <nav class="bottom-nav">
     <button class="nav-btn" :class="{active: tab === 'paris'}" @click="tab = 'paris'; backToFeed()">
-      <span class="nav-icon">⚡</span>
+      <span class="nav-icon nav-icon-bolt">⚡&#xFE0E;</span>
       <span class="nav-lbl">TOP</span>
     </button>
     <button class="nav-btn" :class="{active: tab === 'mesparis'}" @click="tab = 'mesparis'; backToFeed()">

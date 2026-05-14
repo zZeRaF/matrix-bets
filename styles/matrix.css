@@ -258,11 +258,11 @@ body {
   text-transform: uppercase;
 }
 .bet-card-foot .val {
-  color: var(--mx-green-bright);
+  color: var(--mx-text);
   font-size: 0.95rem;
   font-weight: 700;
 }
-.bet-card-foot .mise .val { color: var(--mx-green-pastel); }
+.bet-card-foot .mise .val { color: var(--mx-text); }
 .bet-card-foot .score .val { color: var(--mx-orange); }
 
 /* ─── BANDEAU SANTÉ PIPELINE EN HAUT DU FEED ─── */
@@ -427,7 +427,7 @@ body {
   font-size: 0.7rem;
   letter-spacing: 0.1em;
 }
-.bet-card-placed-mise strong { color: var(--mx-green-bright); }
+.bet-card-placed-mise strong { color: var(--mx-text); }
 .bet-card-placed-pot {
   margin-left: auto;
   color: var(--mx-orange);
@@ -463,7 +463,7 @@ body {
 }
 .bet-card-resolved-won  .bet-card-resolved-badge { color: var(--mx-green-bright); }
 .bet-card-resolved-lost .bet-card-resolved-badge { color: #FF6B6B; }
-.bet-card-resolved-meta { color: var(--mx-green-pastel); font-size: 0.75rem; }
+.bet-card-resolved-meta { color: var(--mx-text); font-size: 0.75rem; }
 .bet-card-resolved-profit {
   font-size: 1rem;
   font-weight: 700;
@@ -830,6 +830,16 @@ body.layer-open .bottom-nav { display: none; }
   transition: color 0.15s;
 }
 .nav-btn .nav-icon { font-size: 1.3rem; line-height: 1; }
+/* L'éclair ⚡ par défaut s'affiche en emoji multi-couleur (jaune system) sur iOS.
+   On force le rendu monochrome (text variant + couleur orange Matrix). */
+.nav-btn .nav-icon-bolt {
+  font-variant-emoji: text;
+  color: var(--mx-orange);
+}
+.nav-btn.active .nav-icon-bolt {
+  color: var(--mx-orange);
+  text-shadow: 0 0 8px rgba(255, 192, 0, 0.5);
+}
 .nav-btn .nav-lbl {
   font-size: 0.65rem;
   letter-spacing: 0.15em;
@@ -2166,7 +2176,7 @@ body.layer-open .bottom-nav { display: none; }
   color: var(--mx-green-pastel);
   margin-bottom: 8px;
 }
-.pending-bet-info strong { color: var(--mx-green-bright); }
+.pending-bet-info strong { color: var(--mx-text); }
 .pending-bet-potential strong { color: var(--mx-orange); }
 .pending-bet-actions {
   display: grid;
@@ -2274,9 +2284,27 @@ body.layer-open .bottom-nav { display: none; }
   padding: 6px 10px;
   border: 1px solid var(--mx-border-thin);
   border-radius: 4px;
-  /* Fond 95% opaque (cohérent avec le reste, pluie en filigrane discret) */
   background: rgba(0, 26, 8, 0.95);
   position: relative;
+}
+/* Variantes par état (Paris en attente / Paris terminés) */
+.mp-section-title--pending {
+  color: var(--mx-orange);
+  background: rgba(80, 56, 0, 0.95);
+  border-color: var(--mx-orange);
+}
+.mp-section-title--pending .mp-count {
+  background: var(--mx-orange);
+  color: #000;
+}
+.mp-section-title--resolved {
+  color: var(--mx-blue);
+  background: rgba(0, 40, 60, 0.95);
+  border-color: var(--mx-blue);
+}
+.mp-section-title--resolved .mp-count {
+  background: var(--mx-blue);
+  color: #000;
 }
 .mp-count {
   display: inline-block;
@@ -2348,6 +2376,7 @@ body.layer-open .bottom-nav { display: none; }
   flex-wrap: wrap;
   font-size: 0.7rem;
 }
+.resolved-bet-info strong { color: var(--mx-text); }
 .resolved-bet-badge {
   font-weight: 700;
   letter-spacing: 0.05em;
