@@ -19,11 +19,10 @@
   --mx-mono: "SF Mono", "Consolas", "Cascadia Mono", "JetBrains Mono", monospace;
   --topbar-h: 56px;
   --bottomnav-h: 64px;
-  /* TEST DEBUG : MAGENTA FLASHY — impossible à manquer si CSS s'applique.
-     Si user voit du magenta sur Paris/Stats → CSS marche, on ajustera.
-     Si user voit toujours du sombre/transparent → CSS PAS appliqué, vraie cause à trouver. */
-  --mx-card-translucent: #FF00FF;
-  --mx-cell-translucent: #FF00AA;
+  /* Backgrounds harmonisés : 100% opaques pour ce build (on baissera l'alpha ensuite
+     pour laisser un peu de pluie matrix visible en filigrane). */
+  --mx-card-translucent: rgb(0, 26, 8);
+  --mx-cell-translucent: rgb(0, 32, 0);
 }
 
 [x-cloak] { display: none !important; }
@@ -52,7 +51,9 @@ body {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  z-index: 0;
+  /* z-index -10 : la pluie passe DERRIÈRE tout le contenu de manière inconditionnelle.
+     Plus aucun élément du body ne peut se retrouver dessous, peu importe leur stacking. */
+  z-index: -10;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.6s ease-out 0.3s;
@@ -403,7 +404,7 @@ body {
 .bet-card-placed {
   margin-top: 10px;
   padding: 10px 12px;
-  background: rgba(80, 56, 0, 0.25);
+  background: rgb(80, 56, 0);
   border: 1px dashed var(--mx-orange);
   border-radius: 4px;
   cursor: default;
@@ -450,8 +451,8 @@ body {
   font-size: 0.8rem;
   cursor: default;
 }
-.bet-card-resolved-won  { background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)); border-left: 4px solid var(--mx-green-bright); }
-.bet-card-resolved-lost { background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)); border-left: 4px solid var(--mx-red-bright); }
+.bet-card-resolved-won  { background: rgb(0, 64, 24); border-left: 4px solid var(--mx-green-bright); }
+.bet-card-resolved-lost { background: rgb(64, 8, 8);  border-left: 4px solid var(--mx-red-bright); }
 .bet-card-resolved-badge {
   background: rgba(0, 0, 0, 0.5);
   padding: 3px 8px;
@@ -2015,7 +2016,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 8px;
   margin-top: 8px;
   padding: 12px;
-  background: rgba(0, 32, 16, 0.55);
+  background: rgb(80, 56, 0);
   border-radius: 4px;
   border: 1px dashed var(--mx-orange);
 }
@@ -2070,8 +2071,8 @@ body.layer-open .bottom-nav { display: none; }
   font-size: 0.8rem;
   flex-wrap: wrap;
 }
-.pari-result-won { background: rgba(0, 64, 24, 0.78); border-left: 4px solid var(--mx-green-bright); color: var(--mx-green-pastel); }
-.pari-result-lost { background: rgba(64, 8, 8, 0.78); border-left: 4px solid #FF1B1B; color: var(--mx-green-pastel); }
+.pari-result-won { background: rgb(0, 64, 24); border-left: 4px solid var(--mx-green-bright); color: var(--mx-green-pastel); }
+.pari-result-lost { background: rgb(64, 8, 8); border-left: 4px solid #FF1B1B; color: var(--mx-green-pastel); }
 .result-badge {
   background: rgba(0, 0, 0, 0.5);
   padding: 3px 8px;
@@ -2117,7 +2118,7 @@ body.layer-open .bottom-nav { display: none; }
   border-radius: 3px;
 }
 .pending-bet-card {
-  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)) !important;
+  background: rgb(80, 56, 0) !important;
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2198,9 +2199,6 @@ body.layer-open .bottom-nav { display: none; }
 .mes-paris {
   padding: 12px;
   padding-bottom: 80px;
-  /* Fond léger pour gommer les "trous" entre sections (sinon impression
-     de transparence très forte alors que les cards elles sont à 0.78). */
-  background: rgba(0, 20, 8, 0.55);
 }
 
 /* Bandeau stats en tête */
@@ -2571,9 +2569,6 @@ body.layer-open .bottom-nav { display: none; }
   display: flex;
   flex-direction: column;
   gap: 16px;
-  /* Fond léger pour gommer les "trous" entre sections où la pluie matrix
-     passait à 100%, donnant une impression d'onglet hyper-transparent. */
-  background: rgba(0, 20, 8, 0.55);
 }
 .stats-empty {
   text-align: center;
