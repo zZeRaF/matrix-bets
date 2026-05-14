@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260513-zk";
+      var APP_VERSION = "20260514-mesparis";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -541,6 +541,86 @@
             sandbox="allow-same-origin allow-popups"></iframe>
   </div>
 
+  <!-- ─── ONGLET MES PARIS (EN ATTENTE multi-dates + TERMINÉS) ─── -->
+  <main class="mes-paris" x-show="tab === 'mesparis'" x-cloak>
+    <!-- Stats récap globales -->
+    <section class="mp-stats-bar">
+      <div class="mp-stat">
+        <div class="mp-stat-lbl">PROFIT NET</div>
+        <div class="mp-stat-val" :class="betStats().profit_net >= 0 ? 'positive' : 'negative'" x-text="(betStats().profit_net >= 0 ? '+' : '') + fmtEur(betStats().profit_net)"></div>
+      </div>
+      <div class="mp-stat">
+        <div class="mp-stat-lbl">WIN RATE</div>
+        <div class="mp-stat-val" x-text="betStats().n_total > 0 ? fmtPct(betStats().win_rate) : '—'"></div>
+      </div>
+      <div class="mp-stat">
+        <div class="mp-stat-lbl">RÉSOLUS</div>
+        <div class="mp-stat-val" x-text="betStats().n_won + '✓ / ' + betStats().n_lost + '✗'"></div>
+      </div>
+      <div class="mp-stat">
+        <div class="mp-stat-lbl">EN ATTENTE</div>
+        <div class="mp-stat-val" x-text="betStats().n_pending"></div>
+      </div>
+    </section>
+
+    <!-- Section EN ATTENTE (toutes dates confondues) -->
+    <template x-if="pendingBets().length > 0">
+      <section class="mp-section">
+        <h2 class="mp-section-title">⏳ EN ATTENTE <span class="mp-count" x-text="pendingBets().length"></span></h2>
+        <template x-for="bet in pendingBets()" :key="bet.id">
+          <article class="pending-bet-card" :data-rule="bet.rule_id">
+            <div class="pending-bet-head">
+              <span class="pending-bet-rule" x-text="bet.rule_id"></span>
+              <span class="pending-bet-match" x-text="bet.home + ' vs ' + bet.away"></span>
+              <span class="pending-bet-date" x-text="fmtDateLabel(bet.placed_at)"></span>
+            </div>
+            <p class="pending-bet-verdict" x-text="bet.verdict"></p>
+            <div class="pending-bet-info">
+              <span>Mise <strong x-text="fmtEur(bet.mise)"></strong></span>
+              <span>@ <strong x-text="fmtNum(bet.cote_book)"></strong></span>
+              <span class="pending-bet-potential">→ +<strong x-text="fmtEur(bet.mise * (bet.cote_book - 1))"></strong></span>
+            </div>
+            <div class="pending-bet-actions">
+              <button class="pari-btn-won" @click.stop="resolveBet(bet.id, 'won')">✓ GAGNÉ</button>
+              <button class="pari-btn-lost" @click.stop="resolveBet(bet.id, 'lost')">✗ PERDU</button>
+            </div>
+          </article>
+        </template>
+      </section>
+    </template>
+
+    <!-- Section TERMINÉS -->
+    <template x-if="resolvedBets().length > 0">
+      <section class="mp-section">
+        <h2 class="mp-section-title">🏆 TERMINÉS <span class="mp-count" x-text="resolvedBets().length"></span></h2>
+        <template x-for="bet in resolvedBets()" :key="bet.id">
+          <article class="resolved-bet-card" :class="'bet-status-' + bet.status" :data-rule="bet.rule_id">
+            <div class="resolved-bet-head">
+              <span class="resolved-bet-rule" x-text="bet.rule_id"></span>
+              <span class="resolved-bet-match" x-text="bet.home + ' vs ' + bet.away"></span>
+              <span class="resolved-bet-date" x-text="fmtDateLabel(bet.placed_at)"></span>
+            </div>
+            <p class="resolved-bet-verdict" x-text="bet.verdict"></p>
+            <div class="resolved-bet-info">
+              <span class="resolved-bet-badge" x-text="bet.status === 'won' ? 'GAGNÉ ✓' : 'PERDU ✗'"></span>
+              <span>Mise <strong x-text="fmtEur(bet.mise)"></strong> @ <strong x-text="fmtNum(bet.cote_book)"></strong></span>
+              <strong class="resolved-bet-profit" :class="bet.status === 'won' ? 'positive' : 'negative'"
+                      x-text="(bet.profit > 0 ? '+' : '') + fmtEur(bet.profit || 0)"></strong>
+            </div>
+          </article>
+        </template>
+      </section>
+    </template>
+
+    <!-- État vide -->
+    <template x-if="pendingBets().length === 0 && resolvedBets().length === 0">
+      <div class="mp-empty">
+        <p class="empty-status">🎯 Aucun pari placé pour l'instant</p>
+        <p class="empty-meta">Quand tu cliqueras "PLACER LE PARI" depuis l'onglet TOP, il apparaîtra ici.<br>Il y restera tant que tu ne l'auras pas résolu (✓ GAGNÉ / ✗ PERDU).</p>
+      </div>
+    </template>
+  </main>
+
   <!-- ─── ONGLET STATISTIQUES (placeholder) ─── -->
   <main class="placeholder-tab" x-show="tab === 'stats'">
     <p class="empty-status">📊 Statistiques</p>
@@ -551,6 +631,10 @@
   <nav class="bottom-nav">
     <button class="nav-btn" :class="{active: tab === 'paris'}" @click="tab = 'paris'; backToFeed()">
       <span class="nav-icon">⚡</span>
+      <span class="nav-lbl">TOP</span>
+    </button>
+    <button class="nav-btn" :class="{active: tab === 'mesparis'}" @click="tab = 'mesparis'; backToFeed()">
+      <span class="nav-icon">🎯</span>
       <span class="nav-lbl">Paris</span>
     </button>
     <button class="nav-btn" :class="{active: tab === 'stats'}" @click="tab = 'stats'; backToFeed()">

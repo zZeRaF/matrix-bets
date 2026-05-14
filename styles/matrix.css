@@ -1975,3 +1975,150 @@ body.layer-open .bottom-nav { display: none; }
   border-top: 1px dashed var(--mx-border-thin);
 }
 .pari-cap-hint span { color: var(--mx-green-pastel); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ONGLET MES PARIS (tab='mesparis')
+   - Stats bandeau en tête
+   - Section EN ATTENTE (toutes dates confondues, anti-oubli)
+   - Section TERMINÉS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.mes-paris {
+  padding: 12px;
+  padding-bottom: 80px;
+}
+
+/* Bandeau stats en tête */
+.mp-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 10px;
+  margin-bottom: 16px;
+  background: rgba(0, 16, 8, 0.95);
+  border: 1px solid var(--mx-border-thick);
+  border-radius: 4px;
+}
+.mp-stat {
+  text-align: center;
+}
+.mp-stat-lbl {
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--mx-green-pastel);
+  margin-bottom: 4px;
+}
+.mp-stat-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: Consolas, monospace;
+  color: var(--mx-green-bright);
+}
+.mp-stat-val.positive { color: var(--mx-green-bright); }
+.mp-stat-val.negative { color: var(--mx-red); }
+
+/* Section titre (EN ATTENTE / TERMINÉS) */
+.mp-section {
+  margin-bottom: 20px;
+}
+.mp-section-title {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--mx-green-bright);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mx-border-thin);
+}
+.mp-count {
+  display: inline-block;
+  background: var(--mx-green-bright);
+  color: var(--mx-bg-dark);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  margin-left: 6px;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+
+/* Date label sur les cartes (Aujourd'hui / Hier / DD/MM) */
+.pending-bet-date,
+.resolved-bet-date {
+  font-size: 0.65rem;
+  color: var(--mx-green-pastel);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Cartes paris résolus */
+.resolved-bet-card {
+  background: rgba(0, 16, 8, 0.95);
+  border: 1px solid var(--mx-border-thick);
+  border-left: 4px solid var(--mx-orange);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.resolved-bet-card[data-rule="R1"] { border-left-color: var(--mx-green-bright); }
+.resolved-bet-card[data-rule="R2"] { border-left-color: var(--mx-blue); }
+.resolved-bet-card[data-rule="R3"] { border-left-color: var(--mx-orange); }
+.resolved-bet-card.bet-status-won { background: rgba(0, 50, 18, 0.4); }
+.resolved-bet-card.bet-status-lost { background: rgba(50, 0, 0, 0.4); opacity: 0.85; }
+
+.resolved-bet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+}
+.resolved-bet-rule {
+  background: var(--mx-orange);
+  color: var(--mx-bg-dark);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+.resolved-bet-card[data-rule="R1"] .resolved-bet-rule { background: var(--mx-green-bright); }
+.resolved-bet-card[data-rule="R2"] .resolved-bet-rule { background: var(--mx-blue); color: #fff; }
+.resolved-bet-match {
+  font-weight: 600;
+  color: var(--mx-green-pastel);
+  font-size: 0.8rem;
+}
+.resolved-bet-verdict {
+  font-size: 0.75rem;
+  color: var(--mx-green-bright);
+  margin: 4px 0 8px;
+}
+.resolved-bet-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+}
+.resolved-bet-badge {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.4);
+}
+.resolved-bet-card.bet-status-won .resolved-bet-badge { color: var(--mx-green-bright); }
+.resolved-bet-card.bet-status-lost .resolved-bet-badge { color: var(--mx-red); }
+.resolved-bet-profit {
+  margin-left: auto;
+  font-size: 0.95rem;
+  font-family: Consolas, monospace;
+}
+.resolved-bet-profit.positive { color: var(--mx-green-bright); }
+.resolved-bet-profit.negative { color: var(--mx-red); }
+
+/* État vide */
+.mp-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--mx-green-pastel);
+}

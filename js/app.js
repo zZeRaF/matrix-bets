@@ -656,6 +656,46 @@ function app() {
         .sort((a, b) => (b.placed_at || "").localeCompare(a.placed_at || ""));
     },
 
+    // Liste tous les paris résolus (won/lost), du plus récent au plus ancien
+    // Source de vérité pour l'onglet "Mes Paris" → section TERMINÉS.
+    resolvedBets() {
+      return this.history
+        .filter((b) => b.status === "won" || b.status === "lost")
+        .sort((a, b) => (b.placed_at || "").localeCompare(a.placed_at || ""));
+    },
+
+    // Stats agrégées sur l'ensemble de l'historique résolu (pour le bandeau en tête de l'onglet)
+    betStats() {
+      const resolved = this.resolvedBets();
+      const won = resolved.filter((b) => b.status === "won");
+      const lost = resolved.filter((b) => b.status === "lost");
+      const totalProfit = resolved.reduce((s, b) => s + (b.profit || 0), 0);
+      const totalMise = resolved.reduce((s, b) => s + (b.mise || 0), 0);
+      return {
+        n_total: resolved.length,
+        n_won: won.length,
+        n_lost: lost.length,
+        n_pending: this.pendingBets().length,
+        profit_net: totalProfit,
+        win_rate: resolved.length > 0 ? won.length / resolved.length : 0,
+        roi: totalMise > 0 ? totalProfit / totalMise : 0,
+      };
+    },
+
+    // Libellé "Aujourd'hui" / "Hier" / "DD/MM" pour une date YYYY-MM-DD
+    fmtDateLabel(iso) {
+      if (!iso) return "";
+      const d = String(iso).split("T")[0];
+      const today = new Date();
+      const todayIso = today.toISOString().split("T")[0];
+      if (d === todayIso) return "Aujourd'hui";
+      const yest = new Date(today);
+      yest.setDate(yest.getDate() - 1);
+      if (d === yest.toISOString().split("T")[0]) return "Hier";
+      const [, m, dd] = d.split("-");
+      return dd + "/" + m;
+    },
+
 
     // Clé d'identification d'un pari (combinaison match + règle + verdict)
     _betKey(date, slug, rule_id, verdict) {
