@@ -47,11 +47,8 @@ body {
 /* ── Pluie matrix de fond : visible sur les bandes latérales en desktop ── */
 .bg-rain {
   position: fixed;
-  /* Idem que .universe-menu-overlay : exclure home indicator pour stabilité 1er paint */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: env(safe-area-inset-bottom, 0);
+  inset: 0;
+  /* inset: 0 + position fixed suffit à remplir la fenêtre, pas besoin de height */
   /* z-index 0 : la pluie est entre body bg et le contenu. Toutes les cards qui veulent
      être au-dessus DOIVENT avoir position: relative (ce qui crée leur stacking-level). */
   z-index: 0;
@@ -147,14 +144,7 @@ body {
 /* ─── OVERLAY MENU UNIVERS (DA artistique pleine page) ─── */
 .universe-menu-overlay {
   position: fixed;
-  /* PAS d'inset:0 : sur iOS PWA standalone, inset:0 inclut la zone home indicator
-     au 1er paint, puis se redimensionne au scroll → l'image cover scale différemment.
-     On positionne explicitement avec safe-area-bottom pour avoir une hauteur STABLE
-     dès le 1er paint (identique à l'état "après scroll" qui était correct). */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: env(safe-area-inset-bottom, 0);
+  inset: 0;
   z-index: 9990;
   background: #000;
   display: flex;
@@ -985,11 +975,7 @@ body.layer-open .bottom-nav { display: none; }
    ============================================================ */
 .splash {
   position: fixed;
-  /* Idem overlays : exclure home indicator pour stabilité 1er paint iOS PWA standalone */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: env(safe-area-inset-bottom, 0);
+  inset: 0;
   z-index: 9999;
   background: #000700;
   overflow: hidden;
