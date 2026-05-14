@@ -2117,7 +2117,7 @@ body.layer-open .bottom-nav { display: none; }
   border-radius: 3px;
 }
 .pending-bet-card {
-  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)) !important;
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2210,7 +2210,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 6px;
   padding: 10px;
   margin-bottom: 16px;
-  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)) !important;
   border: 1px solid var(--mx-border-thick);
   border-radius: 4px;
 }
@@ -2268,7 +2268,7 @@ body.layer-open .bottom-nav { display: none; }
 
 /* Cartes paris résolus */
 .resolved-bet-card {
-  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)) !important;
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2350,7 +2350,7 @@ body.layer-open .bottom-nav { display: none; }
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90));
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90)) !important;
   border: 1px solid var(--mx-border-thin);
   border-left: 4px solid var(--mx-muted);
   border-radius: 4px;
@@ -2585,7 +2585,7 @@ body.layer-open .bottom-nav { display: none; }
 }
 
 .stats-section {
-  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92));
+  background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)) !important;
   border: 1px solid var(--mx-border-thin);
   border-radius: 6px;
   padding: 12px;
