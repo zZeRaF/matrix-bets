@@ -2,7 +2,7 @@
   "version": 1,
   "sport": "tennis",
   "date": "2026-05-14",
-  "generated_at": "2026-05-14T20:35:11",
+  "generated_at": "2026-05-14T23:33:07",
   "n_matches_analysed": 1,
   "n_paris_candidats": 1,
   "scoring_formula": "Pick modèle tennis — étoiles × 20",
@@ -63,7 +63,9 @@
           "mise_combine": 0.0
         }
       },
-      "layers_html_available": []
+      "layers_html_available": [
+        "meso"
+      ]
     }
   },
   "all_ranked": [

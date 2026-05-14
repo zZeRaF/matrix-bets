@@ -755,15 +755,24 @@ function app() {
       if (!layerKey || !this.data || !this.selectedMatchSlug) return "";
       const date = this.data.date;
       const slug = this.selectedMatchSlug;
-      // Cache-buster fort : combine pivot generated_at + Date.now() pour forcer
-      // un fetch réseau à chaque ouverture (les iframes Chrome ont un cache HTTP
-      // très tenace qui ignore parfois les bumps de service worker).
       const pivot_v = this.data.generated_at ? encodeURIComponent(this.data.generated_at) : "0";
       const t = Date.now();
-      return `data/${date}/${slug}/${layerKey}.html?v=${pivot_v}&t=${t}`;
+      // Multi-sport : foot → data/<date>/<slug>/<layer>.html (legacy)
+      //               basket/tennis → data/<sport>/<date>/<slug>/<layer>.html
+      const sport = this.currentUniverse;
+      const base = (sport === "foot") ? `data/${date}/${slug}` : `data/${sport}/${date}/${slug}`;
+      return `${base}/${layerKey}.html?v=${pivot_v}&t=${t}`;
     },
 
     layerLabel(key) {
+      // Label adapté selon l'univers (foot vs basket/tennis)
+      const sport = this.currentUniverse;
+      if (sport === "basket") {
+        return { meso: "MESO · 5 derniers matchs basket" }[key] || (key || "").toUpperCase();
+      }
+      if (sport === "tennis") {
+        return { meso: "MESO · 5 derniers matchs surface" }[key] || (key || "").toUpperCase();
+      }
       return {
         consensus: "CONSENSUS · synthèse",
         macro: "MACRO · saison entière",

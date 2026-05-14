@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basket — Cleveland Cavaliers vs Detroit Pistons</title>
+<style>
+:root {
+  --mx-bg: #001000;
+  --mx-bg-darker: #001505;
+  --mx-bg-dark: #002000;
+  --mx-card: rgba(0, 26, 8, 0.95);
+  --mx-cell: rgba(0, 32, 0, 0.90);
+  --mx-green: #00FF66;
+  --mx-green-pastel: #82FFB4;
+  --mx-orange: #FFC000;
+  --mx-blue: #00B0F0;
+  --mx-red: #FF1B1B;          /* rouge canonique unique (aligné PWA Matrix Bets) */
+  --mx-red-bright: #FF1B1B;   /* alias historique — même valeur */
+  --mx-text: #E8F5E9;  /* blanc-vert très clair (visibilité accentuée) */
+  --mx-muted: #5D8C6E;
+  --mx-border-thin: #195A2D;
+  --mx-border-thick: #216037;
+  /* Couleurs identité équipes (utilisées dans les labels) */
+  --mx-team-home: #00B0F0;   /* bleu Matrix pour équipe domicile */
+  --mx-team-away: #D8A8FF;   /* violet Matrix lavande clair pour équipe extérieure */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--mx-bg);
+  color: var(--mx-text);
+  font-family: Consolas, "SF Mono", monospace;
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 13px;
+}
+h1 {
+  color: var(--mx-green);
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+h2 {
+  color: var(--mx-green);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.meta {
+  color: var(--mx-muted);
+  font-size: 0.75rem;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+}
+.section {
+  background: var(--mx-card);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.verdict-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.verdict-pick {
+  background: var(--mx-bg-dark);
+  border-left: 4px solid var(--mx-green);
+  padding: 12px;
+  border-radius: 4px;
+}
+.verdict-pick.no-bet { border-left-color: var(--mx-red); }
+.verdict-pick .lbl { font-size: 0.65rem; color: var(--mx-muted); letter-spacing: 0.15em; text-transform: uppercase; }
+.verdict-pick .pick-team { font-size: 1.4rem; color: var(--mx-green); font-weight: 700; margin: 4px 0; }
+.verdict-pick.no-bet .pick-team { color: var(--mx-red); }
+.verdict-pick .pick-meta { color: var(--mx-text); font-size: 0.78rem; }
+.proba-bars {
+  margin-top: 10px;
+}
+.proba-bar {
+  display: grid;
+  grid-template-columns: 100px 1fr 60px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+}
+.proba-bar .lbl { color: var(--mx-muted); }
+.proba-bar .track { background: var(--mx-bg-dark); height: 18px; border-radius: 2px; overflow: hidden; }
+.proba-bar .fill { height: 100%; }
+.proba-bar.home .fill { background: var(--mx-green); }
+.proba-bar.away .fill { background: var(--mx-red-bright); }
+/* Stat row : home_val | bidirectional bar | away_val */
+.stat-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 70px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+.stat-val {
+  font-family: Consolas, monospace;
+  color: var(--mx-text);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.stat-val.winner-cell {
+  color: var(--mx-green);
+  font-weight: 700;
+}
+.stat-val.loser-cell {
+  color: var(--mx-red-bright);
+  font-weight: 700;
+}
+.stat-bar-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 14px;
+  background: var(--mx-bg-dark);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--mx-border-thin);
+}
+.stat-half {
+  display: flex;
+  height: 100%;
+}
+.stat-half.left { justify-content: flex-end; }
+.stat-half.right { justify-content: flex-start; }
+.stat-half .bar {
+  height: 100%;
+  transition: width 0.3s;
+}
+.module-block {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: var(--mx-bg-dark);
+  border-radius: 4px;
+  border-left: 3px solid var(--mx-border-thick);
+}
+.module-block.module-final {
+  border-left-color: var(--mx-orange);
+  background: rgba(80, 56, 0, 0.3);
+  margin-top: 14px;
+}
+.module-name {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--mx-green-pastel);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.ind-block {
+  padding: 6px 8px;
+  background: var(--mx-bg-dark);
+  border-radius: 3px;
+  margin-bottom: 4px;
+  border-left: 2px solid var(--mx-border-thin);
+}
+.ind-label {
+  font-size: 0.7rem;
+  color: var(--mx-muted);
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+.rev-hint {
+  color: var(--mx-orange);
+  font-size: 0.65rem;
+  margin-left: 4px;
+}
+.stat-label-mid {
+  text-align: center;
+  color: var(--mx-muted);
+  font-size: 0.7rem;
+  align-self: center;
+  grid-column: 1 / -1;
+}
+.proba-bar .val { color: var(--mx-text); font-family: Consolas, monospace; text-align: right; }
+.stars-full { color: var(--mx-orange); font-size: 1.3rem; letter-spacing: 0.05em; }
+.stars-empty { color: var(--mx-border-thick); font-size: 1.3rem; letter-spacing: 0.05em; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.kpi {
+  background: var(--mx-bg-dark);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+.kpi .lbl { font-size: 0.6rem; color: var(--mx-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.kpi .val { font-size: 1rem; color: var(--mx-text); font-weight: 700; margin-top: 4px; }
+.verdict-status {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 3px;
+  display: inline-block;
+  font-weight: 700;
+}
+.verdict-value-bet { background: var(--mx-green); color: #000; }
+.verdict-saisir { background: var(--mx-orange); color: #000; }
+.verdict-no-bet { background: var(--mx-red-bright); color: #000; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+table th {
+  background: var(--mx-bg-dark);
+  color: var(--mx-green);
+  text-align: center;
+  padding: 6px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--mx-border-thick);
+}
+.mod-name {
+  color: var(--mx-green-pastel);
+  font-weight: 700;
+  padding: 6px;
+}
+.mod-val { color: var(--mx-text); text-align: center; font-family: Consolas, monospace; padding: 6px; }
+.mod-diff { text-align: center; font-weight: 700; padding: 6px; }
+.diff-pos { color: var(--mx-green); }
+.diff-neg { color: var(--mx-red); }
+.diff-neu { color: var(--mx-muted); }
+.ind-row td { padding: 4px 6px; border-bottom: 1px dashed rgba(33, 96, 55, 0.3); }
+.ind-label { color: var(--mx-muted); text-align: center; font-size: 0.7rem; }
+.ind-val { font-family: Consolas, monospace; text-align: center; }
+.ind-home { color: var(--mx-green-pastel); }
+.ind-away { color: var(--mx-orange); }
+.ind-winner-home .ind-home { color: var(--mx-green); font-weight: 700; }
+.ind-winner-away .ind-away { color: var(--mx-orange); font-weight: 700; }
+.fiab {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--mx-bg-dark);
+  border-radius: 4px;
+}
+.fiab-item { text-align: center; }
+.fiab-item .lbl { font-size: 0.65rem; color: var(--mx-muted); letter-spacing: 0.1em; }
+.fiab-item .val { font-size: 1.1rem; color: var(--mx-green); font-weight: 700; }
+.fiab-warn .val { color: var(--mx-orange); }
+.fiab-bad .val { color: var(--mx-red); }
+.teams-legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  background: var(--mx-bg-darker);
+  border-radius: 3px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+.fs-link { color: var(--mx-blue); text-decoration: none; }
+.fs-link:hover { text-decoration: underline; }
+@media (max-width: 600px) {
+  .verdict-box { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<h1><span style="color: var(--mx-team-home);">Cleveland Cavaliers</span> <span style="color: var(--mx-muted); font-weight: 400;">vs</span> <span style="color: var(--mx-team-away);">Detroit Pistons</span></h1>
+<div class="meta">Basket ·  ·  · <a class="fs-link" href="https://www.flashscore.fr/match/basket/den-bosch-4W1bkk62/donar-groningen-QX2dq7kE/?mid=6N8Wv0tA" target="_blank">Voir sur Flashscore ↗</a></div>
+
+<div class="section">
+  <h2>🎯 Verdict moteur</h2>
+  <div class="verdict-box">
+    <div class="verdict-pick ">
+      <div class="lbl">Pick modèle</div>
+      <div class="pick-team">Cleveland Cavaliers</div>
+      <div class="pick-meta">Proba retenue : <strong>65.3%</strong></div>
+      <div style="margin-top: 8px;"><span class="stars-full">★</span><span class="stars-empty">☆☆☆☆</span></div>
+      <div class="pick-meta" style="margin-top: 6px;">Verdict : <span class="verdict-status verdict-saisir">Saisir cotes</span></div>
+    </div>
+    <div class="verdict-pick">
+      <div class="lbl">Probabilités calculées</div>
+      <div class="proba-bars">
+        <div class="proba-bar home">
+          <span class="lbl" style="color: var(--mx-green); font-weight: 700;">Cleveland Cavaliers</span>
+          <div class="track"><div class="fill" style="width: 65%"></div></div>
+          <span class="val" style="color: var(--mx-green); font-weight: 700;">65.3%</span>
+        </div>
+        <div class="proba-bar away">
+          <span class="lbl" style="color: var(--mx-red-bright); font-weight: 700;">Detroit Pistons</span>
+          <div class="track"><div class="fill" style="width: 35%"></div></div>
+          <span class="val" style="color: var(--mx-red-bright); font-weight: 700;">34.7%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="lbl">Marge attendue</div><div class="val">4.4 pts</div></div>
+    <div class="kpi"><div class="lbl">Cote saisie</div><div class="val">—</div></div>
+    <div class="kpi"><div class="lbl">EV (cote × proba)</div><div class="val">—</div></div>
+    <div class="kpi"><div class="lbl">Type pari</div><div class="val" style="font-size: 0.85rem">—</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>📊 Modules synthétiques (5)</h2>
+  <div class="teams-legend">
+    <span style="color: var(--mx-team-home); font-weight: 700;">◆ Cleveland Cavaliers</span>
+    <span style="color: var(--mx-team-away); font-weight: 700;">Detroit Pistons ◆</span>
+  </div>
+  
+        <div class="module-block">
+          <div class="module-name">FORME</div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">74.4</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 74%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 26%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">25.6</div>
+    </div>
+    
+        </div>
+        
+        <div class="module-block">
+          <div class="module-name">PANIER</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">50.1</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 50%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 50%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">49.9</div>
+    </div>
+    
+        </div>
+        
+        <div class="module-block">
+          <div class="module-name">REBONDS</div>
+          
+    <div class="stat-row">
+      <div class="stat-val loser-cell" style="text-align: right;">46.8</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 47%; background: var(--mx-red-bright);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 53%; background: var(--mx-green);"></div>
+        </div>
+      </div>
+      <div class="stat-val winner-cell" style="text-align: left;">53.2</div>
+    </div>
+    
+        </div>
+        
+        <div class="module-block">
+          <div class="module-name">CRÉATION</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">47.5</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 47%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 53%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">52.5</div>
+    </div>
+    
+        </div>
+        
+        <div class="module-block">
+          <div class="module-name">RYTHME</div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">53.8</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 54%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 46%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">46.2</div>
+    </div>
+    
+        </div>
+        
+  
+    <div class="module-block module-final">
+      <div class="module-name" style="color: var(--mx-orange); font-size: 0.85rem;">🏆 SCORE ACTIF</div>
+      
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">54.2</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 54%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 46%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">45.8</div>
+    </div>
+    
+    </div>
+    
+  <div class="fiab">
+    <div class="fiab-item ">
+      <div class="lbl">Fiabilité Cleveland Cavalier</div>
+      <div class="val">100.0%</div>
+    </div>
+    <div class="fiab-item ">
+      <div class="lbl">Fiabilité Detroit Pistons</div>
+      <div class="val">100.0%</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🔬 Indicateurs détaillés (sur 5 derniers H2H)</h2>
+  <div class="teams-legend">
+    <span style="color: var(--mx-team-home); font-weight: 700;">◆ Cleveland Cavaliers</span>
+    <span style="color: var(--mx-muted); font-size: 0.65rem;">↓ = valeur basse meilleure</span>
+    <span style="color: var(--mx-team-away); font-weight: 700;">Detroit Pistons ◆</span>
+  </div>
+  
+        <div class="ind-block">
+          <div class="ind-label">Victoires recentes</div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">0.8</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 76%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 24%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">0.2</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Marge moyenne</div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">2.7</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 50%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 50%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">-2.7</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Points marques</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">111.1</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 51%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 49%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">108.4</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Points encaisses <span class="rev-hint">↓</span></div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">108.4</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 49%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 51%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">111.1</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Shoot %</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">0.47</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 50%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 50%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">0.47</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Shoot 2 pts %</div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">0.57</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 53%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 47%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">0.50</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Shoot 3 pts %</div>
+          
+    <div class="stat-row">
+      <div class="stat-val loser-cell" style="text-align: right;">0.35</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 47%; background: var(--mx-red-bright);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 53%; background: var(--mx-green);"></div>
+        </div>
+      </div>
+      <div class="stat-val winner-cell" style="text-align: left;">0.39</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Lancers Francs %</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">0.81</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 50%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 50%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">0.81</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Rebonds offensifs</div>
+          
+    <div class="stat-row">
+      <div class="stat-val loser-cell" style="text-align: right;">10.3</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 42%; background: var(--mx-red-bright);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 58%; background: var(--mx-green);"></div>
+        </div>
+      </div>
+      <div class="stat-val winner-cell" style="text-align: left;">14.0</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Rebonds defensifs</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">27.0</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 52%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 48%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">25.4</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Total rebonds</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">37.3</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 49%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 51%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">39.4</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Passes</div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">22.9</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 49%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 51%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">24.1</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Contres</div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">7.5</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 58%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 42%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">5.5</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Pertes de balle <span class="rev-hint">↓</span></div>
+          
+    <div class="stat-row">
+      <div class="stat-val " style="text-align: right;">15.2</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 51%; background: var(--mx-orange);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 49%; background: var(--mx-orange);"></div>
+        </div>
+      </div>
+      <div class="stat-val " style="text-align: left;">14.4</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Interceptions</div>
+          
+    <div class="stat-row">
+      <div class="stat-val loser-cell" style="text-align: right;">6.9</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 40%; background: var(--mx-red-bright);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 60%; background: var(--mx-green);"></div>
+        </div>
+      </div>
+      <div class="stat-val winner-cell" style="text-align: left;">10.5</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Fautes personnelles <span class="rev-hint">↓</span></div>
+          
+    <div class="stat-row">
+      <div class="stat-val winner-cell" style="text-align: right;">16.9</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 41%; background: var(--mx-green);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 59%; background: var(--mx-red-bright);"></div>
+        </div>
+      </div>
+      <div class="stat-val loser-cell" style="text-align: left;">24.7</div>
+    </div>
+    
+        </div>
+        
+        <div class="ind-block">
+          <div class="ind-label">Fautes techniques <span class="rev-hint">↓</span></div>
+          
+    <div class="stat-row">
+      <div class="stat-val loser-cell" style="text-align: right;">1.0</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-half left">
+          <div class="bar" style="width: 72%; background: var(--mx-red-bright);"></div>
+        </div>
+        <div class="stat-half right">
+          <div class="bar" style="width: 28%; background: var(--mx-green);"></div>
+        </div>
+      </div>
+      <div class="stat-val winner-cell" style="text-align: left;">0.4</div>
+    </div>
+    
+        </div>
+        
+</div>
+
+<div class="section">
+  <h2>📋 Méthode</h2>
+  <p style="font-size: 0.78rem; line-height: 1.5; color: var(--mx-text);">
+    Le moteur basket calcule la <strong>marge attendue</strong> en combinant la différence des marges récentes, des scores actifs et des stats clés (rebonds, passes, pertes, fautes, 3pts %).
+    La proba de victoire est dérivée via <code>1 - NORMDIST(0, marge_attendue, volatilité)</code>.
+    Les étoiles dépendent de la <strong>fiabilité des données</strong> (couverture stats stables sur les 5 derniers H2H).
+    Un Pick "NO BET" survient si max(proba) &lt; seuil ou écart entre les 2 probas trop faible.
+  </p>
+</div>
+
+<div class="meta" style="text-align: center; margin-top: 20px;">
+  Généré le 14/05/2026 23:33 · Matrix Bets · sport=basket
+</div>
+</body>
+</html>

@@ -2,7 +2,7 @@
   "version": 1,
   "sport": "basket",
   "date": "2026-05-14",
-  "generated_at": "2026-05-14T18:24:25",
+  "generated_at": "2026-05-14T23:33:13",
   "n_matches_analysed": 1,
   "n_paris_candidats": 1,
   "scoring_formula": "Pick modèle basket — étoiles × 20",
@@ -12,9 +12,9 @@
       "match_slug": "cleveland-cavaliers-detroit-pistons",
       "home_team": "Cleveland Cavaliers",
       "away_team": "Detroit Pistons",
-      "competition": "USA: NBA - Phase Finale",
-      "country": "USA",
-      "kickoff_time": "01:00",
+      "competition": "Basket",
+      "country": "",
+      "kickoff_time": "",
       "bet_type": "1X2 simple",
       "verdict": "Victoire Cleveland Cavaliers",
       "confidence": "1★",
@@ -35,9 +35,9 @@
     "cleveland-cavaliers-detroit-pistons": {
       "home": "Cleveland Cavaliers",
       "away": "Detroit Pistons",
-      "competition": "USA: NBA - Phase Finale",
-      "country": "USA",
-      "kickoff_time": "01:00",
+      "competition": "Basket",
+      "country": "",
+      "kickoff_time": "",
       "layers": {
         "meso_basket": {
           "pick_modele": "Cleveland Cavaliers",
@@ -55,7 +55,9 @@
           "ev": null
         }
       },
-      "layers_html_available": [],
+      "layers_html_available": [
+        "meso"
+      ],
       "match_url_fs": "https://www.flashscore.fr/match/basket/den-bosch-4W1bkk62/donar-groningen-QX2dq7kE/?mid=6N8Wv0tA"
     }
   },
@@ -65,9 +67,9 @@
       "match_slug": "cleveland-cavaliers-detroit-pistons",
       "home_team": "Cleveland Cavaliers",
       "away_team": "Detroit Pistons",
-      "competition": "USA: NBA - Phase Finale",
-      "country": "USA",
-      "kickoff_time": "01:00",
+      "competition": "Basket",
+      "country": "",
+      "kickoff_time": "",
       "bet_type": "1X2 simple",
       "verdict": "Victoire Cleveland Cavaliers",
       "confidence": "1★",

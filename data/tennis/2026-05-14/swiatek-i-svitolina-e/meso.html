@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<title>Swiatek I. vs Svitolina E. — Tennis Terre Battue</title>
+<style>
+:root {
+  --mx-bg: #001000;
+  --mx-bg-darker: #001505;
+  --mx-bg-dark: #002000;
+  --mx-bg-card: #001a08;
+  --mx-card-translucent: rgba(0, 26, 8, 0.95);
+  --mx-green-bright: #00FF66;
+  --mx-green-pastel: #82FFB4;
+  --mx-orange: #FFC000;
+  --mx-blue: #00B0F0;
+  --mx-red: #FF1B1B;
+  --mx-red-bright: #FF1B1B;
+  --mx-text: #E8F5E9;
+  --mx-muted: #5D8C6E;
+  --mx-border-thin: #195A2D;
+  --mx-border-thick: #216037;
+  --mx-team-home: #00B0F0;
+  --mx-team-away: #D8A8FF;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 24px;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--mx-bg);
+  color: var(--mx-text);
+}
+h1, h2, h3 { margin: 0 0 8px 0; }
+.header { text-align: center; padding: 16px 0 24px; border-bottom: 2px solid var(--mx-border-thick); margin-bottom: 24px; }
+.header .matchup { font-size: 1.4rem; font-weight: 700; }
+.header .matchup .j1 { color: var(--mx-team-home); }
+.header .matchup .j2 { color: var(--mx-team-away); }
+.header .meta { color: var(--mx-muted); font-size: 0.9rem; margin-top: 6px; }
+.header .meta .surface { color: var(--mx-orange); font-weight: 600; }
+
+/* === Verdict box === */
+.verdict-box {
+  background: var(--mx-card-translucent);
+  border: 1px solid var(--mx-border-thick);
+  border-radius: 8px;
+  padding: 16px; margin-bottom: 20px;
+}
+.verdict-box .pick {
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--mx-team-home);
+  text-align: center; margin-bottom: 8px;
+}
+.verdict-box .pick .stars {
+  font-size: 1.1rem; margin-left: 8px;
+}
+.stars-full { color: var(--mx-orange); }
+.stars-empty { color: var(--mx-muted); }
+.verdict-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-top: 12px;
+}
+.verdict-cell { text-align: center; padding: 8px; border-radius: 4px; background: rgba(0, 32, 0, 0.5); }
+.verdict-cell .lbl { color: var(--mx-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.verdict-cell .val { font-size: 1.1rem; font-weight: 700; color: var(--mx-text); }
+.verdict-value { color: var(--mx-green-bright); }
+.verdict-no-bet { color: var(--mx-red-bright); }
+.verdict-pending { color: var(--mx-orange); }
+
+/* === Section title === */
+.section-title {
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--mx-green-pastel); font-size: 0.85rem;
+  margin: 20px 0 10px; padding-bottom: 4px;
+  border-bottom: 1px solid var(--mx-border-thin);
+}
+
+/* === Modules synthétiques === */
+.modules { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; }
+.module-row {
+  display: grid; grid-template-columns: 100px 1fr 240px 1fr 100px;
+  align-items: center; gap: 8px;
+  background: var(--mx-card-translucent);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 4px; padding: 6px 10px;
+  font-size: 0.95rem;
+}
+.module-row .lbl { color: var(--mx-muted); font-size: 0.75rem; text-transform: uppercase; text-align: center; white-space: nowrap; }
+.module-row .v1 { text-align: right; color: var(--mx-text); font-weight: 600; }
+.module-row .v2 { text-align: left; color: var(--mx-text); font-weight: 600; }
+
+/* === Indicateurs avec barres bidirectionnelles === */
+.indicators { display: grid; grid-template-columns: 1fr; gap: 4px; }
+.ind-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 200px 1fr 60px;
+  align-items: center; gap: 8px;
+  font-size: 0.85rem; padding: 4px 6px;
+  border-bottom: 1px solid rgba(33, 96, 55, 0.2);
+}
+.ind-row .v1 { text-align: right; color: var(--mx-text); font-weight: 600; }
+.ind-row .v2 { text-align: left; color: var(--mx-text); font-weight: 600; }
+.ind-row .lbl { text-align: center; color: var(--mx-muted); font-size: 0.75rem; }
+.ind-row .bar-wrap { display: flex; align-items: center; justify-content: center; }
+.ind-row .bar-left, .ind-row .bar-right { height: 8px; border-radius: 2px; transition: width 0.2s; }
+.ind-row .bar-left { margin-right: 2px; }
+.ind-row .bar-right { margin-left: 2px; }
+
+/* === Sub-blocks (jeux + combiné) === */
+.sub-block {
+  background: var(--mx-card-translucent);
+  border: 1px solid var(--mx-border-thick);
+  border-radius: 6px; padding: 12px; margin-top: 12px;
+}
+.sub-block .title { color: var(--mx-orange); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.sub-block .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sub-block .cell .lbl { color: var(--mx-muted); font-size: 0.7rem; }
+.sub-block .cell .val { font-weight: 700; color: var(--mx-text); }
+
+/* === Fiabilité === */
+.fiab {
+  display: inline-block; padding: 3px 10px; border-radius: 12px;
+  font-size: 0.8rem; font-weight: 700; margin-left: 8px;
+}
+.fiab-good { background: var(--mx-green-bright); color: #000; }
+.fiab-mid { background: var(--mx-orange); color: #000; }
+.fiab-bad { background: var(--mx-red-bright); color: #FFF; }
+</style>
+</head><body>
+<div class="header">
+  <div class="matchup">
+    <span class="j1">Swiatek I.</span>
+    <span style="color: var(--mx-muted); margin: 0 12px;">vs</span>
+    <span class="j2">Svitolina E.</span>
+  </div>
+  <div class="meta">
+    Circuit <strong>Pronostic Tennis WTA</strong> · Surface <span class="surface">Terre Battue</span>
+    <span class="fiab fiab-good">Fiabilité 100%</span>
+  </div>
+</div>
+
+<div class="verdict-box">
+  <div class="pick">
+    Swiatek I.
+    <span class="stars"><span class="stars-full">★★★★★</span><span class="stars-empty"></span></span>
+  </div>
+  <div class="verdict-grid">
+    <div class="verdict-cell"><div class="lbl">Proba Swiatek I.</div><div class="val" style="color:var(--mx-green-bright)">84.5%</div></div>
+    <div class="verdict-cell"><div class="lbl">Proba Svitolina E.</div><div class="val" style="color:var(--mx-red-bright)">15.5%</div></div>
+    <div class="verdict-cell"><div class="lbl">Cote juste</div><div class="val">1.18</div></div>
+    <div class="verdict-cell"><div class="lbl">Verdict 1X2</div><div class="val verdict-value">VALUE BET</div></div>
+    <div class="verdict-cell"><div class="lbl">Cote retenue</div><div class="val">1.25</div></div>
+    <div class="verdict-cell"><div class="lbl">EV</div><div class="val">5.7%</div></div>
+    <div class="verdict-cell"><div class="lbl">Mise conseillée</div><div class="val">0.00 €</div></div>
+    <div class="verdict-cell"><div class="lbl">Type pari</div><div class="val">Saisir cote EW</div></div>
+  </div>
+</div>
+
+<div class="section-title">⚡ Modules synthétiques</div>
+<div class="modules">
+  <div class="module-row">
+    <span class="v1">0.68</span>
+    <div style="display:flex; justify-content:flex-end;"><div style="background:var(--mx-green-bright); height:10px; width:100.0%; border-radius:2px;"></div></div>
+    <span class="lbl">QUALITÉ DE SERVICE</span>
+    <div style="display:flex; justify-content:flex-start;"><div style="background:var(--mx-red-bright); height:10px; width:86.57151287157926%; border-radius:2px;"></div></div>
+    <span class="v2">0.59</span>
+  </div>
+  <div class="module-row">
+    <span class="v1">—</span>
+    <div style="display:flex; justify-content:flex-end;"><div style="background:var(--mx-muted); height:10px; width:0%; border-radius:2px;"></div></div>
+    <span class="lbl">STYLE DE JEU</span>
+    <div style="display:flex; justify-content:flex-start;"><div style="background:var(--mx-muted); height:10px; width:0%; border-radius:2px;"></div></div>
+    <span class="v2">—</span>
+  </div>
+  <div class="module-row">
+    <span class="v1">0.08</span>
+    <div style="display:flex; justify-content:flex-end;"><div style="background:var(--mx-green-bright); height:10px; width:4.5454545454545565%; border-radius:2px;"></div></div>
+    <span class="lbl">POINTS GRATUITS</span>
+    <div style="display:flex; justify-content:flex-start;"><div style="background:var(--mx-red-bright); height:10px; width:100.0%; border-radius:2px;"></div></div>
+    <span class="v2">-1.65</span>
+  </div>
+  <div class="module-row">
+    <span class="v1">0.52</span>
+    <div style="display:flex; justify-content:flex-end;"><div style="background:var(--mx-orange); height:10px; width:93.7064785854476%; border-radius:2px;"></div></div>
+    <span class="lbl">% POINTS IMPORTANTS</span>
+    <div style="display:flex; justify-content:flex-start;"><div style="background:var(--mx-orange); height:10px; width:100.0%; border-radius:2px;"></div></div>
+    <span class="v2">0.56</span>
+  </div>
+  <div class="module-row">
+    <span class="v1">0.61</span>
+    <div style="display:flex; justify-content:flex-end;"><div style="background:var(--mx-orange); height:10px; width:100.0%; border-radius:2px;"></div></div>
+    <span class="lbl">% TOTAL POINTS GAGNÉS</span>
+    <div style="display:flex; justify-content:flex-start;"><div style="background:var(--mx-orange); height:10px; width:90.4137648504711%; border-radius:2px;"></div></div>
+    <span class="v2">0.55</span>
+  </div></div><div class="section-title">📊 Indicateurs détaillés (moyenne 5 derniers matchs sur surface)</div><div class="indicators">
+  <div class="ind-row">
+    <span class="v1">2.33</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="lbl">Aces / match </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:26.61290322580645%;"></div></div>
+    <span class="v2">1.38</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">2.25</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:33.4710743801653%;"></div></div>
+    <span class="lbl">Doubles fautes / match ↓</span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:45.0%;"></div></div>
+    <span class="v2">3.02</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.69</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-orange); width:45.0%;"></div></div>
+    <span class="lbl">% 1er service </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-orange); width:40.589189189189185%;"></div></div>
+    <span class="v2">0.63</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.70</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-orange); width:45.0%;"></div></div>
+    <span class="lbl">% points sur 1er service </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-orange); width:43.85688729874777%;"></div></div>
+    <span class="v2">0.68</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.63</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="lbl">% points sur 2e service </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:33.20921985815603%;"></div></div>
+    <span class="v2">0.47</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.88</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="lbl">% Jeux de service gagnés </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:38.40902639795629%;"></div></div>
+    <span class="v2">0.75</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.62</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="lbl">% Jeux de retour gagnés </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:37.35814889336015%;"></div></div>
+    <span class="v2">0.52</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">1.06</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="lbl">Indice Qualité R / S </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:32.341514677799026%;"></div></div>
+    <span class="v2">0.76</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.53</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="lbl">% Breaks convertis </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-red-bright); width:36.01043707197818%;"></div></div>
+    <span class="v2">0.43</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.51</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-red-bright); width:33.49717514124293%;"></div></div>
+    <span class="lbl">% Breaks sauvés </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-green-bright); width:45.0%;"></div></div>
+    <span class="v2">0.69</span>
+  </div>
+  <div class="ind-row">
+    <span class="v1">0.61</span>
+    <div class="bar-wrap"><div class="bar-left" style="background:var(--mx-orange); width:45.0%;"></div></div>
+    <span class="lbl">% Total points gagnés </span>
+    <div class="bar-wrap"><div class="bar-right" style="background:var(--mx-orange); width:40.68619418271199%;"></div></div>
+    <span class="v2">0.55</span>
+  </div></div>
+<div class="sub-block">
+  <div class="title">🎾 Bloc Jeux totaux (Over/Under)</div>
+  <div class="grid">
+    <div class="cell"><div class="lbl">Jeux attendus modèle</div><div class="val">20.8</div></div>
+    <div class="cell"><div class="lbl">Ligne book</div><div class="val">22.5</div></div>
+    <div class="cell"><div class="lbl">Condition retenue</div><div class="val">Under 22,5</div></div>
+    <div class="cell"><div class="lbl">Verdict jeux</div><div class="val">Under interessant</div></div>
+    <div class="cell"><div class="lbl">Cote retenue jeux</div><div class="val">—</div></div>
+    <div class="cell"><div class="lbl">Score pondéré (L12)</div><div class="val">7.64</div></div>
+  </div>
+</div>
+
+<div class="sub-block">
+  <div class="title">🎯 Bloc Combiné (1X2 + Over/Under)</div>
+  <div class="grid">
+    <div class="cell"><div class="lbl">Verdict combiné</div><div class="val">Saisir cote jeux</div></div>
+    <div class="cell"><div class="lbl">Mise combinée</div><div class="val">0.00 €</div></div>
+    <div class="cell"><div class="lbl">Bankroll</div><div class="val">402.60 €</div></div>
+  </div>
+</div>
+
+</body></html>
