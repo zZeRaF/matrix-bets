@@ -2197,6 +2197,9 @@ body.layer-open .bottom-nav { display: none; }
 .mes-paris {
   padding: 12px;
   padding-bottom: 80px;
+  /* Fond léger pour gommer les "trous" entre sections (sinon impression
+     de transparence très forte alors que les cards elles sont à 0.78). */
+  background: rgba(0, 20, 8, 0.55);
 }
 
 /* Bandeau stats en tête */
@@ -2567,6 +2570,9 @@ body.layer-open .bottom-nav { display: none; }
   display: flex;
   flex-direction: column;
   gap: 16px;
+  /* Fond léger pour gommer les "trous" entre sections où la pluie matrix
+     passait à 100%, donnant une impression d'onglet hyper-transparent. */
+  background: rgba(0, 20, 8, 0.55);
 }
 .stats-empty {
   text-align: center;
