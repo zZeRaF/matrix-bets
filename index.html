@@ -17,7 +17,7 @@
   <title>$MATRIX BET$</title>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-tennis-auto-odds";
+    var APP_VERSION = "20260514-multi-sport-plumbing";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -108,6 +108,16 @@
       <span class="bankroll-val" x-text="fmtEur(bankroll)"></span>
     </div>
   </header>
+
+  <!-- ─── SÉLECTEUR D'UNIVERS MULTI-SPORT (placeholder en attendant DA finale) ─── -->
+  <nav class="universe-selector" aria-label="Choix de l'univers sportif">
+    <button class="universe-btn" :class="{active: currentUniverse === 'foot'}"
+            @click="switchUniverse('foot')">FOOT</button>
+    <button class="universe-btn" :class="{active: currentUniverse === 'basket'}"
+            @click="switchUniverse('basket')">BASKET</button>
+    <button class="universe-btn" :class="{active: currentUniverse === 'tennis'}"
+            @click="switchUniverse('tennis')">TENNIS</button>
+  </nav>
 
   <!-- ─── BANNIÈRE INFO DU JOUR ─── -->
   <div class="day-banner" x-show="data">

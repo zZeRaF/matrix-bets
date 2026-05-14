@@ -286,8 +286,24 @@ function startMatrixRain(canvas, useClientSize = false) {
   };
 }
 
+// LocalStorage : univers actif (foot/basket/tennis) — persistant entre sessions
+const UNIVERSE_KEY = "matrix-bets-universe-v1";
+const VALID_UNIVERSES = ["foot", "basket", "tennis"];
+function loadUniverse() {
+  try {
+    const u = localStorage.getItem(UNIVERSE_KEY);
+    return VALID_UNIVERSES.includes(u) ? u : "foot";
+  } catch { return "foot"; }
+}
+function saveUniverse(u) {
+  try { localStorage.setItem(UNIVERSE_KEY, u); } catch {}
+}
+
 function app() {
   return {
+    // === Multi-sport : univers actif ===
+    currentUniverse: "foot",  // foot | basket | tennis (chargé depuis localStorage en init)
+
     // === Persistant (localStorage) ===
     bankroll: 100,
     peak: 100,
@@ -330,6 +346,7 @@ function app() {
     _splashCancelled: false,
 
     async init() {
+      this.currentUniverse = loadUniverse();
       const saved = loadStoredState();
       if (saved) {
         this.bankroll = saved.bankroll ?? 100;
@@ -532,17 +549,34 @@ function app() {
       if (window.stopThreeScene) window.stopThreeScene();
     },
 
+    // Change l'univers actif (foot/basket/tennis) — persiste + recharge data.
+    switchUniverse(u) {
+      if (!VALID_UNIVERSES.includes(u) || u === this.currentUniverse) return;
+      this.currentUniverse = u;
+      saveUniverse(u);
+      // Reset état dépendant de l'univers
+      this.currentView = "feed";
+      this.selectedMatchSlug = null;
+      this.selectedLayer = null;
+      this.coteInputs = {};
+      this.miseInputs = {};
+      this.loadData();
+    },
+
     async loadData() {
       this.state = "loading";
       this.errorMsg = "";
-      // Fetch latest.json et pipeline_status.json en parallèle.
-      // pipeline_status.json est optionnel : si absent on assume "pas de status, OK".
+      // Fetch latest.json multi-sport + pipeline_status.json en parallèle.
+      // URL dépend de l'univers actif. Fallback foot : data/latest.json (back-compat)
       const ts = Math.floor(Date.now() / 1000 / 60); // cache-buster /minute
+      const universeUrl = `data/${this.currentUniverse}/latest.json?_=${ts}`;
+      const fallbackUrl = this.currentUniverse === "foot" ? `data/latest.json?_=${ts}` : null;
       try {
-        const [resData, resStatus] = await Promise.all([
-          fetch(`data/latest.json?_=${ts}`, { cache: "no-store" }),
-          fetch(`data/pipeline_status.json?_=${ts}`, { cache: "no-store" }).catch(() => null),
-        ]);
+        let resData = await fetch(universeUrl, { cache: "no-store" });
+        if (!resData.ok && fallbackUrl) {
+          resData = await fetch(fallbackUrl, { cache: "no-store" });
+        }
+        const resStatus = await fetch(`data/pipeline_status.json?_=${ts}`, { cache: "no-store" }).catch(() => null);
         if (!resData.ok) throw new Error("HTTP " + resData.status);
         const json = await resData.json();
         this.data = json;

@@ -119,6 +119,43 @@ body {
   text-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
 }
 
+/* ─── SÉLECTEUR D'UNIVERS MULTI-SPORT (placeholder en attendant DA) ─── */
+.universe-selector {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  margin: 8px 16px 0;
+  padding: 4px;
+  background: rgba(0, 16, 8, 0.95);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+}
+.universe-btn {
+  flex: 1;
+  padding: 8px 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--mx-muted);
+  font-family: var(--mx-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.universe-btn:hover {
+  color: var(--mx-green-pastel);
+  border-color: var(--mx-border-thin);
+}
+.universe-btn.active {
+  background: var(--mx-green-header);
+  border-color: var(--mx-green-bright);
+  color: var(--mx-green-bright);
+}
+
 /* ─── BANNIÈRE DATE ─── */
 .day-banner {
   position: relative;
