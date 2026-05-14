@@ -2276,8 +2276,8 @@ body.layer-open .bottom-nav { display: none; }
 .resolved-bet-card[data-rule="R1"] { border-left-color: var(--mx-green-bright); }
 .resolved-bet-card[data-rule="R2"] { border-left-color: var(--mx-blue); }
 .resolved-bet-card[data-rule="R3"] { border-left-color: var(--mx-orange); }
-.resolved-bet-card.bet-status-won { background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)); }
-.resolved-bet-card.bet-status-lost { background: var(--mx-card-translucent, rgba(0, 26, 8, 0.92)); }
+.resolved-bet-card.bet-status-won { background: rgb(0, 64, 24) !important; }
+.resolved-bet-card.bet-status-lost { background: rgb(64, 8, 8) !important; }
 
 .resolved-bet-head {
   display: flex;
