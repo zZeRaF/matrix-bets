@@ -19,6 +19,10 @@
   --mx-mono: "SF Mono", "Consolas", "Cascadia Mono", "JetBrains Mono", monospace;
   --topbar-h: 56px;
   --bottomnav-h: 64px;
+  /* Backgrounds harmonisés : laissent passer un peu de pluie matrix, restent lisibles.
+     Card = premier plan (88% opacité) · Cell = sous-élément (85%). */
+  --mx-card-translucent: rgba(0, 26, 8, 0.88);
+  --mx-cell-translucent: rgba(0, 32, 0, 0.85);
 }
 
 [x-cloak] { display: none !important; }
@@ -150,7 +154,7 @@ body {
 
 .bet-card {
   position: relative;
-  background: var(--mx-bg-card);
+  background: var(--mx-card-translucent);
   border: 1px solid var(--mx-border-thin);
   border-left-width: 4px;
   border-radius: 6px;
@@ -2112,7 +2116,7 @@ body.layer-open .bottom-nav { display: none; }
   border-radius: 3px;
 }
 .pending-bet-card {
-  background: rgba(0, 16, 8, 0.95);
+  background: var(--mx-card-translucent);
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2202,7 +2206,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 6px;
   padding: 10px;
   margin-bottom: 16px;
-  background: rgba(0, 16, 8, 0.95);
+  background: var(--mx-card-translucent);
   border: 1px solid var(--mx-border-thick);
   border-radius: 4px;
 }
@@ -2260,7 +2264,7 @@ body.layer-open .bottom-nav { display: none; }
 
 /* Cartes paris résolus */
 .resolved-bet-card {
-  background: rgba(0, 16, 8, 0.95);
+  background: var(--mx-card-translucent);
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   border-radius: 4px;
@@ -2346,7 +2350,7 @@ body.layer-open .bottom-nav { display: none; }
 }
 
 .stats-section {
-  background: rgba(0, 16, 8, 0.6);
+  background: var(--mx-card-translucent);
   border: 1px solid var(--mx-border-thin);
   border-radius: 6px;
   padding: 12px;
@@ -2384,7 +2388,7 @@ body.layer-open .bottom-nav { display: none; }
 }
 
 .stats-cell {
-  background: var(--mx-bg-dark);
+  background: var(--mx-cell-translucent);
   border: 1px solid var(--mx-border-thin);
   border-radius: 4px;
   padding: 10px 8px;
@@ -2454,7 +2458,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 10px;
 }
 .rule-card {
-  background: var(--mx-bg-dark);
+  background: var(--mx-cell-translucent);
   border: 1px solid var(--mx-border-thin);
   border-left: 4px solid var(--mx-muted);
   border-radius: 4px;
