@@ -2,18 +2,42 @@
   "version": 1,
   "sport": "tennis",
   "date": "2026-05-14",
-  "generated_at": "2026-05-14T20:07:15",
+  "generated_at": "2026-05-14T20:35:11",
   "n_matches_analysed": 1,
-  "n_paris_candidats": 0,
+  "n_paris_candidats": 1,
   "scoring_formula": "Pick modèle tennis — étoiles × 20",
-  "top": [],
+  "top": [
+    {
+      "rank": 1,
+      "match_slug": "swiatek-i-svitolina-e",
+      "home_team": "Swiatek I.",
+      "away_team": "Svitolina E.",
+      "competition": "WTA - SIMPLES: Rome (Italie), terre battue",
+      "country": "Italie",
+      "kickoff_time": "21:00",
+      "bet_type": "1X2 simple",
+      "verdict": "Victoire Swiatek I.",
+      "confidence": "5★",
+      "score_pari": 100,
+      "reasoning": "Pick modèle tennis (WTA / TerreBattue) — 5★ · proba 85% · fiab surface 100%",
+      "favoured": "HOME",
+      "rule_id": "TENNIS-1X2",
+      "rule_label": "Pick modèle vainqueur (TENNIS)",
+      "rule_source": "Excel moteur tennis (WTA)",
+      "proba_validee": 0.8453837045726512,
+      "cote_reelle": 1.25,
+      "kelly_fraction": 0.05672963071581402,
+      "kelly_mise_100eur": 5.67,
+      "edge": 0.05672963071581405
+    }
+  ],
   "matches": {
     "swiatek-i-svitolina-e": {
       "home": "Swiatek I.",
       "away": "Svitolina E.",
       "competition": "WTA - SIMPLES: Rome (Italie), terre battue",
       "country": "Italie",
-      "kickoff_time": "20:30",
+      "kickoff_time": "21:00",
       "layers": {
         "meso_tennis": {
           "circuit": "WTA",
@@ -24,23 +48,47 @@
           "etoiles": 5,
           "fiab_surface": 1.0,
           "score_pondere": 7.644798351648358,
-          "verdict_1x2": "Saisir cote",
-          "type_pari": "Saisir cote",
+          "verdict_1x2": "VALUE BET",
+          "type_pari": "Saisir cote EW",
           "cote_juste": 1.1828948140247257,
-          "cote_retenue": null,
-          "ev": null,
+          "cote_retenue": 1.25,
+          "ev": 0.05672963071581405,
           "mise_conseillee": 0.0,
           "ligne_book": 22.5,
           "jeux_attendus": 20.818891650016646,
           "condition_jeux": "Under 22,5",
           "verdict_jeux": "Under interessant",
           "cote_jeux": null,
-          "verdict_combine": "NO BET",
+          "verdict_combine": "Saisir cote jeux",
           "mise_combine": 0.0
         }
       },
       "layers_html_available": []
     }
   },
-  "all_ranked": []
+  "all_ranked": [
+    {
+      "rank": 1,
+      "match_slug": "swiatek-i-svitolina-e",
+      "home_team": "Swiatek I.",
+      "away_team": "Svitolina E.",
+      "competition": "WTA - SIMPLES: Rome (Italie), terre battue",
+      "country": "Italie",
+      "kickoff_time": "21:00",
+      "bet_type": "1X2 simple",
+      "verdict": "Victoire Swiatek I.",
+      "confidence": "5★",
+      "score_pari": 100,
+      "reasoning": "Pick modèle tennis (WTA / TerreBattue) — 5★ · proba 85% · fiab surface 100%",
+      "favoured": "HOME",
+      "rule_id": "TENNIS-1X2",
+      "rule_label": "Pick modèle vainqueur (TENNIS)",
+      "rule_source": "Excel moteur tennis (WTA)",
+      "proba_validee": 0.8453837045726512,
+      "cote_reelle": 1.25,
+      "kelly_fraction": 0.05672963071581402,
+      "kelly_mise_100eur": 5.67,
+      "edge": 0.05672963071581405
+    }
+  ]
 }
