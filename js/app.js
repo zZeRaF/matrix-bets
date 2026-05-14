@@ -837,6 +837,286 @@ function app() {
         .sort((a, b) => (b.placed_at || "").localeCompare(a.placed_at || ""));
     },
 
+    // ═══════════════════════════════════════════════════════════
+    // MULTI-SPORT : helpers pour stats filtrées par sport actif
+    // ═══════════════════════════════════════════════════════════
+
+    // Infère le sport d'un pari depuis son rule_id.
+    // R1/R2/R3 = foot, BASKET-* = basket, TENNIS-* = tennis.
+    betSport(bet) {
+      const rid = String(bet?.rule_id || "");
+      if (rid.startsWith("BASKET-")) return "basket";
+      if (rid.startsWith("TENNIS-")) return "tennis";
+      return "foot";
+    },
+
+    // Paris résolus filtrés par sport (par défaut = univers actif).
+    resolvedBetsForSport(sport) {
+      const target = sport || this.currentUniverse;
+      return this.resolvedBets().filter(b => this.betSport(b) === target);
+    },
+
+    // Paris en attente filtrés par sport.
+    pendingBetsForSport(sport) {
+      const target = sport || this.currentUniverse;
+      return this.pendingBets().filter(b => this.betSport(b) === target);
+    },
+
+    // Stats agrégées filtrées sur le sport actif.
+    betStatsCurrentSport() {
+      const resolved = this.resolvedBetsForSport(this.currentUniverse);
+      const won = resolved.filter(b => b.status === "won");
+      const lost = resolved.filter(b => b.status === "lost");
+      const totalProfit = resolved.reduce((s, b) => s + (b.profit || 0), 0);
+      const totalMise = resolved.reduce((s, b) => s + (b.mise || 0), 0);
+      return {
+        n_total: resolved.length,
+        n_won: won.length,
+        n_lost: lost.length,
+        n_pending: this.pendingBetsForSport(this.currentUniverse).length,
+        profit_net: totalProfit,
+        total_mise: totalMise,
+        win_rate: resolved.length > 0 ? won.length / resolved.length : 0,
+        roi: totalMise > 0 ? totalProfit / totalMise : 0,
+      };
+    },
+
+    // Stats par règle filtrées sur le sport actif (matche structure statsPerRule()).
+    statsPerRuleCurrentSport() {
+      const resolved = this.resolvedBetsForSport(this.currentUniverse);
+      // Récupère dynamiquement les règles présentes (R1/R2/R3 foot, BASKET-MESO, TENNIS-1X2…)
+      const rulesPresent = [...new Set(resolved.map(b => b.rule_id))];
+      const byRule = {};
+      rulesPresent.forEach((r) => {
+        const bets = resolved.filter((b) => b.rule_id === r);
+        const won = bets.filter((b) => b.status === "won");
+        const lost = bets.filter((b) => b.status === "lost");
+        const n = bets.length;
+        const winRate = n ? won.length / n : 0;
+        const totalMise = bets.reduce((s, b) => s + (b.mise || 0), 0);
+        const totalProfit = bets.reduce((s, b) => s + (b.profit || 0), 0);
+        const roi = totalMise > 0 ? totalProfit / totalMise : 0;
+        const coteAvgWon = won.length ? won.reduce((s, b) => s + (b.cote_book || 0), 0) / won.length : null;
+        const ci = this.wilsonCI(won.length, n);
+        const target = this.BACKTEST_TARGETS[r] || {};
+        byRule[r] = {
+          n_total: n,
+          n_won: won.length,
+          n_lost: lost.length,
+          win_rate: winRate,
+          ci_lo: ci.lo,
+          ci_hi: ci.hi,
+          profit: totalProfit,
+          mise: totalMise,
+          roi: roi,
+          cote_avg_won: coteAvgWon,
+          target_win_rate: target.win_rate ?? null,
+          target_roi: target.roi ?? null,
+          target_in_ci: (target.win_rate != null && ci.lo <= target.win_rate && target.win_rate <= ci.hi),
+        };
+      });
+      return byRule;
+    },
+
+    // Évolution bankroll filtrée par sport (= courbe profit cumulé sur ce sport).
+    bankrollEvolutionCurrentSport() {
+      const resolved = this.resolvedBetsForSport(this.currentUniverse)
+        .slice()
+        .reverse(); // chronologique
+      let cum = 0;
+      const points = [{ idx: 0, bankroll: 0 }];
+      resolved.forEach((b, i) => {
+        cum += b.profit || 0;
+        points.push({ idx: i + 1, bankroll: cum, status: b.status });
+      });
+      return points;
+    },
+
+    drawdownStatsCurrentSport() {
+      const evolution = this.bankrollEvolutionCurrentSport();
+      let peak = evolution[0].bankroll;
+      let maxDD = 0;
+      let currentDD = 0;
+      let maxLosingStreak = 0;
+      let currentStreak = 0;
+      evolution.forEach((p, i) => {
+        if (p.bankroll > peak) peak = p.bankroll;
+        const dd = peak - p.bankroll;
+        if (dd > maxDD) maxDD = dd;
+        if (i === evolution.length - 1) currentDD = dd;
+        if (p.status === "lost") {
+          currentStreak += 1;
+          if (currentStreak > maxLosingStreak) maxLosingStreak = currentStreak;
+        } else if (p.status === "won") {
+          currentStreak = 0;
+        }
+      });
+      return {
+        peak: peak,
+        max_drawdown_abs: maxDD,
+        max_drawdown_pct: peak > 0 ? maxDD / Math.max(peak, 100) : 0,
+        current_drawdown_abs: currentDD,
+        current_drawdown_pct: peak > 0 ? currentDD / Math.max(peak, 100) : 0,
+        max_losing_streak: maxLosingStreak,
+      };
+    },
+
+    // ═══════════════════════════════════════════════════════════
+    // CALIBRATION : proba dite vs win rate observé (Brier score)
+    // ═══════════════════════════════════════════════════════════
+
+    // Brier score = moyenne de (proba_dite - outcome)² où outcome=1 si gagné, 0 sinon.
+    // Brier < 0.20 = bon, 0.20-0.25 = acceptable, > 0.25 = mal calibré.
+    calibrationStatsCurrentSport() {
+      const resolved = this.resolvedBetsForSport(this.currentUniverse)
+        .filter(b => b.proba && b.proba > 0 && b.proba < 1);
+      if (resolved.length === 0) {
+        return { n: 0, brier: null, buckets: [], avg_proba: 0, avg_winrate: 0 };
+      }
+      // Brier score
+      let brierSum = 0;
+      resolved.forEach(b => {
+        const outcome = b.status === "won" ? 1 : 0;
+        brierSum += (b.proba - outcome) ** 2;
+      });
+      const brier = brierSum / resolved.length;
+
+      // Buckets de proba
+      const bucketDefs = [
+        { min: 0.50, max: 0.60, label: "50-60%" },
+        { min: 0.60, max: 0.70, label: "60-70%" },
+        { min: 0.70, max: 0.80, label: "70-80%" },
+        { min: 0.80, max: 0.90, label: "80-90%" },
+        { min: 0.90, max: 1.01, label: "90-100%" },
+      ];
+      const buckets = bucketDefs.map(def => {
+        const inBucket = resolved.filter(b => b.proba >= def.min && b.proba < def.max);
+        const won = inBucket.filter(b => b.status === "won").length;
+        const avgProba = inBucket.length > 0
+          ? inBucket.reduce((s, b) => s + b.proba, 0) / inBucket.length
+          : 0;
+        const winRate = inBucket.length > 0 ? won / inBucket.length : 0;
+        return {
+          label: def.label,
+          n: inBucket.length,
+          avg_proba: avgProba,
+          win_rate: winRate,
+          gap: inBucket.length > 0 ? winRate - avgProba : 0,
+        };
+      }).filter(b => b.n > 0);
+
+      const avgProbaGlobal = resolved.reduce((s, b) => s + b.proba, 0) / resolved.length;
+      const winRateGlobal = resolved.filter(b => b.status === "won").length / resolved.length;
+
+      return {
+        n: resolved.length,
+        brier: brier,
+        buckets: buckets,
+        avg_proba: avgProbaGlobal,
+        avg_winrate: winRateGlobal,
+        gap_global: winRateGlobal - avgProbaGlobal,
+      };
+    },
+
+    // ═══════════════════════════════════════════════════════════
+    // DIAGNOSTIC STRATÉGIE : verdict objectif basé sur seuils
+    // ═══════════════════════════════════════════════════════════
+
+    // Retourne {level, title, recommendation} selon N paris + ROI + drawdown + calibration.
+    // Seuils basés sur intervalle Wilson 95% (cf discussion utopie calibration).
+    strategyDiagnosticCurrentSport() {
+      const stats = this.betStatsCurrentSport();
+      const dd = this.drawdownStatsCurrentSport();
+      const calib = this.calibrationStatsCurrentSport();
+      const n = stats.n_total;
+      const roi = stats.roi;
+      const ddPct = dd.max_drawdown_pct;
+      const brier = calib.brier;
+
+      // STOP DÉFINITIF : drawdown > 70% n'importe quand
+      if (ddPct > 0.70) {
+        return {
+          level: "fail", title: "🛑 STOP IMMÉDIAT",
+          recommendation: "Drawdown > 70% : bankroll management cassé. Arrête, audite tout (proba, Kelly, sélection)."
+        };
+      }
+      // STOP : > 500 paris et ROI < 0
+      if (n >= 500 && roi < 0) {
+        return {
+          level: "fail", title: "🛑 STOP DÉFINITIF",
+          recommendation: `${n} paris résolus, ROI ${(roi*100).toFixed(1)}%. Statistiquement perdant. Arrête, c'est mathématiquement décidé.`
+        };
+      }
+      // STOP : 300-500 paris et ROI < -8%
+      if (n >= 300 && roi < -0.08) {
+        return {
+          level: "fail", title: "🛑 STOP recommandé",
+          recommendation: `${n} paris, ROI ${(roi*100).toFixed(1)}%. ROI vrai probablement < -5%. Ré-architecture du modèle nécessaire avant de continuer.`
+        };
+      }
+      // STOP : 200-300 paris et ROI < -15%
+      if (n >= 200 && n < 300 && roi < -0.15) {
+        return {
+          level: "fail", title: "🛑 STOP, modèle cassé",
+          recommendation: `${n} paris, ROI ${(roi*100).toFixed(1)}%. Trop négatif pour être de la variance. Pause et refactor avant tout nouveau pari.`
+        };
+      }
+      // PAUSE : 100-200 paris et ROI < -20%
+      if (n >= 100 && n < 200 && roi < -0.20) {
+        return {
+          level: "fail", title: "⏸ PAUSE 1 mois + audit",
+          recommendation: `Drawdown sévère sur ${n} paris (ROI ${(roi*100).toFixed(1)}%). Stoppe 1 mois, audite proba modèle vs réalité.`
+        };
+      }
+      // WARN : 200-300 paris et ROI entre -10% et -3%
+      if (n >= 200 && roi >= -0.10 && roi < -0.03) {
+        return {
+          level: "warn", title: "⚠ Réduire la bankroll",
+          recommendation: `${n} paris, ROI ${(roi*100).toFixed(1)}%. ROI vrai probablement négatif. Réduit la bankroll de moitié et continue à mesurer.`
+        };
+      }
+      // WARN : calibration cassée
+      if (brier !== null && brier > 0.25 && n >= 100) {
+        return {
+          level: "warn", title: "⚠ Calibration cassée",
+          recommendation: `Brier score ${brier.toFixed(3)} > 0.25 sur ${n} paris : ton modèle dit X% mais la réalité est Y%. Kelly ment, refactor le scoring proba.`
+        };
+      }
+      // WARN : 100-200 paris ROI moyen
+      if (n >= 100 && n < 200 && roi < 0) {
+        return {
+          level: "warn", title: "⚠ Audit conseillé",
+          recommendation: `${n} paris, ROI ${(roi*100).toFixed(1)}%. Suspect mais pas mortel. Vérifie la calibration et continue à surveiller jusqu'à 200-300 paris.`
+        };
+      }
+      // OK élite : > 500 paris, ROI > 5%
+      if (n >= 500 && roi > 0.05) {
+        return {
+          level: "elite", title: "🏆 Top 5% des amateurs",
+          recommendation: `${n} paris, ROI +${(roi*100).toFixed(1)}%. Exceptionnel. Continue exactement comme ça, ne change rien.`
+        };
+      }
+      // OK : > 300 paris, ROI > 0
+      if (n >= 300 && roi > 0) {
+        return {
+          level: "ok", title: "✅ Stratégie viable",
+          recommendation: `${n} paris, ROI +${(roi*100).toFixed(1)}%. Probablement break-even à léger edge. Continue.`
+        };
+      }
+      // OK : < 100 paris
+      if (n < 50) {
+        return {
+          level: "neutral", title: "🟢 Phase d'apprentissage",
+          recommendation: `Seulement ${n} paris. Pas de jugement possible avant 100-200 paris. Pure variance.`
+        };
+      }
+      // Défaut neutre
+      return {
+        level: "neutral", title: "🟡 Bruit statistique",
+        recommendation: `${n} paris, ROI ${(roi*100).toFixed(1)}%. Encore dans la zone variance, attends d'avoir 200-300 paris pour juger.`
+      };
+    },
+
     // Stats agrégées sur l'ensemble de l'historique résolu (pour le bandeau en tête de l'onglet)
     betStats() {
       const resolved = this.resolvedBets();
@@ -1308,7 +1588,8 @@ function app() {
 
     // Distribution des paris par buckets de cote (utilisé par l'histogramme).
     coteDistribution() {
-      const resolved = this.resolvedBets();
+      // Filtré par sport actif (onglet Stats). La bankroll globale est dans la section Multi-Sport.
+      const resolved = this.resolvedBetsForSport(this.currentUniverse);
       const buckets = [
         { label: "1.00-1.30", lo: 1.0, hi: 1.3, n: 0, won: 0 },
         { label: "1.30-1.50", lo: 1.3, hi: 1.5, n: 0, won: 0 },

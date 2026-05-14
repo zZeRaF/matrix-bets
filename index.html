@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260515-mise-empty-placeholder";
+    var APP_VERSION = "20260515-stats-multisport-calibration-diagnostic";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -909,36 +909,142 @@
           </div>
         </template>
 
-        <!-- ─── 1. VUE D'ENSEMBLE ─── -->
+        <!-- ─── 0bis. MULTI-SPORT (toujours visible, agrégé tous sports) ─── -->
         <section class="stats-section" x-show="resolvedBets().length > 0">
-          <h2 class="stats-section-title">⚡ VUE D'ENSEMBLE</h2>
+          <h2 class="stats-section-title">🌐 MULTI-SPORT (vue globale)</h2>
+          <p class="stats-section-hint">Bankroll mutualisée — agrège les paris foot + basket + tennis.</p>
           <div class="stats-grid stats-grid-4">
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">BANKROLL</div>
+              <div class="stats-cell-val accent" x-text="fmtEur(bankroll)"></div>
+              <div class="stats-cell-sub">peak <span x-text="fmtEur(peak)"></span></div>
+            </div>
             <div class="stats-cell">
               <div class="stats-cell-lbl">PROFIT NET</div>
               <div class="stats-cell-val" :class="betStats().profit_net >= 0 ? 'positive' : 'negative'"
                    x-text="(betStats().profit_net >= 0 ? '+' : '') + fmtEur(betStats().profit_net)"></div>
             </div>
             <div class="stats-cell">
-              <div class="stats-cell-lbl">ROI</div>
+              <div class="stats-cell-lbl">ROI GLOBAL</div>
               <div class="stats-cell-val" :class="betStats().roi >= 0 ? 'positive' : 'negative'"
                    x-text="(betStats().roi >= 0 ? '+' : '') + (betStats().roi * 100).toFixed(1) + '%'"></div>
             </div>
             <div class="stats-cell">
-              <div class="stats-cell-lbl">WIN RATE</div>
-              <div class="stats-cell-val"
-                   :class="betStats().n_total > 0 && betStats().win_rate < 0.60 ? 'negative' : ''"
-                   x-text="fmtPct(betStats().win_rate)"></div>
+              <div class="stats-cell-lbl">PARIS TOTAL</div>
+              <div class="stats-cell-val" x-text="betStats().n_total"></div>
               <div class="stats-cell-sub">
                 <span class="positive" x-text="betStats().n_won + '✓'"></span>
                 <span class="resolved-sep"> / </span>
                 <span class="negative" x-text="betStats().n_lost + '✗'"></span>
               </div>
             </div>
+          </div>
+          <!-- Répartition par sport -->
+          <div class="multisport-breakdown">
+            <template x-for="sport in ['foot','basket','tennis']" :key="sport">
+              <div class="multisport-row" @click="switchUniverse(sport)" :class="{active: currentUniverse === sport}">
+                <span class="multisport-icon" x-text="{foot:'⚽', basket:'🏀', tennis:'🎾'}[sport]"></span>
+                <span class="multisport-name" x-text="sport.toUpperCase()"></span>
+                <span class="multisport-n" x-text="resolvedBetsForSport(sport).length + ' paris'"></span>
+                <span class="multisport-profit" :class="resolvedBetsForSport(sport).reduce((s,b)=>s+(b.profit||0),0) >= 0 ? 'positive' : 'negative'"
+                      x-text="(() => { const p = resolvedBetsForSport(sport).reduce((s,b)=>s+(b.profit||0),0); return (p >= 0 ? '+' : '') + fmtEur(p); })()"></span>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <!-- ─── 1. VUE D'ENSEMBLE SPORT ACTIF ─── -->
+        <section class="stats-section" x-show="resolvedBetsForSport(currentUniverse).length > 0">
+          <h2 class="stats-section-title">⚡ VUE D'ENSEMBLE · <span x-text="currentUniverse.toUpperCase()"></span></h2>
+          <div class="stats-grid stats-grid-4">
             <div class="stats-cell">
-              <div class="stats-cell-lbl">BANKROLL</div>
-              <div class="stats-cell-val accent" x-text="fmtEur(bankroll)"></div>
-              <div class="stats-cell-sub">peak <span x-text="fmtEur(peak)"></span></div>
+              <div class="stats-cell-lbl">PROFIT</div>
+              <div class="stats-cell-val" :class="betStatsCurrentSport().profit_net >= 0 ? 'positive' : 'negative'"
+                   x-text="(betStatsCurrentSport().profit_net >= 0 ? '+' : '') + fmtEur(betStatsCurrentSport().profit_net)"></div>
             </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">ROI</div>
+              <div class="stats-cell-val" :class="betStatsCurrentSport().roi >= 0 ? 'positive' : 'negative'"
+                   x-text="(betStatsCurrentSport().roi >= 0 ? '+' : '') + (betStatsCurrentSport().roi * 100).toFixed(1) + '%'"></div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">WIN RATE</div>
+              <div class="stats-cell-val"
+                   :class="betStatsCurrentSport().n_total > 0 && betStatsCurrentSport().win_rate < 0.60 ? 'negative' : ''"
+                   x-text="fmtPct(betStatsCurrentSport().win_rate)"></div>
+              <div class="stats-cell-sub">
+                <span class="positive" x-text="betStatsCurrentSport().n_won + '✓'"></span>
+                <span class="resolved-sep"> / </span>
+                <span class="negative" x-text="betStatsCurrentSport().n_lost + '✗'"></span>
+              </div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">PARIS</div>
+              <div class="stats-cell-val" x-text="betStatsCurrentSport().n_total"></div>
+              <div class="stats-cell-sub">mise totale <span x-text="fmtEur(betStatsCurrentSport().total_mise)"></span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── 1bis. DIAGNOSTIC STRATÉGIE ─── -->
+        <section class="stats-section" x-show="betStatsCurrentSport().n_total > 0">
+          <h2 class="stats-section-title">🩺 DIAGNOSTIC STRATÉGIE · <span x-text="currentUniverse.toUpperCase()"></span></h2>
+          <div class="diagnostic-box" :class="'diagnostic-' + strategyDiagnosticCurrentSport().level">
+            <div class="diagnostic-title" x-text="strategyDiagnosticCurrentSport().title"></div>
+            <div class="diagnostic-reco" x-text="strategyDiagnosticCurrentSport().recommendation"></div>
+          </div>
+        </section>
+
+        <!-- ─── 1ter. CALIBRATION (proba modèle vs réalité observée) ─── -->
+        <section class="stats-section" x-show="calibrationStatsCurrentSport().n > 0">
+          <h2 class="stats-section-title">🎯 CALIBRATION · <span x-text="currentUniverse.toUpperCase()"></span></h2>
+          <p class="stats-section-hint">Quand le modèle dit X%, on observe Y%. Brier score &lt; 0.20 = bon, &gt; 0.25 = modèle mal calibré (Kelly ment).</p>
+          <div class="stats-grid stats-grid-3">
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">BRIER SCORE</div>
+              <div class="stats-cell-val" :class="(calibrationStatsCurrentSport().brier || 0) > 0.25 ? 'negative' : ((calibrationStatsCurrentSport().brier || 0) < 0.20 ? 'positive' : 'neutral')"
+                   x-text="calibrationStatsCurrentSport().brier !== null ? calibrationStatsCurrentSport().brier.toFixed(3) : '—'"></div>
+              <div class="stats-cell-sub" x-text="'sur ' + calibrationStatsCurrentSport().n + ' paris'"></div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">PROBA MOYENNE DITE</div>
+              <div class="stats-cell-val" x-text="fmtPct(calibrationStatsCurrentSport().avg_proba)"></div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">WIN RATE RÉEL</div>
+              <div class="stats-cell-val"
+                   :class="calibrationStatsCurrentSport().gap_global >= 0 ? 'positive' : 'negative'"
+                   x-text="fmtPct(calibrationStatsCurrentSport().avg_winrate)"></div>
+              <div class="stats-cell-sub"
+                   :class="calibrationStatsCurrentSport().gap_global >= 0 ? 'positive' : 'negative'"
+                   x-text="'écart ' + ((calibrationStatsCurrentSport().gap_global >= 0 ? '+' : '') + (calibrationStatsCurrentSport().gap_global * 100).toFixed(1) + ' pts')"></div>
+            </div>
+          </div>
+          <div class="calib-buckets" x-show="calibrationStatsCurrentSport().buckets.length > 0">
+            <template x-for="bucket in calibrationStatsCurrentSport().buckets" :key="bucket.label">
+              <div class="calib-bucket">
+                <div class="calib-bucket-head">
+                  <strong x-text="bucket.label"></strong>
+                  <span class="calib-bucket-n" x-text="'(n=' + bucket.n + ')'"></span>
+                </div>
+                <div class="calib-bar-row">
+                  <span class="calib-bar-lbl">dite</span>
+                  <div class="calib-bar-wrap">
+                    <div class="calib-bar calib-bar-model" :style="{ width: (bucket.avg_proba * 100) + '%' }"></div>
+                  </div>
+                  <span class="calib-bar-val" x-text="fmtPct(bucket.avg_proba)"></span>
+                </div>
+                <div class="calib-bar-row">
+                  <span class="calib-bar-lbl">réel</span>
+                  <div class="calib-bar-wrap">
+                    <div class="calib-bar calib-bar-real" :style="{ width: (bucket.win_rate * 100) + '%' }"></div>
+                  </div>
+                  <span class="calib-bar-val" x-text="fmtPct(bucket.win_rate)"></span>
+                </div>
+                <div class="calib-bucket-gap" :class="bucket.gap >= 0 ? 'positive' : 'negative'"
+                     x-text="'écart ' + (bucket.gap >= 0 ? '+' : '') + (bucket.gap * 100).toFixed(1) + ' pts'"></div>
+              </div>
+            </template>
           </div>
         </section>
 
@@ -996,85 +1102,52 @@
           <h2 class="stats-section-title">🎯 PERFORMANCE PAR RÈGLE</h2>
           <p class="stats-section-hint">IC95% = intervalle de confiance Wilson. Si la cible backtest tombe dedans → calibration cohérente.</p>
           <div class="rule-stats">
-            <template x-for="rule in ['R1', 'R2', 'R3']" :key="rule">
-              <div class="rule-card" :data-rule="rule" x-show="statsPerRule()[rule].n_total > 0 || rule !== 'R3'">
+            <template x-for="rule in Object.keys(statsPerRuleCurrentSport())" :key="rule">
+              <div class="rule-card" :data-rule="rule">
                 <div class="rule-card-head">
                   <span class="rule-tag" x-text="rule + (rule === 'R1' ? ' ⭐' : '')"></span>
-                  <span class="rule-card-sample" x-text="statsPerRule()[rule].n_total + ' paris'"></span>
+                  <span class="rule-card-sample" x-text="statsPerRuleCurrentSport()[rule].n_total + ' paris'"></span>
                 </div>
-                <template x-if="statsPerRule()[rule].n_total === 0">
+                <template x-if="statsPerRuleCurrentSport()[rule].n_total === 0">
                   <p class="rule-card-empty">Aucun pari résolu pour cette règle.</p>
                 </template>
-                <template x-if="statsPerRule()[rule].n_total > 0">
+                <template x-if="statsPerRuleCurrentSport()[rule].n_total > 0">
                   <div class="rule-card-body">
                     <div class="rule-card-line">
                       <span class="rule-lbl">Win rate</span>
-                      <strong class="rule-val" x-text="fmtPct(statsPerRule()[rule].win_rate)"></strong>
-                      <span class="rule-target" x-show="statsPerRule()[rule].target_win_rate != null">
-                        cible <span x-text="fmtPct(statsPerRule()[rule].target_win_rate)"></span>
+                      <strong class="rule-val" x-text="fmtPct(statsPerRuleCurrentSport()[rule].win_rate)"></strong>
+                      <span class="rule-target" x-show="statsPerRuleCurrentSport()[rule].target_win_rate != null">
+                        cible <span x-text="fmtPct(statsPerRuleCurrentSport()[rule].target_win_rate)"></span>
                       </span>
                     </div>
                     <div class="rule-card-line">
                       <span class="rule-lbl">IC95%</span>
                       <span class="rule-val rule-val-secondary"
-                            x-text="'[' + fmtPct(statsPerRule()[rule].ci_lo) + ' ; ' + fmtPct(statsPerRule()[rule].ci_hi) + ']'"></span>
-                      <span class="rule-target rule-target-ok" x-show="statsPerRule()[rule].target_in_ci">✓ cible dans IC</span>
-                      <span class="rule-target rule-target-ko" x-show="statsPerRule()[rule].target_win_rate != null && !statsPerRule()[rule].target_in_ci">⚠ cible hors IC</span>
+                            x-text="'[' + fmtPct(statsPerRuleCurrentSport()[rule].ci_lo) + ' ; ' + fmtPct(statsPerRuleCurrentSport()[rule].ci_hi) + ']'"></span>
+                      <span class="rule-target rule-target-ok" x-show="statsPerRuleCurrentSport()[rule].target_in_ci">✓ cible dans IC</span>
+                      <span class="rule-target rule-target-ko" x-show="statsPerRuleCurrentSport()[rule].target_win_rate != null && !statsPerRuleCurrentSport()[rule].target_in_ci">⚠ cible hors IC</span>
                     </div>
                     <div class="rule-card-line">
                       <span class="rule-lbl">ROI</span>
-                      <strong class="rule-val" :class="statsPerRule()[rule].roi >= 0 ? 'positive' : 'negative'"
-                              x-text="(statsPerRule()[rule].roi >= 0 ? '+' : '') + (statsPerRule()[rule].roi * 100).toFixed(1) + '%'"></strong>
-                      <span class="rule-target" x-show="statsPerRule()[rule].target_roi != null">
-                        cible +<span x-text="(statsPerRule()[rule].target_roi * 100).toFixed(1) + '%'"></span>
+                      <strong class="rule-val" :class="statsPerRuleCurrentSport()[rule].roi >= 0 ? 'positive' : 'negative'"
+                              x-text="(statsPerRuleCurrentSport()[rule].roi >= 0 ? '+' : '') + (statsPerRuleCurrentSport()[rule].roi * 100).toFixed(1) + '%'"></strong>
+                      <span class="rule-target" x-show="statsPerRuleCurrentSport()[rule].target_roi != null">
+                        cible +<span x-text="(statsPerRuleCurrentSport()[rule].target_roi * 100).toFixed(1) + '%'"></span>
                       </span>
                     </div>
                     <div class="rule-card-line">
                       <span class="rule-lbl">Cote moy.</span>
-                      <span class="rule-val rule-val-secondary" x-text="statsPerRule()[rule].cote_avg_won != null ? fmtNum(statsPerRule()[rule].cote_avg_won) : '—'"></span>
+                      <span class="rule-val rule-val-secondary" x-text="statsPerRuleCurrentSport()[rule].cote_avg_won != null ? fmtNum(statsPerRuleCurrentSport()[rule].cote_avg_won) : '—'"></span>
                       <span class="rule-target">sur paris gagnés</span>
                     </div>
                     <div class="rule-card-line">
                       <span class="rule-lbl">Profit</span>
-                      <strong class="rule-val" :class="statsPerRule()[rule].profit >= 0 ? 'positive' : 'negative'"
-                              x-text="(statsPerRule()[rule].profit >= 0 ? '+' : '') + fmtEur(statsPerRule()[rule].profit)"></strong>
-                      <span class="rule-target">mise totale <span x-text="fmtEur(statsPerRule()[rule].mise)"></span></span>
+                      <strong class="rule-val" :class="statsPerRuleCurrentSport()[rule].profit >= 0 ? 'positive' : 'negative'"
+                              x-text="(statsPerRuleCurrentSport()[rule].profit >= 0 ? '+' : '') + fmtEur(statsPerRuleCurrentSport()[rule].profit)"></strong>
+                      <span class="rule-target">mise totale <span x-text="fmtEur(statsPerRuleCurrentSport()[rule].mise)"></span></span>
                     </div>
                   </div>
                 </template>
-              </div>
-            </template>
-          </div>
-        </section>
-
-        <!-- ─── 4. CALIBRATION (proba modèle vs observé) ─── -->
-        <section class="stats-section">
-          <h2 class="stats-section-title">🎚️ CALIBRATION DU MODÈLE</h2>
-          <p class="stats-section-hint">Proba moyenne attendue par la règle vs win rate réel observé. Une dérive persistante (n≥20) suggère un recalibrage.</p>
-          <div class="calibration-grid">
-            <template x-for="rule in ['R1', 'R2', 'R3']" :key="rule">
-              <div class="calib-row" :data-rule="rule" x-show="calibrationByRule()[rule].n > 0">
-                <span class="calib-rule" x-text="rule"></span>
-                <div class="calib-bars">
-                  <div class="calib-bar-row">
-                    <span class="calib-bar-lbl">Proba modèle</span>
-                    <div class="calib-bar-track">
-                      <div class="calib-bar calib-bar-model" :style="{ width: ((calibrationByRule()[rule].proba_avg || 0) * 100) + '%' }"></div>
-                    </div>
-                    <span class="calib-bar-val" x-text="fmtPct(calibrationByRule()[rule].proba_avg || 0)"></span>
-                  </div>
-                  <div class="calib-bar-row">
-                    <span class="calib-bar-lbl">Observé</span>
-                    <div class="calib-bar-track">
-                      <div class="calib-bar calib-bar-real" :style="{ width: ((calibrationByRule()[rule].observed || 0) * 100) + '%' }"></div>
-                    </div>
-                    <span class="calib-bar-val" x-text="fmtPct(calibrationByRule()[rule].observed || 0)"></span>
-                  </div>
-                  <div class="calib-diff" :class="(calibrationByRule()[rule].diff || 0) >= 0 ? 'positive' : 'negative'">
-                    <span x-text="((calibrationByRule()[rule].diff || 0) >= 0 ? '+' : '') + ((calibrationByRule()[rule].diff || 0) * 100).toFixed(1) + ' pts'"></span>
-                    <span class="calib-n" x-text="'(n=' + calibrationByRule()[rule].n + ')'"></span>
-                  </div>
-                </div>
               </div>
             </template>
           </div>
@@ -1104,23 +1177,23 @@
           <div class="stats-grid stats-grid-4">
             <div class="stats-cell">
               <div class="stats-cell-lbl">SÉRIE WIN MAX</div>
-              <div class="stats-cell-val positive" x-text="drawdownStats().max_winning_streak"></div>
+              <div class="stats-cell-val positive" x-text="drawdownStatsCurrentSport().max_winning_streak"></div>
               <div class="stats-cell-sub">paris consécutifs</div>
             </div>
             <div class="stats-cell">
               <div class="stats-cell-lbl">SÉRIE LOSS MAX</div>
-              <div class="stats-cell-val negative" x-text="drawdownStats().max_losing_streak"></div>
+              <div class="stats-cell-val negative" x-text="drawdownStatsCurrentSport().max_losing_streak"></div>
               <div class="stats-cell-sub">paris consécutifs</div>
             </div>
             <div class="stats-cell">
               <div class="stats-cell-lbl">DRAWDOWN ACTUEL</div>
-              <div class="stats-cell-val" :class="drawdownStats().current_drawdown_pct > 0.25 ? 'negative' : 'neutral'"
-                   x-text="(drawdownStats().current_drawdown_pct * 100).toFixed(1) + '%'"></div>
-              <div class="stats-cell-sub" x-show="drawdownStats().current_drawdown_pct > 0.25">⚠ protect ON</div>
+              <div class="stats-cell-val" :class="drawdownStatsCurrentSport().current_drawdown_pct > 0.25 ? 'negative' : 'neutral'"
+                   x-text="(drawdownStatsCurrentSport().current_drawdown_pct * 100).toFixed(1) + '%'"></div>
+              <div class="stats-cell-sub" x-show="drawdownStatsCurrentSport().current_drawdown_pct > 0.25">⚠ protect ON</div>
             </div>
             <div class="stats-cell">
               <div class="stats-cell-lbl">DRAWDOWN MAX</div>
-              <div class="stats-cell-val" x-text="(drawdownStats().max_drawdown_pct * 100).toFixed(1) + '%'"></div>
+              <div class="stats-cell-val" x-text="(drawdownStatsCurrentSport().max_drawdown_pct * 100).toFixed(1) + '%'"></div>
               <div class="stats-cell-sub">historique</div>
             </div>
           </div>
