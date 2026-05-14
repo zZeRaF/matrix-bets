@@ -274,17 +274,17 @@ body {
 }
 .pipeline-banner:active { transform: scale(0.99); }
 .pipeline-banner-fail {
-  background: rgba(64, 8, 8, 0.7);
+  background: rgba(64, 8, 8, 0.78);
   border-color: var(--mx-red-bright);
   border-left: 4px solid var(--mx-red-bright);
 }
 .pipeline-banner-warn {
-  background: rgba(80, 56, 0, 0.55);
+  background: rgba(80, 56, 0, 0.78);
   border-color: var(--mx-orange);
   border-left: 4px solid var(--mx-orange);
 }
 .pipeline-banner-ok {
-  background: rgba(0, 64, 24, 0.4);
+  background: rgba(0, 64, 24, 0.78);
   border-color: var(--mx-green-bright);
   border-left: 4px solid var(--mx-green-bright);
 }
@@ -373,7 +373,7 @@ body {
   font-size: 0.72rem;
 }
 .pipeline-step-row.step-ok { border-left-color: var(--mx-green-bright); }
-.pipeline-step-row.step-fail { border-left-color: var(--mx-red-bright); background: rgba(64, 8, 8, 0.3); }
+.pipeline-step-row.step-fail { border-left-color: var(--mx-red-bright); background: rgba(64, 8, 8, 0.78); }
 .pipeline-step-row.step-skipped { border-left-color: var(--mx-muted); opacity: 0.7; }
 .pipeline-step-row.step-pending { border-left-color: var(--mx-orange); }
 .pipeline-step-row.step-running { border-left-color: var(--mx-blue); }
@@ -449,8 +449,8 @@ body {
   font-size: 0.8rem;
   cursor: default;
 }
-.bet-card-resolved-won  { background: rgba(0, 64, 24, 0.6);  border-left: 4px solid var(--mx-green-bright); }
-.bet-card-resolved-lost { background: rgba(64, 8, 8, 0.6);   border-left: 4px solid var(--mx-red-bright); }
+.bet-card-resolved-won  { background: rgba(0, 64, 24, 0.78); border-left: 4px solid var(--mx-green-bright); }
+.bet-card-resolved-lost { background: rgba(64, 8, 8, 0.78);  border-left: 4px solid var(--mx-red-bright); }
 .bet-card-resolved-badge {
   background: rgba(0, 0, 0, 0.5);
   padding: 3px 8px;
@@ -2069,8 +2069,8 @@ body.layer-open .bottom-nav { display: none; }
   font-size: 0.8rem;
   flex-wrap: wrap;
 }
-.pari-result-won { background: rgba(0, 64, 24, 0.6); border-left: 4px solid var(--mx-green-bright); color: var(--mx-green-pastel); }
-.pari-result-lost { background: rgba(64, 8, 8, 0.6); border-left: 4px solid #FF1B1B; color: var(--mx-green-pastel); }
+.pari-result-won { background: rgba(0, 64, 24, 0.78); border-left: 4px solid var(--mx-green-bright); color: var(--mx-green-pastel); }
+.pari-result-lost { background: rgba(64, 8, 8, 0.78); border-left: 4px solid #FF1B1B; color: var(--mx-green-pastel); }
 .result-badge {
   background: rgba(0, 0, 0, 0.5);
   padding: 3px 8px;
@@ -2277,8 +2277,8 @@ body.layer-open .bottom-nav { display: none; }
 .resolved-bet-card[data-rule="R1"] { border-left-color: var(--mx-green-bright); }
 .resolved-bet-card[data-rule="R2"] { border-left-color: var(--mx-blue); }
 .resolved-bet-card[data-rule="R3"] { border-left-color: var(--mx-orange); }
-.resolved-bet-card.bet-status-won { background: rgba(0, 50, 18, 0.4); }
-.resolved-bet-card.bet-status-lost { background: rgba(50, 0, 0, 0.4); opacity: 0.85; }
+.resolved-bet-card.bet-status-won { background: rgba(0, 64, 24, 0.78); }
+.resolved-bet-card.bet-status-lost { background: rgba(64, 8, 8, 0.78); }
 
 .resolved-bet-head {
   display: flex;
@@ -2662,7 +2662,7 @@ body.layer-open .bottom-nav { display: none; }
   width: 100%;
   height: 160px;
   display: block;
-  background: rgba(0, 32, 16, 0.4);
+  background: rgba(0, 32, 16, 0.78);
   border-radius: 4px;
 }
 .bankroll-chart-legend {
