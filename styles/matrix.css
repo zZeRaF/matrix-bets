@@ -21,8 +21,8 @@
   --topbar-h: 56px;
   --bottomnav-h: 64px;
   /* Backgrounds harmonisés : 90% opacité, pluie matrix très discrète en filigrane. */
-  --mx-card-translucent: rgba(0, 26, 8, 0.90);
-  --mx-cell-translucent: rgba(0, 32, 0, 0.90);
+  --mx-card-translucent: rgba(0, 26, 8, 0.95);
+  --mx-cell-translucent: rgba(0, 32, 0, 0.95);
 }
 
 [x-cloak] { display: none !important; }
@@ -375,7 +375,7 @@ body {
   font-size: 0.72rem;
 }
 .pipeline-step-row.step-ok { border-left-color: var(--mx-green-bright); }
-.pipeline-step-row.step-fail { border-left-color: var(--mx-red-bright); background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90)); }
+.pipeline-step-row.step-fail { border-left-color: var(--mx-red-bright); background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.95)); }
 .pipeline-step-row.step-skipped { border-left-color: var(--mx-muted); opacity: 0.7; }
 .pipeline-step-row.step-pending { border-left-color: var(--mx-orange); }
 .pipeline-step-row.step-running { border-left-color: var(--mx-blue); }
@@ -404,7 +404,7 @@ body {
 .bet-card-placed {
   margin-top: 10px;
   padding: 10px 12px;
-  background: rgba(80, 56, 0, 0.90);
+  background: rgba(80, 56, 0, 0.95);
   border: 1px dashed var(--mx-orange);
   border-radius: 4px;
   cursor: default;
@@ -451,8 +451,8 @@ body {
   font-size: 0.8rem;
   cursor: default;
 }
-.bet-card-resolved-won  { background: rgba(0, 64, 24, 0.90); border-left: 4px solid var(--mx-green-bright); }
-.bet-card-resolved-lost { background: rgba(64, 8, 8, 0.90);  border-left: 4px solid var(--mx-red-bright); }
+.bet-card-resolved-won  { background: rgba(0, 64, 24, 0.95); border-left: 4px solid var(--mx-green-bright); }
+.bet-card-resolved-lost { background: rgba(64, 8, 8, 0.95);  border-left: 4px solid var(--mx-red-bright); }
 .bet-card-resolved-badge {
   background: rgba(0, 0, 0, 0.5);
   padding: 3px 8px;
@@ -2016,7 +2016,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 8px;
   margin-top: 8px;
   padding: 12px;
-  background: rgba(80, 56, 0, 0.90);
+  background: rgba(80, 56, 0, 0.95);
   border-radius: 4px;
   border: 1px dashed var(--mx-orange);
 }
@@ -2071,8 +2071,8 @@ body.layer-open .bottom-nav { display: none; }
   font-size: 0.8rem;
   flex-wrap: wrap;
 }
-.pari-result-won { background: rgba(0, 64, 24, 0.90); border-left: 4px solid var(--mx-green-bright); color: var(--mx-green-pastel); }
-.pari-result-lost { background: rgba(64, 8, 8, 0.90); border-left: 4px solid #FF1B1B; color: var(--mx-red); }
+.pari-result-won { background: rgba(0, 64, 24, 0.95); border-left: 4px solid var(--mx-green-bright); color: var(--mx-green-pastel); }
+.pari-result-lost { background: rgba(64, 8, 8, 0.95); border-left: 4px solid #FF1B1B; color: var(--mx-red); }
 .result-badge {
   background: rgba(0, 0, 0, 0.5);
   padding: 3px 8px;
@@ -2118,7 +2118,7 @@ body.layer-open .bottom-nav { display: none; }
   border-radius: 3px;
 }
 .pending-bet-card {
-  background: rgba(80, 56, 0, 0.90) !important;
+  background: rgba(80, 56, 0, 0.95) !important;
   border: 1px solid var(--mx-border-thick);
   border-left: 4px solid var(--mx-orange);
   position: relative;
@@ -2242,8 +2242,12 @@ body.layer-open .bottom-nav { display: none; }
   color: var(--mx-green-bright);
   text-transform: uppercase;
   margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--mx-border-thin);
+  padding: 6px 10px;
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 4px;
+  /* Fond 100% opaque : le titre "🏆 TERMINÉS 1" reste lisible sans pluie derrière */
+  background: rgb(0, 26, 8);
+  position: relative;
 }
 .mp-count {
   display: inline-block;
@@ -2279,8 +2283,8 @@ body.layer-open .bottom-nav { display: none; }
 .resolved-bet-card[data-rule="R1"] { border-left-color: var(--mx-green-bright); }
 .resolved-bet-card[data-rule="R2"] { border-left-color: var(--mx-blue); }
 .resolved-bet-card[data-rule="R3"] { border-left-color: var(--mx-orange); }
-.resolved-bet-card.bet-status-won { background: rgba(0, 64, 24, 0.90) !important; }
-.resolved-bet-card.bet-status-lost { background: rgba(64, 8, 8, 0.90) !important; }
+.resolved-bet-card.bet-status-won { background: rgba(0, 64, 24, 0.95) !important; }
+.resolved-bet-card.bet-status-lost { background: rgba(64, 8, 8, 0.95) !important; }
 
 .resolved-bet-head {
   display: flex;
@@ -2352,7 +2356,7 @@ body.layer-open .bottom-nav { display: none; }
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90)) !important;
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.95)) !important;
   border: 1px solid var(--mx-border-thin);
   border-left: 4px solid var(--mx-muted);
   border-radius: 4px;
@@ -2625,7 +2629,7 @@ body.layer-open .bottom-nav { display: none; }
 }
 
 .stats-cell {
-  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90));
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.95));
   border: 1px solid var(--mx-border-thin);
   border-radius: 4px;
   padding: 10px 8px;
@@ -2695,7 +2699,7 @@ body.layer-open .bottom-nav { display: none; }
   gap: 10px;
 }
 .rule-card {
-  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.90));
+  background: var(--mx-cell-translucent, rgba(0, 32, 0, 0.95));
   border: 1px solid var(--mx-border-thin);
   border-left: 4px solid var(--mx-muted);
   border-radius: 4px;
