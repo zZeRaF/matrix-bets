@@ -104,11 +104,10 @@ async function pushGistState(token, gistId, state) {
   });
 }
 
-// ─── API publique (utilisée par app.js) ──────────────────────────
+// ─── API publique exposée via window.MatrixSync ─────────────────
 
 // Configure le token : trouve ou crée le gist. Renvoie {token, gist_id}.
-// Throw si le token est invalide.
-export async function configureSync(token, initialState) {
+async function configureSync(token, initialState) {
   let gistId = await findGist(token);
   if (!gistId) {
     gistId = await createGist(token, initialState);
@@ -119,15 +118,15 @@ export async function configureSync(token, initialState) {
 }
 
 // Lit le state distant. Renvoie null si pas configuré ou gist vide.
-export async function pullRemote() {
+async function pullRemote() {
   const auth = loadSyncAuth();
   if (!auth) return null;
   return await pullGistState(auth.token, auth.gist_id);
 }
 
 // Écrit le state local sur le gist. Met à jour updated_at automatiquement.
-// Renvoie l'objet pushé (avec updated_at).
-export async function pushLocal(localState) {
+// Renvoie l'objet pushé.
+async function pushLocal(localState) {
   const auth = loadSyncAuth();
   if (!auth) return null;
   const toSend = { ...localState, updated_at: new Date().toISOString() };
@@ -135,34 +134,21 @@ export async function pushLocal(localState) {
   return toSend;
 }
 
-// Réconcilie local vs distant : si distant plus récent → renvoie distant à appliquer.
-// Si local plus récent → push local et renvoie null (rien à changer côté caller).
-// Si égal → null. Si erreur réseau → throw.
-export async function reconcile(localState) {
-  const remote = await pullRemote();
-  if (!remote) {
-    // Premier push : on envoie le local
-    await pushLocal(localState);
-    return null;
-  }
-  const localTs = localState.updated_at || "1970-01-01T00:00:00";
-  const remoteTs = remote.updated_at || "1970-01-01T00:00:00";
-  if (remoteTs > localTs) {
-    return remote; // distant plus récent → caller doit l'appliquer
-  }
-  if (localTs > remoteTs) {
-    await pushLocal(localState);
-    return null;
-  }
-  return null;
-}
-
-// Renvoie l'auth courante (token + gist_id + configured_at) ou null.
-export function getSyncAuth() {
+// Renvoie l'auth courante ou null.
+function getSyncAuth() {
   return loadSyncAuth();
 }
 
 // Efface la config (déconnexion).
-export function disconnectSync() {
+function disconnectSync() {
   clearSyncAuth();
 }
+
+// Expose en global pour app.js (chargé en script classique, pas module)
+window.MatrixSync = {
+  configureSync,
+  pullRemote,
+  pushLocal,
+  getSyncAuth,
+  disconnectSync,
+};

@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260514-translucent2";
+      var APP_VERSION = "20260514-sync";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -656,6 +656,36 @@
   <!-- ─── ONGLET STATISTIQUES ─── -->
   <main class="stats-tab" x-show="tab === 'stats'" x-cloak>
 
+    <!-- ── SECTION SYNCHRO (toujours visible en haut) ── -->
+    <section class="stats-section">
+      <h2 class="stats-section-title">🔄 SYNCHRO MULTI-DEVICE</h2>
+      <template x-if="!syncAuth">
+        <div class="sync-status sync-status-off">
+          <div class="sync-status-text">
+            <strong>Non configurée</strong>
+            <div class="sync-status-hint">Ta bankroll et tes paris sont locaux à ce device.<br>Configure la synchro pour aligner PC + téléphone.</div>
+          </div>
+          <button class="btn-sync-cta" @click="openSyncModal()">Configurer</button>
+        </div>
+      </template>
+      <template x-if="syncAuth">
+        <div class="sync-status" :class="'sync-status-' + syncStatus">
+          <div class="sync-status-text">
+            <strong x-text="syncStatusLabel()"></strong>
+            <div class="sync-status-hint">
+              <span x-show="syncLastAt">Dernière sync : <span x-text="fmtTime(syncLastAt)"></span> · </span>
+              <span>Gist : ...<span x-text="(syncAuth.gist_id || '').slice(-8)"></span></span>
+            </div>
+            <div class="sync-status-error" x-show="syncError" x-text="syncError"></div>
+          </div>
+          <div class="sync-actions">
+            <button class="btn-sync-small" @click="pullAndApply()">↻ Forcer sync</button>
+            <button class="btn-sync-small btn-sync-danger" @click="disconnectSyncAction()">Déconnecter</button>
+          </div>
+        </div>
+      </template>
+    </section>
+
     <!-- État vide : aucun pari résolu encore -->
     <template x-if="resolvedBets().length === 0">
       <div class="stats-empty">
@@ -972,6 +1002,51 @@
     </button>
   </nav>
 
+  <!-- ─── MODAL CONFIGURATION SYNCHRO ─── -->
+  <div class="sync-modal-overlay" x-show="showSyncModal" x-cloak
+       @click.self="closeSyncModal()" @keydown.escape.window="closeSyncModal()">
+    <div class="sync-modal">
+      <header class="sync-modal-head">
+        <h2>🔄 Configurer la synchro</h2>
+        <button class="sync-modal-close" @click="closeSyncModal()">×</button>
+      </header>
+      <div class="sync-modal-body">
+        <p class="sync-modal-intro">
+          Cette PWA synchronise ta bankroll et tes paris entre tous tes appareils via un Gist GitHub privé.
+          Le Gist n'est visible que par toi (compte GitHub).
+        </p>
+
+        <h3>Étape 1 — Créer un Personal Access Token</h3>
+        <ol class="sync-modal-steps">
+          <li>Ouvre <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">github.com/settings/tokens/new</a></li>
+          <li>Note (n'importe quel nom) : <code>matrix-bets-sync</code></li>
+          <li>Expiration : <strong>No expiration</strong> (ou la durée qui te convient)</li>
+          <li>Coche <strong>uniquement</strong> la case <code>gist</code></li>
+          <li>Tout en bas, clique <strong>Generate token</strong></li>
+          <li>Copie le token affiché (commence par <code>ghp_</code>)</li>
+        </ol>
+
+        <h3>Étape 2 — Coller le token</h3>
+        <input type="password" class="sync-modal-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxx"
+               x-model="syncTokenInput" autocomplete="off" spellcheck="false">
+        <p class="sync-modal-hint">
+          Le token est stocké sur <strong>ce device uniquement</strong>. Pour configurer un autre device,
+          tu colleras le même token là-bas.
+        </p>
+
+        <div class="sync-modal-actions">
+          <button class="btn-sync-cancel" @click="closeSyncModal()">Annuler</button>
+          <button class="btn-sync-confirm" @click="connectSync()"
+                  :disabled="syncStatus === 'syncing'">
+            <span x-show="syncStatus !== 'syncing'">Connecter</span>
+            <span x-show="syncStatus === 'syncing'">Connexion…</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sync.js"></script>
   <script src="js/app.js"></script>
   <!-- Three.js désactivé : <script type="module" src="js/three-scene.js"></script> -->
 

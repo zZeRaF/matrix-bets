@@ -231,6 +231,7 @@ function saveStoredState(state) {
         bankroll: state.bankroll,
         peak: state.peak,
         history: state.history,
+        updated_at: state.updated_at,
       })
     );
   } catch {}
@@ -291,6 +292,15 @@ function app() {
     bankroll: 100,
     peak: 100,
     history: [],
+    updated_at: null,        // ISO timestamp dernière modif locale (pour réconcilier vs gist)
+
+    // === Sync GitHub Gist (volatile, recharge à chaque ouverture) ===
+    syncAuth: null,          // {token, gist_id, configured_at} si configuré
+    syncStatus: "idle",      // idle | syncing | error | pulled | pushed
+    syncLastAt: null,        // timestamp dernier succès sync (ISO)
+    syncError: null,         // message d'erreur si syncStatus='error'
+    showSyncModal: false,    // affichage modal config sync
+    syncTokenInput: "",      // contenu input token dans modal
 
     // === Volatile (par session) ===
     data: null,
@@ -324,6 +334,14 @@ function app() {
         this.bankroll = saved.bankroll ?? 100;
         this.peak = saved.peak ?? Math.max(saved.bankroll ?? 100, 100);
         this.history = saved.history ?? [];
+        this.updated_at = saved.updated_at ?? null;
+      }
+      // Sync GitHub Gist (best-effort, ne bloque pas l'init si erreur)
+      this.syncAuth = (window.MatrixSync && window.MatrixSync.getSyncAuth()) || null;
+      if (this.syncAuth) {
+        // pull au démarrage + polling 30s
+        this.pullAndApply().catch(() => {});
+        setInterval(() => { this.pullAndApply().catch(() => {}); }, 30000);
       }
       this.detectAudio();
       // Tente d'auto-démarrer l'audio (peut être bloqué selon navigateur)
@@ -720,7 +738,7 @@ function app() {
       if (isNaN(n) || n < 0) return;
       this.bankroll = n;
       if (n > this.peak) this.peak = n;
-      saveStoredState(this);
+      this._saveAndSync();
     },
 
     // ═══════════════════════════════════════════════════
@@ -863,7 +881,7 @@ function app() {
         resolved_at: null,
       };
       this.history.push(entry);
-      saveStoredState(this);
+      this._saveAndSync();
     },
 
     // Marque un pari comme gagné ou perdu, ajuste bankroll
@@ -881,7 +899,7 @@ function app() {
       bet.status = outcome;
       bet.resolved_at = new Date().toISOString();
       if (this.bankroll > this.peak) this.peak = this.bankroll;
-      saveStoredState(this);
+      this._saveAndSync();
     },
 
     // Annuler un pari placé (avant résolution) — au cas où erreur de saisie
@@ -891,7 +909,135 @@ function app() {
       if (this.history[idx].status !== "placed") return;
       if (!confirm("Annuler ce pari (mise non engagée) ?")) return;
       this.history.splice(idx, 1);
+      this._saveAndSync();
+    },
+
+    // ═══════════════════════════════════════════════════
+    // SYNC GITHUB GIST — multi-device
+    // ═══════════════════════════════════════════════════
+
+    // Helper appelé après chaque modif locale : save localStorage + push gist (non bloquant).
+    _saveAndSync() {
+      this.updated_at = new Date().toISOString();
       saveStoredState(this);
+      this.pushNow().catch(() => {}); // fire-and-forget
+    },
+
+    // Snapshot du state actuel (ce qu'on persiste / sync)
+    _stateSnapshot() {
+      return {
+        bankroll: this.bankroll,
+        peak: this.peak,
+        history: this.history,
+        updated_at: this.updated_at,
+      };
+    },
+
+    // Push le state actuel vers le gist. Mise à jour syncStatus / syncLastAt.
+    async pushNow() {
+      if (!this.syncAuth || !window.MatrixSync) return;
+      this.syncStatus = "syncing";
+      try {
+        const pushed = await window.MatrixSync.pushLocal(this._stateSnapshot());
+        if (pushed && pushed.updated_at) {
+          this.updated_at = pushed.updated_at;
+          saveStoredState(this);
+        }
+        this.syncStatus = "pushed";
+        this.syncLastAt = new Date().toISOString();
+        this.syncError = null;
+      } catch (e) {
+        this.syncStatus = "error";
+        this.syncError = e.message || String(e);
+      }
+    },
+
+    // Pull du gist et applique si plus récent que local.
+    async pullAndApply() {
+      if (!this.syncAuth || !window.MatrixSync) return;
+      this.syncStatus = "syncing";
+      try {
+        const remote = await window.MatrixSync.pullRemote();
+        if (!remote) {
+          // Gist vide : push notre local
+          await this.pushNow();
+          return;
+        }
+        const localTs = this.updated_at || "1970-01-01T00:00:00";
+        const remoteTs = remote.updated_at || "1970-01-01T00:00:00";
+        if (remoteTs > localTs) {
+          // Distant plus récent → on adopte
+          this.bankroll = remote.bankroll ?? this.bankroll;
+          this.peak = remote.peak ?? this.peak;
+          this.history = remote.history ?? [];
+          this.updated_at = remote.updated_at;
+          saveStoredState(this);
+          this.syncStatus = "pulled";
+        } else if (localTs > remoteTs) {
+          // Local plus récent → push
+          await this.pushNow();
+          return;
+        } else {
+          this.syncStatus = "pushed"; // déjà synchro
+        }
+        this.syncLastAt = new Date().toISOString();
+        this.syncError = null;
+      } catch (e) {
+        this.syncStatus = "error";
+        this.syncError = e.message || String(e);
+      }
+    },
+
+    // Modal config sync
+    openSyncModal() {
+      this.syncTokenInput = "";
+      this.showSyncModal = true;
+    },
+
+    closeSyncModal() {
+      this.showSyncModal = false;
+      this.syncTokenInput = "";
+    },
+
+    // Connecte un token : trouve ou crée le gist, démarre la sync.
+    async connectSync() {
+      const token = (this.syncTokenInput || "").trim();
+      if (!token) { alert("Colle ton Personal Access Token GitHub d'abord."); return; }
+      if (!window.MatrixSync) { alert("Module sync non chargé"); return; }
+      this.syncStatus = "syncing";
+      try {
+        this.syncAuth = await window.MatrixSync.configureSync(token, this._stateSnapshot());
+        // Réconcilier : si le gist contient déjà un état (autre device), on l'adopte
+        await this.pullAndApply();
+        this.closeSyncModal();
+        // Démarrer le polling 30s
+        setInterval(() => { this.pullAndApply().catch(() => {}); }, 30000);
+      } catch (e) {
+        this.syncStatus = "error";
+        this.syncError = e.message || String(e);
+        alert("Échec connexion : " + this.syncError + "\n\nVérifie que le token a bien le scope 'gist' et qu'il est valide.");
+      }
+    },
+
+    // Déconnecte (efface la config sync). N'efface PAS bankroll/history.
+    disconnectSyncAction() {
+      if (!confirm("Déconnecter la synchro ? Ta bankroll et ton historique restent sur ce device, mais ne seront plus synchronisés avec tes autres appareils.")) return;
+      if (window.MatrixSync) window.MatrixSync.disconnectSync();
+      this.syncAuth = null;
+      this.syncStatus = "idle";
+      this.syncLastAt = null;
+      this.syncError = null;
+    },
+
+    // Label FR pour syncStatus
+    syncStatusLabel() {
+      return {
+        idle: "Non configuré",
+        syncing: "Synchronisation…",
+        pushed: "✓ À jour",
+        pulled: "✓ Synchronisé (data importée)",
+        error: "⚠ Erreur",
+      }[this.syncStatus] || this.syncStatus;
     },
 
     // ═══════════════════════════════════════════════════
