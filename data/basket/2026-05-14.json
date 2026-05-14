@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "sport": "basket",
+  "date": "2026-05-14",
+  "generated_at": "2026-05-14T18:24:25",
+  "n_matches_analysed": 1,
+  "n_paris_candidats": 1,
+  "scoring_formula": "Pick modèle basket — étoiles × 20",
+  "top": [
+    {
+      "rank": 1,
+      "match_slug": "cleveland-cavaliers-detroit-pistons",
+      "home_team": "Cleveland Cavaliers",
+      "away_team": "Detroit Pistons",
+      "competition": "USA: NBA - Phase Finale",
+      "country": "USA",
+      "kickoff_time": "01:00",
+      "bet_type": "1X2 simple",
+      "verdict": "Victoire Cleveland Cavaliers",
+      "confidence": "1★",
+      "score_pari": 20,
+      "reasoning": "Pick modèle basket — confiance 1★ · marge attendue 4.4 pts · fiabilité dom 100% / ext 100%",
+      "favoured": "HOME",
+      "rule_id": null,
+      "rule_label": "Pick modèle Basket (analyse 5 derniers H2H)",
+      "rule_source": "Excel moteur basket",
+      "proba_validee": 0.6526978162050285,
+      "cote_reelle": null,
+      "kelly_fraction": null,
+      "kelly_mise_100eur": null,
+      "edge": null
+    }
+  ],
+  "matches": {
+    "cleveland-cavaliers-detroit-pistons": {
+      "home": "Cleveland Cavaliers",
+      "away": "Detroit Pistons",
+      "competition": "USA: NBA - Phase Finale",
+      "country": "USA",
+      "kickoff_time": "01:00",
+      "layers": {
+        "meso_basket": {
+          "pick_modele": "Cleveland Cavaliers",
+          "proba_validee": 0.6526978162050285,
+          "proba_home": 0.6526978162050285,
+          "proba_away": 0.34730218379497146,
+          "etoiles": 1,
+          "marge_attendue": 4.43,
+          "verdict_excel": "Saisir cotes",
+          "type_pari": null,
+          "book_retenu": null,
+          "fiabilite_home": 1.0,
+          "fiabilite_away": 1.0,
+          "cote_retenue": null,
+          "ev": null
+        }
+      },
+      "layers_html_available": [],
+      "match_url_fs": "https://www.flashscore.fr/match/basket/den-bosch-4W1bkk62/donar-groningen-QX2dq7kE/?mid=6N8Wv0tA"
+    }
+  },
+  "all_ranked": [
+    {
+      "rank": 1,
+      "match_slug": "cleveland-cavaliers-detroit-pistons",
+      "home_team": "Cleveland Cavaliers",
+      "away_team": "Detroit Pistons",
+      "competition": "USA: NBA - Phase Finale",
+      "country": "USA",
+      "kickoff_time": "01:00",
+      "bet_type": "1X2 simple",
+      "verdict": "Victoire Cleveland Cavaliers",
+      "confidence": "1★",
+      "score_pari": 20,
+      "reasoning": "Pick modèle basket — confiance 1★ · marge attendue 4.4 pts · fiabilité dom 100% / ext 100%",
+      "favoured": "HOME",
+      "rule_id": null,
+      "rule_label": "Pick modèle Basket (analyse 5 derniers H2H)",
+      "rule_source": "Excel moteur basket",
+      "proba_validee": 0.6526978162050285,
+      "cote_reelle": null,
+      "kelly_fraction": null,
+      "kelly_mise_100eur": null,
+      "edge": null
+    }
+  ]
+}
