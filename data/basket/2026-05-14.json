@@ -2,7 +2,7 @@
   "version": 1,
   "sport": "basket",
   "date": "2026-05-14",
-  "generated_at": "2026-05-14T23:46:21",
+  "generated_at": "2026-05-14T23:57:49",
   "n_matches_analysed": 1,
   "n_paris_candidats": 1,
   "scoring_formula": "Pick modèle basket — étoiles × 20",
@@ -21,14 +21,14 @@
       "score_pari": 20,
       "reasoning": "Pick modèle basket — confiance 1★ · marge attendue 4.4 pts · fiabilité dom 100% / ext 100%",
       "favoured": "HOME",
-      "rule_id": null,
+      "rule_id": "BASKET-MESO",
       "rule_label": "Pick modèle Basket (analyse 5 derniers H2H)",
       "rule_source": "Excel moteur basket",
       "proba_validee": 0.6526978162050285,
-      "cote_reelle": null,
-      "kelly_fraction": null,
-      "kelly_mise_100eur": null,
-      "edge": null
+      "cote_reelle": 1.68,
+      "kelly_fraction": 0.03548982765604702,
+      "kelly_mise_100eur": 3.55,
+      "edge": 0.09653233122444793
     }
   ],
   "matches": {
@@ -46,13 +46,13 @@
           "proba_away": 0.34730218379497146,
           "etoiles": 1,
           "marge_attendue": 4.43,
-          "verdict_excel": "Saisir cotes",
+          "verdict_excel": "VALUE BET",
           "type_pari": null,
           "book_retenu": null,
           "fiabilite_home": 1.0,
           "fiabilite_away": 1.0,
-          "cote_retenue": null,
-          "ev": null
+          "cote_retenue": 1.68,
+          "ev": 0.09653233122444793
         }
       },
       "layers_html_available": [
@@ -76,14 +76,14 @@
       "score_pari": 20,
       "reasoning": "Pick modèle basket — confiance 1★ · marge attendue 4.4 pts · fiabilité dom 100% / ext 100%",
       "favoured": "HOME",
-      "rule_id": null,
+      "rule_id": "BASKET-MESO",
       "rule_label": "Pick modèle Basket (analyse 5 derniers H2H)",
       "rule_source": "Excel moteur basket",
       "proba_validee": 0.6526978162050285,
-      "cote_reelle": null,
-      "kelly_fraction": null,
-      "kelly_mise_100eur": null,
-      "edge": null
+      "cote_reelle": 1.68,
+      "kelly_fraction": 0.03548982765604702,
+      "kelly_mise_100eur": 3.55,
+      "edge": 0.09653233122444793
     }
   ]
 }
