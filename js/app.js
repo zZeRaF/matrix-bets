@@ -304,6 +304,7 @@ function app() {
     // === Multi-sport : univers actif ===
     currentUniverse: "foot",  // foot | basket | tennis (chargé depuis localStorage en init)
     showUniverseMenu: false,  // overlay menu DA artistique
+    previewUniverse: null,    // sport sélectionné en preview (1er tap), confirmé par 2e tap
 
     // === Persistant (localStorage) ===
     bankroll: 100,
@@ -551,6 +552,26 @@ function app() {
       // Parcours systématique : après la cinématique, on affiche TOUJOURS le menu
       // de sélection d'univers. L'utilisateur doit explicitement choisir son sport.
       this.showUniverseMenu = true;
+    },
+
+    // Ferme l'overlay menu + reset preview (clean state).
+    closeUniverseMenu() {
+      this.showUniverseMenu = false;
+      this.previewUniverse = null;
+    },
+
+    // Sélection 2-tap : 1er tap preview (highlight), 2e tap sur le même sport confirme.
+    selectUniverse(u) {
+      if (!VALID_UNIVERSES.includes(u)) return;
+      if (this.previewUniverse === u) {
+        // 2e tap : confirme
+        this.switchUniverse(u);
+        this.previewUniverse = null;
+        this.showUniverseMenu = false;
+      } else {
+        // 1er tap (ou tap sur un autre sport) : preview
+        this.previewUniverse = u;
+      }
     },
 
     // Change l'univers actif (foot/basket/tennis) — persiste + recharge data.

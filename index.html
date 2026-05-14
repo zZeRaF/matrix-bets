@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-final-no-vf-cover";
+    var APP_VERSION = "20260514-universe-2tap-select";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -142,26 +142,26 @@
 
   <!-- ─── OVERLAY MENU SÉLECTEUR D'UNIVERS (DA artistique) ─── -->
   <div class="universe-menu-overlay" x-show="showUniverseMenu" x-transition.opacity x-cloak
-       @click.self="showUniverseMenu = false">
+       @click.self="closeUniverseMenu()">
     <div class="universe-menu-container">
-      <button class="universe-menu-close" @click="showUniverseMenu = false" aria-label="Fermer">✕</button>
+      <button class="universe-menu-close" @click="closeUniverseMenu()" aria-label="Fermer">✕</button>
       <div class="universe-menu-image-wrap">
         <img src="img/universe-menu.png" alt="Choisis ton univers" class="universe-menu-img">
         <button class="universe-hotspot universe-hotspot-foot"
-                :class="{active: currentUniverse === 'foot'}"
-                @click="switchUniverse('foot'); showUniverseMenu = false"
+                :class="{active: (previewUniverse || currentUniverse) === 'foot'}"
+                @click="selectUniverse('foot')"
                 aria-label="Choisir Foot">
           <span class="universe-hotspot-label">FOOT</span>
         </button>
         <button class="universe-hotspot universe-hotspot-basket"
-                :class="{active: currentUniverse === 'basket'}"
-                @click="switchUniverse('basket'); showUniverseMenu = false"
+                :class="{active: (previewUniverse || currentUniverse) === 'basket'}"
+                @click="selectUniverse('basket')"
                 aria-label="Choisir Basket">
           <span class="universe-hotspot-label">BASKET</span>
         </button>
         <button class="universe-hotspot universe-hotspot-tennis"
-                :class="{active: currentUniverse === 'tennis'}"
-                @click="switchUniverse('tennis'); showUniverseMenu = false"
+                :class="{active: (previewUniverse || currentUniverse) === 'tennis'}"
+                @click="selectUniverse('tennis')"
                 aria-label="Choisir Tennis">
           <span class="universe-hotspot-label">TENNIS</span>
         </button>
