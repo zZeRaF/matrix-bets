@@ -1000,6 +1000,9 @@ function app() {
     },
 
     // Connecte un token : trouve ou crée le gist, démarre la sync.
+    // IMPORTANT : à la connexion, on PRIVILÉGIE le gist existant (s'il a du contenu)
+    // plutôt que de comparer naïvement les timestamps. Sinon un device récemment
+    // modifié écraserait la version cloud légitime des autres devices.
     async connectSync() {
       const token = (this.syncTokenInput || "").trim();
       if (!token) { alert("Colle ton Personal Access Token GitHub d'abord."); return; }
@@ -1007,8 +1010,28 @@ function app() {
       this.syncStatus = "syncing";
       try {
         this.syncAuth = await window.MatrixSync.configureSync(token, this._stateSnapshot());
-        // Réconcilier : si le gist contient déjà un état (autre device), on l'adopte
-        await this.pullAndApply();
+        // Pull le gist : si contenu présent, on l'adopte INCONDITIONNELLEMENT (priorité cloud).
+        // Si gist vide (nouvelle config), on push notre state local.
+        const remote = await window.MatrixSync.pullRemote();
+        if (remote && (remote.history !== undefined || remote.bankroll !== undefined)) {
+          const hasContent = (remote.history && remote.history.length > 0)
+                          || (remote.bankroll !== undefined && remote.bankroll !== 100);
+          if (hasContent) {
+            // Adopter le gist existant (autre device a déjà configuré)
+            this.bankroll = remote.bankroll ?? this.bankroll;
+            this.peak = remote.peak ?? this.peak;
+            this.history = remote.history ?? [];
+            this.updated_at = remote.updated_at;
+            saveStoredState(this);
+            this.syncStatus = "pulled";
+            this.syncLastAt = new Date().toISOString();
+          } else {
+            // Gist quasi-vide : on push notre local
+            await this.pushNow();
+          }
+        } else {
+          await this.pushNow();
+        }
         this.closeSyncModal();
         // Démarrer le polling 30s
         setInterval(() => { this.pullAndApply().catch(() => {}); }, 30000);
