@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-basket-tennis-meso-html";
+    var APP_VERSION = "20260514-meso-sections-multi-sport";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -317,9 +317,7 @@
               <span x-text="selectedMatch().away"></span>
             </h1>
             <p class="detail-meta">
-              <span x-text="selectedMatch().competition + (selectedMatch().country ? ' · ' + selectedMatch().country : '')"></span>
-              <span class="dot">·</span>
-              <span x-text="selectedMatch().kickoff_time"></span>
+              <span x-text="[selectedMatch().competition, selectedMatch().country, selectedMatch().kickoff_time].filter(s => s).join(' · ')"></span>
             </p>
           </div>
         </header>
@@ -392,7 +390,7 @@
             </section>
           </template>
 
-          <!-- MESO (10 derniers) -->
+          <!-- MESO (10 derniers) - FOOT -->
           <template x-if="selectedMatch().layers?.meso">
             <section class="layer-section layer-meso clickable"
                      @click="openLayer('meso')"
@@ -412,6 +410,85 @@
                   <div class="stat-val" x-text="fmtNum(selectedMatch().layers.meso.total_buts_attendus)"></div>
                 </div>
               </div>
+            </section>
+          </template>
+
+          <!-- MESO BASKET (5 derniers H2H sur surface) -->
+          <template x-if="selectedMatch().layers?.meso_basket">
+            <section class="layer-section layer-meso clickable"
+                     @click="openLayer('meso')"
+                     :class="{available: hasLayerHtml('meso')}">
+              <h2 class="layer-title">MESO · 5 derniers basket <span class="open-arrow" x-show="hasLayerHtml('meso')">›</span></h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">Pick modèle</div>
+                  <div class="stat-val green" x-text="selectedMatch().layers.meso_basket.pick_modele || '—'"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Proba</div>
+                  <div class="stat-val" x-text="fmtPct(selectedMatch().layers.meso_basket.proba_validee)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Confiance</div>
+                  <div class="stat-val" x-text="(selectedMatch().layers.meso_basket.etoiles || 0) + '★'"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Marge attendue</div>
+                  <div class="stat-val" x-text="(selectedMatch().layers.meso_basket.marge_attendue !== null && selectedMatch().layers.meso_basket.marge_attendue !== undefined) ? fmtNum(selectedMatch().layers.meso_basket.marge_attendue, 1) + ' pts' : '—'"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Fiab. HOME / AWAY</div>
+                  <div class="stat-val">
+                    <span x-text="fmtPct(selectedMatch().layers.meso_basket.fiabilite_home)"></span>
+                    <span class="muted">/</span>
+                    <span x-text="fmtPct(selectedMatch().layers.meso_basket.fiabilite_away)"></span>
+                  </div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Verdict Excel</div>
+                  <div class="stat-val" x-text="selectedMatch().layers.meso_basket.verdict_excel || '—'"></div>
+                </div>
+              </div>
+            </section>
+          </template>
+
+          <!-- MESO TENNIS (5 derniers consécutifs surface) -->
+          <template x-if="selectedMatch().layers?.meso_tennis">
+            <section class="layer-section layer-meso clickable"
+                     @click="openLayer('meso')"
+                     :class="{available: hasLayerHtml('meso')}">
+              <h2 class="layer-title">MESO · 5 derniers tennis <span class="open-arrow" x-show="hasLayerHtml('meso')">›</span></h2>
+              <div class="layer-grid">
+                <div class="layer-stat">
+                  <div class="stat-lbl">Pick modèle</div>
+                  <div class="stat-val green" x-text="selectedMatch().layers.meso_tennis.pick_modele || '—'"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Proba retenue</div>
+                  <div class="stat-val" x-text="fmtPct(selectedMatch().layers.meso_tennis.proba_retenue)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Fiab. surface</div>
+                  <div class="stat-val" x-text="fmtPct(selectedMatch().layers.meso_tennis.fiab_surface)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Étoiles</div>
+                  <div class="stat-val" x-text="(selectedMatch().layers.meso_tennis.etoiles || 0) + '★'"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Cote juste</div>
+                  <div class="stat-val" x-text="fmtNum(selectedMatch().layers.meso_tennis.cote_juste, 2)"></div>
+                </div>
+                <div class="layer-stat">
+                  <div class="stat-lbl">Verdict 1X2</div>
+                  <div class="stat-val" x-text="selectedMatch().layers.meso_tennis.verdict_1x2 || '—'"></div>
+                </div>
+              </div>
+              <template x-if="selectedMatch().layers.meso_tennis.condition_jeux">
+                <div class="layer-verdict">
+                  <span x-text="'Jeux totaux : ' + (selectedMatch().layers.meso_tennis.condition_jeux || '—') + ' (modèle ' + fmtNum(selectedMatch().layers.meso_tennis.jeux_attendus, 1) + ' vs book ' + fmtNum(selectedMatch().layers.meso_tennis.ligne_book, 1) + ')'"></span>
+                </div>
+              </template>
             </section>
           </template>
 
