@@ -17,14 +17,17 @@
   <title>$MATRIX BET$</title>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
+    var APP_VERSION = "20260514-sync4-versiondyn";
     (function () {
-      var APP_VERSION = "20260514-sync3";
+      // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
+      document.addEventListener("DOMContentLoaded", function () {
+        var el = document.getElementById("splash-version");
+        if (el) el.textContent = "build " + APP_VERSION;
+      });
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
         if (stored !== null && "serviceWorker" in navigator) {
-          // Version a changé : on désinscrit tous les SW et on vide tous les caches, puis reload.
-          // Ne pas boucler : on a déjà mis à jour localStorage, donc au prochain reload on passera.
           Promise.all([
             navigator.serviceWorker.getRegistrations().then(function (regs) {
               return Promise.all(regs.map(function (r) { return r.unregister(); }));
@@ -74,7 +77,7 @@
         </span>
       </div>
       <div class="splash-tagline">// PRONOS FOOT · ANALYSES 4 COUCHES</div>
-      <div class="splash-version" id="splash-version">build 20260513-zk</div>
+      <div class="splash-version" id="splash-version">build —</div>
 
       <ul class="splash-log">
         <template x-for="(line, idx) in splashLog" :key="idx">
