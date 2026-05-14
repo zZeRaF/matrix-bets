@@ -72,7 +72,9 @@
 .status-incertain { background: #FFC000 !important; }
 .tag.fav, .tag.def, .tag.neutre { color: #000 !important; }
 table th { background: #002000 !important; color: #00FF66 !important; border-color: #195A2D !important; }
-table td { color: #FFF !important; border-color: #195A2D !important; }
+table td { border-color: #195A2D !important; }
+/* NB : pas de color !important global sur td — laisse les color:#000 inline (fonds vifs)
+   l'emporter. Le CSS du template fournit #FFF par défaut sur fond sombre. */
 .tag.fav, .tag.def, .tag.neutre { color: #000 !important; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: Consolas, "Courier New", monospace, -apple-system; }
