@@ -17,7 +17,7 @@
   <title>$MATRIX BET$</title>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-colors-tabs-bolt";
+    var APP_VERSION = "20260514-red-canonical";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -747,7 +747,7 @@
             </div>
 
             <div class="pipeline-steps">
-              <template x-for="step in ['collecte','analyses','pwa','push']" :key="step">
+              <template x-for="step in ['collecte','analyses','pwa','basket','push']" :key="step">
                 <div class="pipeline-step-row" :class="'step-' + (pipelineStatus.steps[step]?.status || 'PENDING').toLowerCase()">
                   <span class="pipeline-step-icon"
                         x-text="{OK:'✓', FAIL:'✗', SKIPPED:'—', PENDING:'⏳', RUNNING:'⟳'}[pipelineStatus.steps[step]?.status || 'PENDING']"></span>

@@ -10,7 +10,7 @@
   --mx-green-pastel: #82FFB4;
   --mx-green-header: #0A4D2A;
   --mx-red-bright: #FF1B1B;
-  --mx-red: #FF6B6B;          /* rouge clair lisible sur fond rouge sombre (paris perdus) */
+  --mx-red: #FF1B1B;          /* rouge canonique unique — identique sur tous les chiffres/textes rouges */
   --mx-orange: #FFC000;
   --mx-blue: #00B0F0;
   --mx-border-thick: #216037;
@@ -301,7 +301,7 @@ body {
   letter-spacing: 0.1em;
   font-size: 0.85rem;
 }
-.pipeline-banner-fail .pipeline-banner-title { color: #FF6B6B; }
+.pipeline-banner-fail .pipeline-banner-title { color: var(--mx-red); }
 .pipeline-banner-warn .pipeline-banner-title { color: var(--mx-orange); }
 .pipeline-banner-time {
   color: var(--mx-muted);
@@ -339,7 +339,7 @@ body {
 .pipeline-status-lbl { color: var(--mx-muted); font-size: 0.7rem; letter-spacing: 0.05em; }
 .pipeline-status-row strong { color: var(--mx-text); font-family: Consolas, monospace; }
 .status-OK { color: var(--mx-green-bright) !important; }
-.status-FAIL { color: #FF6B6B !important; }
+.status-FAIL { color: var(--mx-red) !important; }
 .status-PARTIAL { color: var(--mx-orange) !important; }
 .status-RUNNING { color: var(--mx-blue) !important; }
 .pipeline-status-error {
@@ -353,7 +353,7 @@ body {
 }
 .pipeline-status-err-summary {
   margin-top: 4px;
-  color: #FF6B6B;
+  color: var(--mx-red);
   font-family: Consolas, monospace;
   font-size: 0.7rem;
 }
@@ -462,7 +462,7 @@ body {
   letter-spacing: 0.12em;
 }
 .bet-card-resolved-won  .bet-card-resolved-badge { color: var(--mx-green-bright); }
-.bet-card-resolved-lost .bet-card-resolved-badge { color: #FF6B6B; }
+.bet-card-resolved-lost .bet-card-resolved-badge { color: var(--mx-red); }
 .bet-card-resolved-meta { color: var(--mx-text); font-size: 0.75rem; }
 .bet-card-resolved-profit {
   font-size: 1rem;
@@ -470,7 +470,7 @@ body {
   margin-left: auto;
 }
 .bet-card-resolved-won  .bet-card-resolved-profit { color: var(--mx-green-bright); }
-.bet-card-resolved-lost .bet-card-resolved-profit { color: #FF6B6B; }
+.bet-card-resolved-lost .bet-card-resolved-profit { color: var(--mx-red); }
 
 /* ─── ÉTATS LOADING / EMPTY / ERROR ─── */
 .empty {
@@ -2092,10 +2092,10 @@ body.layer-open .bottom-nav { display: none; }
   letter-spacing: 0.12em;
 }
 .pari-result-won .result-badge { color: var(--mx-green-bright); }
-.pari-result-lost .result-badge { color: #FF6B6B; }
+.pari-result-lost .result-badge { color: var(--mx-red); }
 .result-profit { font-size: 1rem; }
 .pari-result-won .result-profit { color: var(--mx-green-bright); }
-.pari-result-lost .result-profit { color: #FF6B6B; }
+.pari-result-lost .result-profit { color: var(--mx-red); }
 
 @media (max-width: 480px) {
   .pari-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2445,7 +2445,7 @@ body.layer-open .bottom-nav { display: none; }
 }
 .sync-status-error {
   margin-top: 4px;
-  color: #FF6B6B;
+  color: var(--mx-red);
   font-size: 0.7rem;
   font-family: Consolas, monospace;
   word-break: break-word;
@@ -2482,7 +2482,7 @@ body.layer-open .bottom-nav { display: none; }
   transition: all 0.15s;
 }
 .btn-sync-small:hover { color: var(--mx-green-bright); border-color: var(--mx-green-bright); }
-.btn-sync-danger { color: #FF6B6B; }
+.btn-sync-danger { color: var(--mx-red); }
 .btn-sync-danger:hover { color: var(--mx-red-bright); border-color: var(--mx-red-bright); }
 .btn-sync-warning { color: var(--mx-orange); }
 .btn-sync-warning:hover { color: var(--mx-orange); border-color: var(--mx-orange); filter: brightness(1.1); }

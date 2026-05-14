@@ -625,7 +625,8 @@ function app() {
       return {
         collecte: "Collecte (Footystats + Flashscore + FotMob)",
         analyses: "Analyses 4 couches + TOP10",
-        pwa: "Génération données PWA",
+        pwa: "Génération données PWA foot",
+        basket: "Pipeline basket (NBA)",
         push: "Push GitHub Pages",
       }[s] || s;
     },
