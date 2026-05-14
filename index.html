@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260515-multisport-title-clean";
+    var APP_VERSION = "20260515-snapshot-btn-compact";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -910,12 +910,9 @@
         </template>
 
         <!-- ─── Bouton snapshot pour partage analyse ─── -->
-        <section class="stats-section" x-show="resolvedBets().length > 0">
-          <button class="btn-snapshot" @click="copyStatsSnapshot()">
-            📋 Copier mes stats (pour analyse externe)
-          </button>
-          <p class="stats-section-hint">Copie un dump JSON complet de tes perfos dans le clipboard. Tu peux le coller dans le chat pour analyse détaillée.</p>
-        </section>
+        <div class="snapshot-wrap" x-show="resolvedBets().length > 0">
+          <button class="btn-snapshot" @click="copyStatsSnapshot()">📋 Copier Stats</button>
+        </div>
 
         <!-- ─── 0bis. MULTI-SPORT (toujours visible, agrégé tous sports) ─── -->
         <section class="stats-section" x-show="resolvedBets().length > 0">

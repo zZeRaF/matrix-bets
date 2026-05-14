@@ -117,23 +117,29 @@ body {
   text-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
 }
 
-/* ─── Bouton snapshot stats ─── */
+/* ─── Bouton snapshot stats (compact) ─── */
+.snapshot-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 16px 8px;
+}
 .btn-snapshot {
-  width: 100%;
-  padding: 12px;
-  background: rgba(0, 64, 24, 0.6);
-  border: 1px solid var(--mx-green-bright);
-  border-radius: 4px;
-  color: var(--mx-green-bright);
+  padding: 6px 12px;
+  background: rgba(0, 48, 18, 0.6);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 3px;
+  color: var(--mx-green-pastel);
   font-family: var(--mx-mono);
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.15s;
 }
 .btn-snapshot:hover, .btn-snapshot:active {
-  background: rgba(0, 96, 36, 0.8);
+  background: rgba(0, 64, 24, 0.8);
+  border-color: var(--mx-green-bright);
+  color: var(--mx-green-bright);
 }
 
 /* ─── STATS MULTI-SPORT : répartition par univers (cliquable pour switcher) ─── */
