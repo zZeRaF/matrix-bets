@@ -121,7 +121,7 @@ body {
 .snapshot-wrap {
   display: flex;
   justify-content: center;
-  margin: 16px 16px;
+  margin: 8px 16px;
 }
 .btn-snapshot {
   padding: 6px 12px;
