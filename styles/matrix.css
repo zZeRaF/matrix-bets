@@ -19,11 +19,11 @@
   --mx-mono: "SF Mono", "Consolas", "Cascadia Mono", "JetBrains Mono", monospace;
   --topbar-h: 56px;
   --bottomnav-h: 64px;
-  /* TEST 100% OPAQUE — pour valider que le CSS s'applique sans subjectivité.
-     Si rendu opaque visible → mécanisme OK, on ajustera l'alpha vers du translucide.
-     Si rendu encore transparent → le CSS ne s'applique pas, problème ailleurs. */
-  --mx-card-translucent: rgb(0, 26, 8);
-  --mx-cell-translucent: rgb(0, 32, 0);
+  /* TEST DEBUG : MAGENTA FLASHY — impossible à manquer si CSS s'applique.
+     Si user voit du magenta sur Paris/Stats → CSS marche, on ajustera.
+     Si user voit toujours du sombre/transparent → CSS PAS appliqué, vraie cause à trouver. */
+  --mx-card-translucent: #FF00FF;
+  --mx-cell-translucent: #FF00AA;
 }
 
 [x-cloak] { display: none !important; }
