@@ -48,8 +48,7 @@ body {
 .bg-rain {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: calc(var(--vh, 1vh) * 100);
+  /* inset: 0 + position fixed suffit à remplir la fenêtre, pas besoin de height */
   /* z-index 0 : la pluie est entre body bg et le contenu. Toutes les cards qui veulent
      être au-dessus DOIVENT avoir position: relative (ce qui crée leur stacking-level). */
   z-index: 0;
@@ -157,7 +156,7 @@ body {
 .universe-menu-container {
   position: relative;
   width: 100%;
-  height: calc(var(--vh, 1vh) * 100);
+  height: 100%;            /* parent .universe-menu-overlay est fixed inset:0 → hauteur viewport */
 }
 .universe-menu-close {
   position: fixed;
@@ -1026,7 +1025,7 @@ body.layer-open .bottom-nav { display: none; }
 .splash-content {
   position: relative;
   z-index: 2;
-  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100%;        /* parent .splash est fixed inset:0 → remplit viewport */
   display: flex;
   flex-direction: column;
   align-items: center;

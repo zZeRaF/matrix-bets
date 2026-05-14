@@ -15,25 +15,34 @@
   <link rel="apple-touch-icon" sizes="192x192" href="icons/app-icon-192-v3.png">
   <link rel="stylesheet" href="styles/matrix.css">
   <title>$MATRIX BET$</title>
-  <!-- VIEWPORT-HEIGHT FIX iOS : 100vh/100dvh sont buggés au 1er paint sur Safari/PWA standalone.
-       On set --vh = window.innerHeight/100 en pixels, recalculé à chaque resize/orientation. -->
+  <!-- VIEWPORT-HEIGHT FIX iOS : window.innerHeight est instable au 1er paint Safari/PWA.
+       On utilise visualViewport.height en priorité + recalculs multiples au load. -->
   <script>
     (function () {
       function setVH() {
-        document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+        var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        document.documentElement.style.setProperty('--vh', (h * 0.01) + 'px');
       }
       setVH();
+      // Hooks événements
       window.addEventListener('resize', setVH);
       window.addEventListener('orientationchange', setVH);
-      // iOS visualViewport (gère barre Safari qui apparaît/disparaît au scroll)
+      window.addEventListener('load', setVH);
+      document.addEventListener('DOMContentLoaded', setVH);
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', setVH);
       }
+      // Recalculs forcés : iOS termine son layout interne en plusieurs étapes après le 1er paint
+      requestAnimationFrame(setVH);
+      setTimeout(setVH, 0);
+      setTimeout(setVH, 100);
+      setTimeout(setVH, 300);
+      setTimeout(setVH, 1000);
     })();
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-vh-fix-ios";
+    var APP_VERSION = "20260514-vh-fix-ios-v2";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
