@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260514-sync2";
+      var APP_VERSION = "20260514-sync3";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -679,7 +679,8 @@
             <div class="sync-status-error" x-show="syncError" x-text="syncError"></div>
           </div>
           <div class="sync-actions">
-            <button class="btn-sync-small" @click="pullAndApply()">↻ Forcer sync</button>
+            <button class="btn-sync-small" @click="pullAndApply()" title="Récupère la version du Gist (à utiliser sur le device qui a une version OBSOLÈTE)">↻ Forcer sync (pull)</button>
+            <button class="btn-sync-small btn-sync-warning" @click="forcePushNow()" title="Pousse l'état de CE device vers le Gist (à utiliser sur le device qui a la BONNE version)">↑ Forcer push</button>
             <button class="btn-sync-small btn-sync-danger" @click="disconnectSyncAction()">Déconnecter</button>
           </div>
         </div>

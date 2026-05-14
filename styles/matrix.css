@@ -2416,6 +2416,8 @@ body.layer-open .bottom-nav { display: none; }
 .btn-sync-small:hover { color: var(--mx-green-bright); border-color: var(--mx-green-bright); }
 .btn-sync-danger { color: #FF6B6B; }
 .btn-sync-danger:hover { color: var(--mx-red-bright); border-color: var(--mx-red-bright); }
+.btn-sync-warning { color: var(--mx-orange); }
+.btn-sync-warning:hover { color: var(--mx-orange); border-color: var(--mx-orange); filter: brightness(1.1); }
 
 /* ── Modal de configuration ── */
 .sync-modal-overlay {

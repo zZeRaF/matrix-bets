@@ -952,6 +952,20 @@ function app() {
       }
     },
 
+    // Force un push de l'état actuel (bankroll + history) avec updated_at = maintenant.
+    // Utile pour résoudre un conflit de sync : on impose la version de CE device au cloud
+    // SANS modifier le state lui-même (pari LA Galaxy reste bien marqué perdu, etc.).
+    async forcePushNow() {
+      if (!this.syncAuth) { alert("Sync non configurée"); return; }
+      if (!confirm("Forcer la mise sur le Gist de la bankroll + historique actuels de CE device ?\n\nLes autres devices écraseront leur version par celle-ci au prochain pull (30s ou bouton « ↻ Forcer sync »).")) return;
+      this.updated_at = new Date().toISOString();
+      saveStoredState(this);
+      await this.pushNow();
+      if (this.syncStatus !== "error") {
+        alert("✓ État poussé. Va sur ton autre device → Stats → « ↻ Forcer sync ».");
+      }
+    },
+
     // Pull du gist et applique si plus récent que local.
     async pullAndApply() {
       if (!this.syncAuth || !window.MatrixSync) return;
