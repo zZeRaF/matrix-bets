@@ -2231,6 +2231,35 @@ body.layer-open .bottom-nav { display: none; }
 }
 .mp-stat-val.positive { color: var(--mx-green-bright); }
 .mp-stat-val.negative { color: var(--mx-red); }
+/* Spans à l'intérieur de .mp-stat-val ou .stats-cell-sub : couleurs gagné/perdu */
+.mp-stat-val .positive,
+.stats-cell-sub .positive { color: var(--mx-green-bright); }
+.mp-stat-val .negative,
+.stats-cell-sub .negative { color: var(--mx-red); }
+.resolved-sep { color: var(--mx-muted); font-weight: 400; }
+
+/* Bouton ↺ Kelly (réinitialiser mise) discret */
+.pari-mise-reset {
+  background: transparent;
+  border: 1px solid var(--mx-border-thin);
+  color: var(--mx-muted);
+  border-radius: 3px;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: all 0.15s;
+}
+.pari-mise-reset:hover {
+  color: var(--mx-green-bright);
+  border-color: var(--mx-green-bright);
+}
+.pari-kelly-suggestion {
+  color: var(--mx-orange);
+  font-size: 0.9rem;
+}
 
 /* Section titre (EN ATTENTE / TERMINÉS) */
 .mp-section {

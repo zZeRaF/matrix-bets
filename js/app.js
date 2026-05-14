@@ -315,6 +315,7 @@ function app() {
     detailSubtab: "analyse",        // "analyse" ou "pari"
     selectedLayer: null,            // null | "consensus" | "macro" | "meso" | "micro" | "news"
     coteInputs: {},                 // { [pari.rank]: cote saisie utilisateur } (réactif Alpine)
+    miseInputs: {},                 // { [pari.rank]: mise saisie utilisateur } (éditable, défaut = Kelly)
 
     // === Splash ===
     showSplash: true,
@@ -553,10 +554,17 @@ function app() {
           this.pipelineStatus = null;
         }
         const newCotes = {};
+        const newMises = {};
         (json.top || []).forEach((p) => {
-          newCotes[p.rank] = (p.cote_reelle || p.cote_estimee || "").toString();
+          const cote = p.cote_reelle || p.cote_estimee || "";
+          newCotes[p.rank] = cote.toString();
+          // Mise par défaut = Kelly calculé sur bankroll actuelle + cote actuelle
+          // (l'utilisateur peut la modifier librement avant de placer)
+          const mise = this.computeMise(p, parseFloat(cote) || null);
+          newMises[p.rank] = mise > 0 ? mise.toFixed(2) : "";
         });
         this.coteInputs = newCotes;
+        this.miseInputs = newMises;
         this.state = !json.top || json.top.length === 0 ? "empty" : "ok";
       } catch (e) {
         this.state = "error";
@@ -844,7 +852,8 @@ function app() {
     },
 
     // Place un pari → entry history avec status='placed'
-    placeBet(pari, coteReelle) {
+    // miseOverride : si fourni, écrase la mise calculée Kelly. Sinon Kelly auto.
+    placeBet(pari, coteReelle, miseOverride = null) {
       if (!pari || !coteReelle || coteReelle <= 1) {
         alert("Cote invalide (doit être > 1).");
         return;
@@ -853,10 +862,20 @@ function app() {
         alert("Ce pari a déjà été placé.");
         return;
       }
-      const mise = this.computeMise(pari, coteReelle);
-      if (mise <= 0) {
-        alert("Mise calculée = 0 (cote trop basse ou proba trop faible). Pari non rentable.");
-        return;
+      let mise;
+      if (miseOverride && miseOverride > 0) {
+        mise = Math.round(miseOverride * 100) / 100;
+        // Avertit si supérieur au cap 7% bankroll (mais autorise)
+        const cap = Math.round(this.bankroll * 0.07 * 100) / 100;
+        if (mise > cap) {
+          if (!confirm(`Mise saisie (${mise.toFixed(2)}€) > cap 7% bankroll (${cap.toFixed(2)}€). Confirmer quand même ?`)) return;
+        }
+      } else {
+        mise = this.computeMise(pari, coteReelle);
+        if (mise <= 0) {
+          alert("Mise calculée = 0 (cote trop basse ou proba trop faible). Pari non rentable.");
+          return;
+        }
       }
       const entry = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
