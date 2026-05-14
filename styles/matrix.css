@@ -259,6 +259,135 @@ body {
 .bet-card-foot .mise .val { color: var(--mx-green-pastel); }
 .bet-card-foot .score .val { color: var(--mx-orange); }
 
+/* ─── BANDEAU SANTÉ PIPELINE EN HAUT DU FEED ─── */
+.pipeline-banner {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+.pipeline-banner:active { transform: scale(0.99); }
+.pipeline-banner-fail {
+  background: rgba(64, 8, 8, 0.7);
+  border-color: var(--mx-red-bright);
+  border-left: 4px solid var(--mx-red-bright);
+}
+.pipeline-banner-warn {
+  background: rgba(80, 56, 0, 0.55);
+  border-color: var(--mx-orange);
+  border-left: 4px solid var(--mx-orange);
+}
+.pipeline-banner-ok {
+  background: rgba(0, 64, 24, 0.4);
+  border-color: var(--mx-green-bright);
+  border-left: 4px solid var(--mx-green-bright);
+}
+.pipeline-banner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pipeline-banner-title {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+}
+.pipeline-banner-fail .pipeline-banner-title { color: #FF6B6B; }
+.pipeline-banner-warn .pipeline-banner-title { color: var(--mx-orange); }
+.pipeline-banner-time {
+  color: var(--mx-muted);
+  font-size: 0.7rem;
+  font-family: Consolas, monospace;
+}
+.pipeline-banner-detail {
+  margin-top: 4px;
+  color: var(--mx-green-pastel);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.pipeline-banner-cta {
+  margin-top: 6px;
+  color: var(--mx-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-align: right;
+}
+
+/* ─── ONGLET STATS : section santé pipeline ─── */
+.pipeline-status-summary {
+  padding: 10px 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  border-left: 4px solid;
+}
+.pipeline-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  padding: 3px 0;
+}
+.pipeline-status-lbl { color: var(--mx-muted); font-size: 0.7rem; letter-spacing: 0.05em; }
+.pipeline-status-row strong { color: var(--mx-text); font-family: Consolas, monospace; }
+.status-OK { color: var(--mx-green-bright) !important; }
+.status-FAIL { color: #FF6B6B !important; }
+.status-PARTIAL { color: var(--mx-orange) !important; }
+.status-RUNNING { color: var(--mx-blue) !important; }
+.pipeline-status-error {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-left: 3px solid var(--mx-red-bright);
+  color: var(--mx-green-pastel);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.pipeline-status-err-summary {
+  margin-top: 4px;
+  color: #FF6B6B;
+  font-family: Consolas, monospace;
+  font-size: 0.7rem;
+}
+
+.pipeline-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pipeline-step-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--mx-bg-dark);
+  border-left: 3px solid var(--mx-muted);
+  border-radius: 3px;
+  font-size: 0.72rem;
+}
+.pipeline-step-row.step-ok { border-left-color: var(--mx-green-bright); }
+.pipeline-step-row.step-fail { border-left-color: var(--mx-red-bright); background: rgba(64, 8, 8, 0.3); }
+.pipeline-step-row.step-skipped { border-left-color: var(--mx-muted); opacity: 0.7; }
+.pipeline-step-row.step-pending { border-left-color: var(--mx-orange); }
+.pipeline-step-row.step-running { border-left-color: var(--mx-blue); }
+.pipeline-step-icon {
+  font-weight: 700;
+  text-align: center;
+  font-size: 0.95rem;
+}
+.pipeline-step-row.step-ok .pipeline-step-icon { color: var(--mx-green-bright); }
+.pipeline-step-row.step-fail .pipeline-step-icon { color: var(--mx-red-bright); }
+.pipeline-step-row.step-pending .pipeline-step-icon { color: var(--mx-orange); }
+.pipeline-step-name { color: var(--mx-text); }
+.pipeline-step-time {
+  color: var(--mx-muted);
+  font-family: Consolas, monospace;
+  font-size: 0.7rem;
+}
+
 /* ─── ÉTATS INLINE PARI PLACÉ / GAGNÉ / PERDU SUR BET-CARD DU TOP ─── */
 /* Quand un pari du TOP a été placé, son état + boutons ✓/✗ s'affichent
    directement dans la carte pour résolution 1-clic (pas de drill-down). */

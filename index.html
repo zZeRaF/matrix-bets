@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260514-stats";
+      var APP_VERSION = "20260514-pipelinehealth";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -139,6 +139,20 @@
 
   <!-- ─── FIL D'ACTUALITÉ DES PARIS ─── -->
   <main class="feed" x-show="state === 'ok' && tab === 'paris' && currentView === 'feed'">
+
+    <!-- ─── BANDEAU SANTÉ PIPELINE (rouge si FAIL, orange si données stales) ─── -->
+    <template x-if="pipelineHealthMsg()">
+      <div class="pipeline-banner" :class="'pipeline-banner-' + pipelineHealthMsg().level"
+           @click="tab = 'stats'">
+        <div class="pipeline-banner-head">
+          <span class="pipeline-banner-title" x-text="pipelineHealthMsg().title"></span>
+          <span class="pipeline-banner-time" x-show="pipelineHealthMsg().time"
+                x-text="fmtTime(pipelineHealthMsg().time)"></span>
+        </div>
+        <div class="pipeline-banner-detail" x-text="pipelineHealthMsg().detail"></div>
+        <div class="pipeline-banner-cta">[ Voir détails dans Stats › ]</div>
+      </div>
+    </template>
 
     <template x-for="pari in data.top" :key="pari.rank">
       <article class="bet-card"
@@ -650,11 +664,61 @@
       </div>
     </template>
 
-    <template x-if="resolvedBets().length > 0">
+    <template x-if="resolvedBets().length > 0 || pipelineStatus">
       <div>
 
+        <!-- ─── 0. SANTÉ PIPELINE (toujours affiché si status dispo) ─── -->
+        <template x-if="pipelineStatus">
+          <section class="stats-section">
+            <h2 class="stats-section-title">🩺 SANTÉ PIPELINE</h2>
+            <p class="stats-section-hint">Pipeline nocturne (Run_Daily_Autonomous). Heure du dernier passage de chaque étape.</p>
+            <div class="pipeline-status-summary"
+                 :class="'pipeline-banner-' + (pipelineStatus.overall_status === 'FAIL' ? 'fail' : (pipelineStatus.overall_status === 'OK' ? 'ok' : 'warn'))">
+              <div class="pipeline-status-row">
+                <span class="pipeline-status-lbl">Run du</span>
+                <strong x-text="pipelineStatus.run_date"></strong>
+              </div>
+              <div class="pipeline-status-row">
+                <span class="pipeline-status-lbl">Statut global</span>
+                <strong :class="'status-' + pipelineStatus.overall_status"
+                        x-text="pipelineStatus.overall_status"></strong>
+              </div>
+              <div class="pipeline-status-row" x-show="pipelineStatus.last_run_at">
+                <span class="pipeline-status-lbl">Fin du run</span>
+                <strong x-text="fmtTime(pipelineStatus.last_run_at)"></strong>
+              </div>
+              <template x-if="pipelineStatus.overall_status === 'FAIL' && pipelineStatus.error_step">
+                <div class="pipeline-status-error">
+                  <div><strong>Étape échouée :</strong> <span x-text="stepLabel(pipelineStatus.error_step)"></span></div>
+                  <div class="pipeline-status-err-summary" x-text="pipelineStatus.error_summary"></div>
+                </div>
+              </template>
+            </div>
+
+            <div class="pipeline-steps">
+              <template x-for="step in ['collecte','analyses','pwa','push']" :key="step">
+                <div class="pipeline-step-row" :class="'step-' + (pipelineStatus.steps[step]?.status || 'PENDING').toLowerCase()">
+                  <span class="pipeline-step-icon"
+                        x-text="{OK:'✓', FAIL:'✗', SKIPPED:'—', PENDING:'⏳', RUNNING:'⟳'}[pipelineStatus.steps[step]?.status || 'PENDING']"></span>
+                  <span class="pipeline-step-name" x-text="stepLabel(step)"></span>
+                  <span class="pipeline-step-time"
+                        x-text="pipelineStatus.steps[step]?.ended_at ? fmtTime(pipelineStatus.steps[step].ended_at) : '—'"></span>
+                </div>
+              </template>
+            </div>
+          </section>
+        </template>
+
+        <!-- État vide quand pas de paris résolus mais status pipeline présent -->
+        <template x-if="resolvedBets().length === 0">
+          <div class="stats-empty">
+            <p class="empty-status">📊 Aucun pari résolu encore</p>
+            <p class="empty-meta">Place tes paris depuis l'onglet TOP pour voir les stats apparaître.</p>
+          </div>
+        </template>
+
         <!-- ─── 1. VUE D'ENSEMBLE ─── -->
-        <section class="stats-section">
+        <section class="stats-section" x-show="resolvedBets().length > 0">
           <h2 class="stats-section-title">⚡ VUE D'ENSEMBLE</h2>
           <div class="stats-grid stats-grid-4">
             <div class="stats-cell">

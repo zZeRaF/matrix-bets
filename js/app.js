@@ -294,6 +294,7 @@ function app() {
 
     // === Volatile (par session) ===
     data: null,
+    pipelineStatus: null,    // contenu de data/pipeline_status.json (santé du run nocturne)
     state: "loading", // loading | ok | empty | error
     errorMsg: "",
     tab: "paris",
@@ -515,14 +516,24 @@ function app() {
     async loadData() {
       this.state = "loading";
       this.errorMsg = "";
+      // Fetch latest.json et pipeline_status.json en parallèle.
+      // pipeline_status.json est optionnel : si absent on assume "pas de status, OK".
+      const ts = Math.floor(Date.now() / 1000 / 60); // cache-buster /minute
       try {
-        const ts = Math.floor(Date.now() / 1000 / 60); // cache-buster /minute
-        const res = await fetch(`data/latest.json?_=${ts}`, { cache: "no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const json = await res.json();
+        const [resData, resStatus] = await Promise.all([
+          fetch(`data/latest.json?_=${ts}`, { cache: "no-store" }),
+          fetch(`data/pipeline_status.json?_=${ts}`, { cache: "no-store" }).catch(() => null),
+        ]);
+        if (!resData.ok) throw new Error("HTTP " + resData.status);
+        const json = await resData.json();
         this.data = json;
-        // Pré-initialise coteInputs avec une string vide pour chaque pari du TOP
-        // (Alpine ne tracke pas les clés de dict ajoutées dynamiquement après init)
+        // Status pipeline (best-effort, ne casse pas l'app si absent ou invalide)
+        if (resStatus && resStatus.ok) {
+          try { this.pipelineStatus = await resStatus.json(); }
+          catch { this.pipelineStatus = null; }
+        } else {
+          this.pipelineStatus = null;
+        }
         const newCotes = {};
         (json.top || []).forEach((p) => {
           newCotes[p.rank] = (p.cote_reelle || p.cote_estimee || "").toString();
@@ -533,6 +544,73 @@ function app() {
         this.state = "error";
         this.errorMsg = e.message || String(e);
       }
+    },
+
+    // ═══════════════════════════════════════════════════
+    // SANTÉ PIPELINE — bandeau d'alerte en haut du feed
+    // ═══════════════════════════════════════════════════
+
+    // Retourne {level, title, detail, step} si problème, sinon null.
+    // level : "fail" (rouge) ou "warn" (orange).
+    pipelineHealthMsg() {
+      const todayIso = new Date().toISOString().split("T")[0];
+      const dataDate = this.data?.date;
+      // 1. Pipeline status FAIL → bandeau rouge prioritaire
+      if (this.pipelineStatus && this.pipelineStatus.overall_status === "FAIL") {
+        const step = this.pipelineStatus.error_step || "?";
+        const summary = this.pipelineStatus.error_summary || "Erreur inconnue";
+        return {
+          level: "fail",
+          title: "⚠ PIPELINE EN ÉCHEC",
+          detail: `Étape « ${step} » a échoué : ${summary}`,
+          step,
+          time: this.pipelineStatus.last_update_at || this.pipelineStatus.last_run_at,
+        };
+      }
+      // 2. Données obsolètes (latest.json date < aujourd'hui) → bandeau orange
+      if (dataDate && dataDate < todayIso) {
+        return {
+          level: "warn",
+          title: "⚠ DONNÉES OBSOLÈTES",
+          detail: `Affichage du TOP ${this.formatDateFr(dataDate)} — pipeline du jour pas (encore) exécuté.`,
+          step: null,
+          time: this.pipelineStatus?.last_run_at,
+        };
+      }
+      // 3. Dernier run > 24h → bandeau orange (cas pipeline stoppé depuis longtemps)
+      if (this.pipelineStatus?.last_run_at) {
+        const lastMs = new Date(this.pipelineStatus.last_run_at).getTime();
+        const ageH = (Date.now() - lastMs) / (1000 * 3600);
+        if (ageH > 24) {
+          return {
+            level: "warn",
+            title: "⚠ DERNIER RUN ANCIEN",
+            detail: `Dernier pipeline il y a ${ageH.toFixed(0)} h.`,
+            step: null,
+            time: this.pipelineStatus.last_run_at,
+          };
+        }
+      }
+      return null;
+    },
+
+    // Étiquette FR pour une étape pipeline
+    stepLabel(s) {
+      return {
+        collecte: "Collecte (Footystats + Flashscore + FotMob)",
+        analyses: "Analyses 4 couches + TOP10",
+        pwa: "Génération données PWA",
+        push: "Push GitHub Pages",
+      }[s] || s;
+    },
+
+    // Formate un timestamp ISO en HH:MM locale, sinon "—"
+    fmtTime(iso) {
+      if (!iso) return "—";
+      try {
+        const d = new Date(iso);
+        return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+      } catch { return iso; }
     },
 
     fmtEur(v) {

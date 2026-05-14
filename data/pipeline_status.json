@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "run_date": "2026-05-15",
+  "started_at": "2026-05-14T12:59:13",
+  "last_update_at": "2026-05-14T12:59:14",
+  "last_run_at": "2026-05-14T12:59:14",
+  "overall_status": "OK",
+  "error_step": null,
+  "error_summary": null,
+  "steps": {
+    "collecte": {
+      "status": "OK",
+      "ended_at": "2026-05-14T12:59:13"
+    },
+    "analyses": {
+      "status": "OK",
+      "ended_at": "2026-05-14T12:59:14"
+    },
+    "pwa": {
+      "status": "OK",
+      "ended_at": "2026-05-14T12:59:14"
+    },
+    "push": {
+      "status": "OK",
+      "ended_at": "2026-05-14T12:59:14"
+    }
+  }
+}
