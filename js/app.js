@@ -548,6 +548,9 @@ function app() {
       if (splashEl) splashEl.style.display = "none";
       if (this._splashStopRain) this._splashStopRain();
       if (window.stopThreeScene) window.stopThreeScene();
+      // Parcours systématique : après la cinématique, on affiche TOUJOURS le menu
+      // de sélection d'univers. L'utilisateur doit explicitement choisir son sport.
+      this.showUniverseMenu = true;
     },
 
     // Change l'univers actif (foot/basket/tennis) — persiste + recharge data.
