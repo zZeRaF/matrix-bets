@@ -627,6 +627,7 @@ function app() {
         analyses: "Analyses 4 couches + TOP10",
         pwa: "Génération données PWA foot",
         basket: "Pipeline basket (NBA)",
+        tennis: "Pipeline tennis (ATP + WTA)",
         push: "Push GitHub Pages",
       }[s] || s;
     },

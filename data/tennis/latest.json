@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "sport": "tennis",
+  "date": "2026-05-14",
+  "generated_at": "2026-05-14T20:07:15",
+  "n_matches_analysed": 1,
+  "n_paris_candidats": 0,
+  "scoring_formula": "Pick modèle tennis — étoiles × 20",
+  "top": [],
+  "matches": {
+    "swiatek-i-svitolina-e": {
+      "home": "Swiatek I.",
+      "away": "Svitolina E.",
+      "competition": "WTA - SIMPLES: Rome (Italie), terre battue",
+      "country": "Italie",
+      "kickoff_time": "20:30",
+      "layers": {
+        "meso_tennis": {
+          "circuit": "WTA",
+          "surface": "TerreBattue",
+          "pick_modele": "Swiatek I.",
+          "proba_retenue": 0.8453837045726512,
+          "proba_j1": 0.8453837045726512,
+          "etoiles": 5,
+          "fiab_surface": 1.0,
+          "score_pondere": 7.644798351648358,
+          "verdict_1x2": "Saisir cote",
+          "type_pari": "Saisir cote",
+          "cote_juste": 1.1828948140247257,
+          "cote_retenue": null,
+          "ev": null,
+          "mise_conseillee": 0.0,
+          "ligne_book": 22.5,
+          "jeux_attendus": 20.818891650016646,
+          "condition_jeux": "Under 22,5",
+          "verdict_jeux": "Under interessant",
+          "cote_jeux": null,
+          "verdict_combine": "NO BET",
+          "mise_combine": 0.0
+        }
+      },
+      "layers_html_available": []
+    }
+  },
+  "all_ranked": []
+}
