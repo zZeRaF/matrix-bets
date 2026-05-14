@@ -259,6 +259,84 @@ body {
 .bet-card-foot .mise .val { color: var(--mx-green-pastel); }
 .bet-card-foot .score .val { color: var(--mx-orange); }
 
+/* ─── ÉTATS INLINE PARI PLACÉ / GAGNÉ / PERDU SUR BET-CARD DU TOP ─── */
+/* Quand un pari du TOP a été placé, son état + boutons ✓/✗ s'affichent
+   directement dans la carte pour résolution 1-clic (pas de drill-down). */
+.bet-card.bet-card-placed { border-left-color: var(--mx-orange); }
+.bet-card.bet-card-won    { border-left-color: var(--mx-green-bright); }
+.bet-card.bet-card-lost   { border-left-color: var(--mx-red-bright); opacity: 0.92; }
+
+.bet-card-placed {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(80, 56, 0, 0.25);
+  border: 1px dashed var(--mx-orange);
+  border-radius: 4px;
+  cursor: default;
+}
+.bet-card-placed-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 0.75rem;
+  color: var(--mx-green-pastel);
+  margin-bottom: 8px;
+}
+.bet-card-placed-badge {
+  background: var(--mx-orange);
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+.bet-card-placed-mise strong { color: var(--mx-green-bright); }
+.bet-card-placed-pot {
+  margin-left: auto;
+  color: var(--mx-orange);
+}
+.bet-card-placed-pot strong { color: var(--mx-orange); }
+.bet-card-placed-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.bet-card-resolved {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: default;
+}
+.bet-card-resolved-won  { background: rgba(0, 64, 24, 0.6);  border-left: 4px solid var(--mx-green-bright); }
+.bet-card-resolved-lost { background: rgba(64, 8, 8, 0.6);   border-left: 4px solid var(--mx-red-bright); }
+.bet-card-resolved-badge {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+}
+.bet-card-resolved-won  .bet-card-resolved-badge { color: var(--mx-green-bright); }
+.bet-card-resolved-lost .bet-card-resolved-badge { color: #FF6B6B; }
+.bet-card-resolved-meta { color: var(--mx-green-pastel); font-size: 0.75rem; }
+.bet-card-resolved-profit {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-left: auto;
+}
+.bet-card-resolved-won  .bet-card-resolved-profit { color: var(--mx-green-bright); }
+.bet-card-resolved-lost .bet-card-resolved-profit { color: #FF6B6B; }
+
 /* ─── ÉTATS LOADING / EMPTY / ERROR ─── */
 .empty {
   margin: 60px 16px;

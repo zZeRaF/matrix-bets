@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260514-mesparis";
+      var APP_VERSION = "20260514-topinplace";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -139,36 +139,10 @@
 
   <!-- ─── FIL D'ACTUALITÉ DES PARIS ─── -->
   <main class="feed" x-show="state === 'ok' && tab === 'paris' && currentView === 'feed'">
-    <!-- ─── PARIS PLACÉS À RÉSOUDRE ─── -->
-    <template x-if="pendingBets().length > 0">
-      <section class="pending-bets-section">
-        <h2 class="pending-bets-title">
-          ⏳ PARIS EN COURS <span class="pending-bets-count" x-text="pendingBets().length"></span>
-        </h2>
-        <template x-for="bet in pendingBets()" :key="bet.id">
-          <article class="pending-bet-card" :data-rule="bet.rule_id">
-            <div class="pending-bet-head">
-              <span class="pending-bet-rule" x-text="bet.rule_id"></span>
-              <span class="pending-bet-match" x-text="bet.home + ' vs ' + bet.away"></span>
-            </div>
-            <p class="pending-bet-verdict" x-text="bet.verdict"></p>
-            <div class="pending-bet-info">
-              <span>Mise <strong x-text="fmtEur(bet.mise)"></strong></span>
-              <span>@ <strong x-text="fmtNum(bet.cote_book)"></strong></span>
-              <span class="pending-bet-potential">→ +<strong x-text="fmtEur(bet.mise * (bet.cote_book - 1))"></strong></span>
-            </div>
-            <div class="pending-bet-actions">
-              <button class="pari-btn-won" @click.stop="resolveBet(bet.id, 'won')">✓ GAGNÉ</button>
-              <button class="pari-btn-lost" @click.stop="resolveBet(bet.id, 'lost')">✗ PERDU</button>
-            </div>
-          </article>
-        </template>
-      </section>
-    </template>
 
     <template x-for="pari in data.top" :key="pari.rank">
       <article class="bet-card"
-               :class="ruleClass(pari.rule_id)"
+               :class="[ruleClass(pari.rule_id), getBetForPari(pari) ? 'bet-card-' + getBetForPari(pari).status : '']"
                @click="openDetail(pari.match_slug)">
 
         <header class="bet-card-head">
@@ -202,6 +176,50 @@
             <span class="val" x-text="pari.score_pari?.toFixed(0)"></span>
           </span>
         </footer>
+
+        <!-- ── ÉTAT PARI PLACÉ : encart inline + boutons ✓/✗ en 1 clic ── -->
+        <template x-if="getBetForPari(pari) && getBetForPari(pari).status === 'placed'">
+          <div class="bet-card-placed" @click.stop>
+            <div class="bet-card-placed-head">
+              <span class="bet-card-placed-badge">✅ PLACÉ</span>
+              <span class="bet-card-placed-mise">
+                Mise <strong x-text="fmtEur(getBetForPari(pari).mise)"></strong>
+                @ <strong x-text="fmtNum(getBetForPari(pari).cote_book)"></strong>
+              </span>
+              <span class="bet-card-placed-pot">
+                → +<strong x-text="fmtEur(getBetForPari(pari).mise * (getBetForPari(pari).cote_book - 1))"></strong>
+              </span>
+            </div>
+            <div class="bet-card-placed-actions">
+              <button class="pari-btn-won" @click.stop="resolveBet(getBetForPari(pari).id, 'won')">✓ GAGNÉ</button>
+              <button class="pari-btn-lost" @click.stop="resolveBet(getBetForPari(pari).id, 'lost')">✗ PERDU</button>
+            </div>
+          </div>
+        </template>
+
+        <!-- ── ÉTAT PARI GAGNÉ ── -->
+        <template x-if="getBetForPari(pari) && getBetForPari(pari).status === 'won'">
+          <div class="bet-card-resolved bet-card-resolved-won" @click.stop>
+            <span class="bet-card-resolved-badge">GAGNÉ ✓</span>
+            <span class="bet-card-resolved-meta">
+              Mise <span x-text="fmtEur(getBetForPari(pari).mise)"></span>
+              @ <span x-text="fmtNum(getBetForPari(pari).cote_book)"></span>
+            </span>
+            <strong class="bet-card-resolved-profit" x-text="'+' + fmtEur(getBetForPari(pari).profit)"></strong>
+          </div>
+        </template>
+
+        <!-- ── ÉTAT PARI PERDU ── -->
+        <template x-if="getBetForPari(pari) && getBetForPari(pari).status === 'lost'">
+          <div class="bet-card-resolved bet-card-resolved-lost" @click.stop>
+            <span class="bet-card-resolved-badge">PERDU ✗</span>
+            <span class="bet-card-resolved-meta">
+              Mise <span x-text="fmtEur(getBetForPari(pari).mise)"></span>
+              @ <span x-text="fmtNum(getBetForPari(pari).cote_book)"></span>
+            </span>
+            <strong class="bet-card-resolved-profit" x-text="fmtEur(getBetForPari(pari).profit)"></strong>
+          </div>
+        </template>
       </article>
     </template>
   </main>
