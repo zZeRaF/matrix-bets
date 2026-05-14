@@ -838,6 +838,83 @@ function app() {
     },
 
     // ═══════════════════════════════════════════════════════════
+    // SNAPSHOT STATS : export texte complet pour analyse externe
+    // ═══════════════════════════════════════════════════════════
+
+    // Construit un objet JSON exhaustif des perfos (pour partage analyse).
+    // Pas de token sync ni de data identifiable au-delà des matchs pariés.
+    buildStatsSnapshot() {
+      const out = {
+        snapshot_at: new Date().toISOString(),
+        bankroll: this.bankroll,
+        peak: this.peak,
+        n_history_total: this.history.length,
+        global: this.betStats(),
+        by_sport: {},
+      };
+      ["foot", "basket", "tennis"].forEach((sport) => {
+        // Sauvegarde le currentUniverse pour le restaurer après
+        const prev = this.currentUniverse;
+        this.currentUniverse = sport;
+        const resolved = this.resolvedBetsForSport(sport);
+        out.by_sport[sport] = {
+          n_resolved: resolved.length,
+          n_pending: this.pendingBetsForSport(sport).length,
+          stats: this.betStatsCurrentSport(),
+          drawdown: this.drawdownStatsCurrentSport(),
+          calibration: this.calibrationStatsCurrentSport(),
+          diagnostic: this.strategyDiagnosticCurrentSport(),
+          per_rule: this.statsPerRuleCurrentSport(),
+          // Liste compacte des paris résolus (date, slug, rule, cote, mise, proba, status, profit)
+          bets: resolved.map((b) => ({
+            date: b.date,
+            placed_at: b.placed_at,
+            slug: b.match_slug,
+            home: b.home,
+            away: b.away,
+            comp: b.competition,
+            rule: b.rule_id,
+            bet_type: b.bet_type,
+            verdict: b.verdict,
+            cote: b.cote_book,
+            mise: b.mise,
+            proba: b.proba,
+            kelly_f: b.kelly_fraction,
+            status: b.status,
+            profit: b.profit,
+          })),
+        };
+        this.currentUniverse = prev;
+      });
+      return out;
+    },
+
+    // Copie le snapshot dans le clipboard pour partage rapide.
+    async copyStatsSnapshot() {
+      const snap = this.buildStatsSnapshot();
+      const txt = JSON.stringify(snap, null, 2);
+      try {
+        await navigator.clipboard.writeText(txt);
+        alert("✅ Snapshot copié (" + txt.length + " chars). Colle-le dans ton chat.");
+      } catch (e) {
+        // Fallback : ouvre une textarea modale pour copier-coller manuel
+        const ta = document.createElement("textarea");
+        ta.value = txt;
+        ta.style.position = "fixed";
+        ta.style.top = "10%";
+        ta.style.left = "5%";
+        ta.style.width = "90%";
+        ta.style.height = "70%";
+        ta.style.zIndex = "99999";
+        ta.style.fontSize = "0.7rem";
+        document.body.appendChild(ta);
+        ta.select();
+        alert("Clipboard bloqué — sélectionne tout dans la textarea + copie manuellement, puis tape OK.");
+        document.body.removeChild(ta);
+      }
+    },
+
+    // ═══════════════════════════════════════════════════════════
     // MULTI-SPORT : helpers pour stats filtrées par sport actif
     // ═══════════════════════════════════════════════════════════
 
