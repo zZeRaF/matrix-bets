@@ -18,7 +18,7 @@
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
     (function () {
-      var APP_VERSION = "20260514-topinplace";
+      var APP_VERSION = "20260514-stats";
       var stored = localStorage.getItem("bt-version");
       if (stored !== APP_VERSION) {
         localStorage.setItem("bt-version", APP_VERSION);
@@ -639,10 +639,257 @@
     </template>
   </main>
 
-  <!-- ─── ONGLET STATISTIQUES (placeholder) ─── -->
-  <main class="placeholder-tab" x-show="tab === 'stats'">
-    <p class="empty-status">📊 Statistiques</p>
-    <p class="empty-meta">Cet onglet sera disponible en J3 : win rate, ROI, évolution bankroll, perfo par règle.</p>
+  <!-- ─── ONGLET STATISTIQUES ─── -->
+  <main class="stats-tab" x-show="tab === 'stats'" x-cloak>
+
+    <!-- État vide : aucun pari résolu encore -->
+    <template x-if="resolvedBets().length === 0">
+      <div class="stats-empty">
+        <p class="empty-status">📊 Aucun pari résolu</p>
+        <p class="empty-meta">Place tes paris depuis l'onglet TOP puis marque-les ✓ GAGNÉ / ✗ PERDU.<br>Les statistiques s'enrichiront automatiquement.</p>
+      </div>
+    </template>
+
+    <template x-if="resolvedBets().length > 0">
+      <div>
+
+        <!-- ─── 1. VUE D'ENSEMBLE ─── -->
+        <section class="stats-section">
+          <h2 class="stats-section-title">⚡ VUE D'ENSEMBLE</h2>
+          <div class="stats-grid stats-grid-4">
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">PROFIT NET</div>
+              <div class="stats-cell-val" :class="betStats().profit_net >= 0 ? 'positive' : 'negative'"
+                   x-text="(betStats().profit_net >= 0 ? '+' : '') + fmtEur(betStats().profit_net)"></div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">ROI</div>
+              <div class="stats-cell-val" :class="betStats().roi >= 0 ? 'positive' : 'negative'"
+                   x-text="(betStats().roi >= 0 ? '+' : '') + (betStats().roi * 100).toFixed(1) + '%'"></div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">WIN RATE</div>
+              <div class="stats-cell-val" x-text="fmtPct(betStats().win_rate)"></div>
+              <div class="stats-cell-sub" x-text="betStats().n_won + '✓ / ' + betStats().n_lost + '✗'"></div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">BANKROLL</div>
+              <div class="stats-cell-val accent" x-text="fmtEur(bankroll)"></div>
+              <div class="stats-cell-sub">peak <span x-text="fmtEur(peak)"></span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── 2. ÉVOLUTION BANKROLL ─── -->
+        <template x-if="bankrollChartSvg()">
+          <section class="stats-section">
+            <h2 class="stats-section-title">📈 ÉVOLUTION BANKROLL</h2>
+            <div class="bankroll-chart">
+              <svg :viewBox="bankrollChartSvg().viewBox" preserveAspectRatio="none" class="bankroll-svg">
+                <!-- Grille horizontale (3 ticks) -->
+                <template x-for="t in bankrollChartSvg().yTicks" :key="t.v">
+                  <g>
+                    <line :x1="bankrollChartSvg().chartLeft" :x2="bankrollChartSvg().chartRight"
+                          :y1="t.y" :y2="t.y"
+                          stroke="#195A2D" stroke-width="0.5" stroke-dasharray="2,3" opacity="0.4"/>
+                    <text :x="bankrollChartSvg().chartLeft - 4" :y="t.y" dy="3"
+                          text-anchor="end" fill="#5D8C6E" font-size="8" x-text="t.label"></text>
+                  </g>
+                </template>
+                <!-- Ligne horizontale = départ -->
+                <line :x1="bankrollChartSvg().chartLeft" :x2="bankrollChartSvg().chartRight"
+                      :y1="bankrollChartSvg().initialY" :y2="bankrollChartSvg().initialY"
+                      stroke="#FFC000" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.6"/>
+                <!-- Aire -->
+                <path :d="bankrollChartSvg().areaD" fill="url(#bankrollGrad)" opacity="0.35"/>
+                <!-- Ligne -->
+                <path :d="bankrollChartSvg().pathD" fill="none" stroke="#00FF66" stroke-width="1.8"
+                      stroke-linejoin="round" stroke-linecap="round"/>
+                <!-- Marqueurs won/lost/start -->
+                <template x-for="m in bankrollChartSvg().markers" :key="m.cx + '-' + m.cy">
+                  <circle :cx="m.cx" :cy="m.cy" r="2.5"
+                          :fill="m.status === 'won' ? '#00FF66' : m.status === 'lost' ? '#FF1B1B' : '#FFC000'"
+                          stroke="#001000" stroke-width="0.8">
+                    <title x-text="m.label + ' (' + (m.delta >= 0 ? '+' : '') + m.delta.toFixed(2) + '€)'"></title>
+                  </circle>
+                </template>
+                <defs>
+                  <linearGradient id="bankrollGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#00FF66" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#00FF66" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="bankroll-chart-legend">
+                <span><span class="dot dot-green"></span>Gagné</span>
+                <span><span class="dot dot-red"></span>Perdu</span>
+                <span><span class="dot dot-orange"></span>Départ <span x-text="fmtEur(bankrollChartSvg().initialValue)"></span></span>
+              </div>
+            </div>
+          </section>
+        </template>
+
+        <!-- ─── 3. PERFORMANCE PAR RÈGLE vs BACKTEST ─── -->
+        <section class="stats-section">
+          <h2 class="stats-section-title">🎯 PERFORMANCE PAR RÈGLE</h2>
+          <p class="stats-section-hint">IC95% = intervalle de confiance Wilson. Si la cible backtest tombe dedans → calibration cohérente.</p>
+          <div class="rule-stats">
+            <template x-for="rule in ['R1', 'R2', 'R3']" :key="rule">
+              <div class="rule-card" :data-rule="rule" x-show="statsPerRule()[rule].n_total > 0 || rule !== 'R3'">
+                <div class="rule-card-head">
+                  <span class="rule-tag" x-text="rule + (rule === 'R1' ? ' ⭐' : '')"></span>
+                  <span class="rule-card-sample" x-text="statsPerRule()[rule].n_total + ' paris'"></span>
+                </div>
+                <template x-if="statsPerRule()[rule].n_total === 0">
+                  <p class="rule-card-empty">Aucun pari résolu pour cette règle.</p>
+                </template>
+                <template x-if="statsPerRule()[rule].n_total > 0">
+                  <div class="rule-card-body">
+                    <div class="rule-card-line">
+                      <span class="rule-lbl">Win rate</span>
+                      <strong class="rule-val" x-text="fmtPct(statsPerRule()[rule].win_rate)"></strong>
+                      <span class="rule-target" x-show="statsPerRule()[rule].target_win_rate != null">
+                        cible <span x-text="fmtPct(statsPerRule()[rule].target_win_rate)"></span>
+                      </span>
+                    </div>
+                    <div class="rule-card-line">
+                      <span class="rule-lbl">IC95%</span>
+                      <span class="rule-val rule-val-secondary"
+                            x-text="'[' + fmtPct(statsPerRule()[rule].ci_lo) + ' ; ' + fmtPct(statsPerRule()[rule].ci_hi) + ']'"></span>
+                      <span class="rule-target rule-target-ok" x-show="statsPerRule()[rule].target_in_ci">✓ cible dans IC</span>
+                      <span class="rule-target rule-target-ko" x-show="statsPerRule()[rule].target_win_rate != null && !statsPerRule()[rule].target_in_ci">⚠ cible hors IC</span>
+                    </div>
+                    <div class="rule-card-line">
+                      <span class="rule-lbl">ROI</span>
+                      <strong class="rule-val" :class="statsPerRule()[rule].roi >= 0 ? 'positive' : 'negative'"
+                              x-text="(statsPerRule()[rule].roi >= 0 ? '+' : '') + (statsPerRule()[rule].roi * 100).toFixed(1) + '%'"></strong>
+                      <span class="rule-target" x-show="statsPerRule()[rule].target_roi != null">
+                        cible +<span x-text="(statsPerRule()[rule].target_roi * 100).toFixed(1) + '%'"></span>
+                      </span>
+                    </div>
+                    <div class="rule-card-line">
+                      <span class="rule-lbl">Cote moy.</span>
+                      <span class="rule-val rule-val-secondary" x-text="statsPerRule()[rule].cote_avg_won != null ? fmtNum(statsPerRule()[rule].cote_avg_won) : '—'"></span>
+                      <span class="rule-target">sur paris gagnés</span>
+                    </div>
+                    <div class="rule-card-line">
+                      <span class="rule-lbl">Profit</span>
+                      <strong class="rule-val" :class="statsPerRule()[rule].profit >= 0 ? 'positive' : 'negative'"
+                              x-text="(statsPerRule()[rule].profit >= 0 ? '+' : '') + fmtEur(statsPerRule()[rule].profit)"></strong>
+                      <span class="rule-target">mise totale <span x-text="fmtEur(statsPerRule()[rule].mise)"></span></span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <!-- ─── 4. CALIBRATION (proba modèle vs observé) ─── -->
+        <section class="stats-section">
+          <h2 class="stats-section-title">🎚️ CALIBRATION DU MODÈLE</h2>
+          <p class="stats-section-hint">Proba moyenne attendue par la règle vs win rate réel observé. Une dérive persistante (n≥20) suggère un recalibrage.</p>
+          <div class="calibration-grid">
+            <template x-for="rule in ['R1', 'R2', 'R3']" :key="rule">
+              <div class="calib-row" :data-rule="rule" x-show="calibrationByRule()[rule].n > 0">
+                <span class="calib-rule" x-text="rule"></span>
+                <div class="calib-bars">
+                  <div class="calib-bar-row">
+                    <span class="calib-bar-lbl">Proba modèle</span>
+                    <div class="calib-bar-track">
+                      <div class="calib-bar calib-bar-model" :style="{ width: ((calibrationByRule()[rule].proba_avg || 0) * 100) + '%' }"></div>
+                    </div>
+                    <span class="calib-bar-val" x-text="fmtPct(calibrationByRule()[rule].proba_avg || 0)"></span>
+                  </div>
+                  <div class="calib-bar-row">
+                    <span class="calib-bar-lbl">Observé</span>
+                    <div class="calib-bar-track">
+                      <div class="calib-bar calib-bar-real" :style="{ width: ((calibrationByRule()[rule].observed || 0) * 100) + '%' }"></div>
+                    </div>
+                    <span class="calib-bar-val" x-text="fmtPct(calibrationByRule()[rule].observed || 0)"></span>
+                  </div>
+                  <div class="calib-diff" :class="(calibrationByRule()[rule].diff || 0) >= 0 ? 'positive' : 'negative'">
+                    <span x-text="((calibrationByRule()[rule].diff || 0) >= 0 ? '+' : '') + ((calibrationByRule()[rule].diff || 0) * 100).toFixed(1) + ' pts'"></span>
+                    <span class="calib-n" x-text="'(n=' + calibrationByRule()[rule].n + ')'"></span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <!-- ─── 5. DISTRIBUTION PAR COTE ─── -->
+        <section class="stats-section">
+          <h2 class="stats-section-title">📊 DISTRIBUTION PAR TRANCHE DE COTE</h2>
+          <div class="cote-histogram">
+            <template x-for="bk in coteDistribution()" :key="bk.label">
+              <div class="cote-bucket" x-show="bk.n > 0">
+                <div class="cote-bucket-label" x-text="bk.label"></div>
+                <div class="cote-bucket-bar">
+                  <div class="cote-bucket-fill" :style="{ width: Math.max(8, bk.n / Math.max(...coteDistribution().map(x => x.n)) * 100) + '%' }">
+                    <span class="cote-bucket-n" x-text="bk.n"></span>
+                  </div>
+                </div>
+                <div class="cote-bucket-wr" x-text="bk.n > 0 ? fmtPct(bk.win_rate) : '—'"></div>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <!-- ─── 6. DRAWDOWN & SÉRIES ─── -->
+        <section class="stats-section">
+          <h2 class="stats-section-title">🛡️ DRAWDOWN & SÉRIES</h2>
+          <div class="stats-grid stats-grid-4">
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">SÉRIE WIN MAX</div>
+              <div class="stats-cell-val positive" x-text="drawdownStats().max_winning_streak"></div>
+              <div class="stats-cell-sub">paris consécutifs</div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">SÉRIE LOSS MAX</div>
+              <div class="stats-cell-val negative" x-text="drawdownStats().max_losing_streak"></div>
+              <div class="stats-cell-sub">paris consécutifs</div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">DRAWDOWN ACTUEL</div>
+              <div class="stats-cell-val" :class="drawdownStats().current_drawdown_pct > 0.25 ? 'negative' : 'neutral'"
+                   x-text="(drawdownStats().current_drawdown_pct * 100).toFixed(1) + '%'"></div>
+              <div class="stats-cell-sub" x-show="drawdownStats().current_drawdown_pct > 0.25">⚠ protect ON</div>
+            </div>
+            <div class="stats-cell">
+              <div class="stats-cell-lbl">DRAWDOWN MAX</div>
+              <div class="stats-cell-val" x-text="(drawdownStats().max_drawdown_pct * 100).toFixed(1) + '%'"></div>
+              <div class="stats-cell-sub">historique</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── 7. HISTORIQUE CHRONOLOGIQUE ─── -->
+        <section class="stats-section">
+          <h2 class="stats-section-title">📜 HISTORIQUE COMPLET</h2>
+          <div class="hist-list">
+            <template x-for="bet in resolvedBets()" :key="bet.id">
+              <div class="hist-row" :class="'hist-' + bet.status">
+                <div class="hist-row-top">
+                  <span class="hist-rule" x-text="bet.rule_id"></span>
+                  <span class="hist-match" x-text="bet.home + ' vs ' + bet.away"></span>
+                  <strong class="hist-profit" :class="bet.status === 'won' ? 'positive' : 'negative'"
+                          x-text="(bet.profit > 0 ? '+' : '') + fmtEur(bet.profit || 0)"></strong>
+                </div>
+                <div class="hist-row-bot">
+                  <span class="hist-date" x-text="fmtDateLabel(bet.placed_at)"></span>
+                  <span class="hist-sep">·</span>
+                  <span class="hist-verdict" x-text="bet.verdict"></span>
+                  <span class="hist-sep">·</span>
+                  <span class="hist-cote" x-text="fmtEur(bet.mise) + ' @ ' + fmtNum(bet.cote_book)"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </section>
+
+      </div>
+    </template>
   </main>
 
   <!-- ─── BOTTOM NAVIGATION ─── -->

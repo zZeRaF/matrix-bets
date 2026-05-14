@@ -815,6 +815,253 @@ function app() {
       this.history.splice(idx, 1);
       saveStoredState(this);
     },
+
+    // ═══════════════════════════════════════════════════
+    // STATS AVANCÉES — onglet Stats
+    // Toutes les fonctions ci-dessous lisent this.history (paris résolus)
+    // et produisent des agrégats pour les graphes + tableaux comparatifs.
+    // ═══════════════════════════════════════════════════
+
+    // Cibles backtest officielles (rétroactif 152 matchs) — base de comparaison
+    BACKTEST_TARGETS: {
+      R1: { win_rate: 0.737, roi: 0.221, sample: 19, cote_moy_gagnes: 1.66 },
+      R2: { win_rate: 0.800, roi: 0.153, sample: 15, cote_moy_gagnes: 1.44 },
+      R3: { win_rate: null, roi: null, sample: 0, cote_moy_gagnes: null }, // pas de backtest
+    },
+
+    // Intervalle de confiance Wilson 95% pour une proportion p sur n essais.
+    // Plus robuste que Wald sur petits échantillons (utile vu qu'on a quelques paris résolus).
+    wilsonCI(wins, n, z = 1.96) {
+      if (!n) return { lo: 0, hi: 0, center: 0 };
+      const p = wins / n;
+      const denom = 1 + (z * z) / n;
+      const center = (p + (z * z) / (2 * n)) / denom;
+      const margin = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / denom;
+      return {
+        lo: Math.max(0, center - margin),
+        hi: Math.min(1, center + margin),
+        center,
+      };
+    },
+
+    // Agrégats par règle (R1, R2, R3) sur les paris RÉSOLUS uniquement.
+    // Comparaison automatique vs backtest cible.
+    statsPerRule() {
+      const resolved = this.resolvedBets();
+      const byRule = {};
+      ["R1", "R2", "R3"].forEach((r) => {
+        const bets = resolved.filter((b) => b.rule_id === r);
+        const won = bets.filter((b) => b.status === "won");
+        const lost = bets.filter((b) => b.status === "lost");
+        const n = bets.length;
+        const winRate = n ? won.length / n : 0;
+        const totalMise = bets.reduce((s, b) => s + (b.mise || 0), 0);
+        const totalProfit = bets.reduce((s, b) => s + (b.profit || 0), 0);
+        const roi = totalMise > 0 ? totalProfit / totalMise : 0;
+        const coteAvgWon = won.length ? won.reduce((s, b) => s + (b.cote_book || 0), 0) / won.length : null;
+        const ci = this.wilsonCI(won.length, n);
+        const target = this.BACKTEST_TARGETS[r] || {};
+        byRule[r] = {
+          n_total: n,
+          n_won: won.length,
+          n_lost: lost.length,
+          win_rate: winRate,
+          ci_lo: ci.lo,
+          ci_hi: ci.hi,
+          profit: totalProfit,
+          mise: totalMise,
+          roi,
+          cote_avg_won: coteAvgWon,
+          target_win_rate: target.win_rate,
+          target_roi: target.roi,
+          target_sample: target.sample,
+          // Direction de la dérive vs backtest
+          drift_win_rate: target.win_rate != null && n > 0 ? winRate - target.win_rate : null,
+          drift_roi: target.roi != null && n > 0 ? roi - target.roi : null,
+          // Significativité : la cible backtest tombe-t-elle dans l'IC95% ?
+          target_in_ci: target.win_rate != null && n > 0 && target.win_rate >= ci.lo && target.win_rate <= ci.hi,
+        };
+      });
+      return byRule;
+    },
+
+    // Évolution chronologique de la bankroll, du plus ancien au plus récent.
+    // Point initial = bankroll - somme totale des profits (reconstitution rétroactive).
+    // Renvoie [{ts, value, delta, status, label}].
+    bankrollEvolution() {
+      const resolved = this.resolvedBets()
+        .slice()
+        .sort((a, b) => (a.resolved_at || "").localeCompare(b.resolved_at || ""));
+      if (resolved.length === 0) return [];
+      const totalProfit = resolved.reduce((s, b) => s + (b.profit || 0), 0);
+      let cursor = this.bankroll - totalProfit;
+      const points = [{
+        ts: resolved[0].placed_at || resolved[0].resolved_at,
+        value: cursor,
+        delta: 0,
+        status: "start",
+        label: "Départ",
+      }];
+      resolved.forEach((b) => {
+        cursor = Math.round((cursor + (b.profit || 0)) * 100) / 100;
+        points.push({
+          ts: b.resolved_at,
+          value: cursor,
+          delta: b.profit || 0,
+          status: b.status,
+          label: `${b.home} vs ${b.away} (${b.rule_id})`,
+        });
+      });
+      return points;
+    },
+
+    // Analyses drawdown : plus longue série de pertes, plus longue série de gains,
+    // drawdown actuel vs peak, drawdown max historique.
+    drawdownStats() {
+      const evolution = this.bankrollEvolution();
+      if (evolution.length === 0) {
+        return {
+          max_losing_streak: 0,
+          max_winning_streak: 0,
+          current_drawdown_pct: 0,
+          max_drawdown_pct: 0,
+          peak_value: this.bankroll,
+        };
+      }
+      let curWin = 0, curLoss = 0, maxWin = 0, maxLoss = 0;
+      evolution.slice(1).forEach((p) => {
+        if (p.status === "won") {
+          curWin++; curLoss = 0;
+          if (curWin > maxWin) maxWin = curWin;
+        } else if (p.status === "lost") {
+          curLoss++; curWin = 0;
+          if (curLoss > maxLoss) maxLoss = curLoss;
+        }
+      });
+      // Drawdown max = plus grande baisse depuis un peak
+      let peak = evolution[0].value;
+      let maxDD = 0;
+      evolution.forEach((p) => {
+        if (p.value > peak) peak = p.value;
+        const dd = peak > 0 ? (peak - p.value) / peak : 0;
+        if (dd > maxDD) maxDD = dd;
+      });
+      const peakVal = Math.max(this.peak, this.bankroll);
+      const currentDD = peakVal > 0 ? (peakVal - this.bankroll) / peakVal : 0;
+      return {
+        max_losing_streak: maxLoss,
+        max_winning_streak: maxWin,
+        current_drawdown_pct: currentDD,
+        max_drawdown_pct: maxDD,
+        peak_value: peakVal,
+      };
+    },
+
+    // Distribution des paris par buckets de cote (utilisé par l'histogramme).
+    coteDistribution() {
+      const resolved = this.resolvedBets();
+      const buckets = [
+        { label: "1.00-1.30", lo: 1.0, hi: 1.3, n: 0, won: 0 },
+        { label: "1.30-1.50", lo: 1.3, hi: 1.5, n: 0, won: 0 },
+        { label: "1.50-1.80", lo: 1.5, hi: 1.8, n: 0, won: 0 },
+        { label: "1.80-2.20", lo: 1.8, hi: 2.2, n: 0, won: 0 },
+        { label: "2.20-3.00", lo: 2.2, hi: 3.0, n: 0, won: 0 },
+        { label: "3.00+",     lo: 3.0, hi: 999, n: 0, won: 0 },
+      ];
+      resolved.forEach((b) => {
+        const c = b.cote_book || 0;
+        const bk = buckets.find((x) => c >= x.lo && c < x.hi);
+        if (bk) {
+          bk.n++;
+          if (b.status === "won") bk.won++;
+        }
+      });
+      buckets.forEach((bk) => {
+        bk.win_rate = bk.n > 0 ? bk.won / bk.n : 0;
+      });
+      return buckets;
+    },
+
+    // Stats de calibration : proba modèle moyenne (au moment du placement)
+    // vs win rate réel observé. Si divergence → soit le modèle est mal calibré,
+    // soit sample trop petit (cf. IC95%).
+    calibrationByRule() {
+      const resolved = this.resolvedBets();
+      const out = {};
+      ["R1", "R2", "R3"].forEach((r) => {
+        const bets = resolved.filter((b) => b.rule_id === r);
+        if (bets.length === 0) {
+          out[r] = { n: 0, proba_avg: null, observed: null, diff: null };
+          return;
+        }
+        const won = bets.filter((b) => b.status === "won").length;
+        const probaAvg = bets.reduce((s, b) => s + (b.proba || 0), 0) / bets.length;
+        const observed = won / bets.length;
+        out[r] = {
+          n: bets.length,
+          proba_avg: probaAvg,
+          observed,
+          diff: observed - probaAvg,
+        };
+      });
+      return out;
+    },
+
+    // ═══════════════════════════════════════════════════
+    // GRAPHIQUE BANKROLL — helpers SVG
+    // ═══════════════════════════════════════════════════
+
+    // Construit les attributs SVG d'un line chart à partir de bankrollEvolution().
+    // viewBox = "0 0 W H". On normalise les valeurs y entre yMin et yMax.
+    bankrollChartSvg(W = 320, H = 140, padTop = 12, padBot = 24, padL = 36, padR = 12) {
+      const points = this.bankrollEvolution();
+      if (points.length < 2) return null;
+      const values = points.map((p) => p.value);
+      let yMin = Math.min(...values);
+      let yMax = Math.max(...values);
+      const yRange = yMax - yMin;
+      // 10% de marge haut/bas si plat
+      const pad = Math.max(yRange * 0.1, Math.max(yMax * 0.02, 1));
+      yMin -= pad;
+      yMax += pad;
+      const xN = points.length - 1;
+      const chartW = W - padL - padR;
+      const chartH = H - padTop - padBot;
+      const toX = (i) => padL + (i / xN) * chartW;
+      const toY = (v) => padTop + ((yMax - v) / (yMax - yMin)) * chartH;
+      const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"}${toX(i).toFixed(1)} ${toY(p.value).toFixed(1)}`).join(" ");
+      // Aire sous la courbe
+      const areaD = pathD + ` L${toX(xN).toFixed(1)} ${(padTop + chartH).toFixed(1)} L${padL} ${(padTop + chartH).toFixed(1)} Z`;
+      // Marqueurs (points won/lost)
+      const markers = points.map((p, i) => ({
+        cx: toX(i).toFixed(1),
+        cy: toY(p.value).toFixed(1),
+        status: p.status,
+        value: p.value,
+        delta: p.delta,
+        label: p.label,
+      }));
+      // Axes y : 3 ticks (min, mid, max)
+      const yMid = (yMin + yMax) / 2;
+      const yTicks = [
+        { v: yMax, y: padTop.toFixed(1), label: yMax.toFixed(0) + "€" },
+        { v: yMid, y: (padTop + chartH / 2).toFixed(1), label: yMid.toFixed(0) + "€" },
+        { v: yMin, y: (padTop + chartH).toFixed(1), label: yMin.toFixed(0) + "€" },
+      ];
+      // Ligne horizontale = bankroll initiale (premier point)
+      const initialY = toY(points[0].value).toFixed(1);
+      return {
+        viewBox: `0 0 ${W} ${H}`,
+        pathD,
+        areaD,
+        markers,
+        yTicks,
+        chartLeft: padL,
+        chartRight: W - padR,
+        initialY,
+        initialValue: points[0].value,
+      };
+    },
   };
 }
 
