@@ -148,13 +148,16 @@ body {
   position: fixed;
   inset: 0;
   z-index: 9990;
-  background: rgba(0, 0, 0, 0.92);
+  background: #000;                    /* hermétique : aucun flash possible */
   display: flex;
   justify-content: center;
   align-items: flex-start;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  /* Safe-area iOS : évite que la tête du joueur foot soit cropée sous le notch / barre statut */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .universe-menu-container {
   position: relative;

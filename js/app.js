@@ -348,6 +348,10 @@ function app() {
 
     async init() {
       this.currentUniverse = loadUniverse();
+      // Affiche le menu IMMÉDIATEMENT (sous le splash, z-index inférieur).
+      // Quand le splash se ferme, le menu est déjà rendu et hermétique :
+      // pas de flash possible vers le contenu d'un univers.
+      this.showUniverseMenu = true;
       const saved = loadStoredState();
       if (saved) {
         this.bankroll = saved.bankroll ?? 100;
@@ -548,9 +552,7 @@ function app() {
       if (splashEl) splashEl.style.display = "none";
       if (this._splashStopRain) this._splashStopRain();
       if (window.stopThreeScene) window.stopThreeScene();
-      // Parcours systématique : après la cinématique, on affiche TOUJOURS le menu
-      // de sélection d'univers. L'utilisateur doit explicitement choisir son sport.
-      this.showUniverseMenu = true;
+      // Note : showUniverseMenu = true déjà set dès init() pour éviter le flash.
     },
 
     // Change l'univers actif (foot/basket/tennis) — persiste + recharge data.
