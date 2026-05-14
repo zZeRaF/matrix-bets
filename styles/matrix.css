@@ -120,8 +120,8 @@ body {
 /* ─── Bouton snapshot stats (compact) ─── */
 .snapshot-wrap {
   display: flex;
-  justify-content: flex-end;
-  margin: 0 16px 8px;
+  justify-content: center;
+  margin: 16px 16px;
 }
 .btn-snapshot {
   padding: 6px 12px;
