@@ -15,9 +15,25 @@
   <link rel="apple-touch-icon" sizes="192x192" href="icons/app-icon-192-v3.png">
   <link rel="stylesheet" href="styles/matrix.css">
   <title>$MATRIX BET$</title>
+  <!-- VIEWPORT-HEIGHT FIX iOS : 100vh/100dvh sont buggés au 1er paint sur Safari/PWA standalone.
+       On set --vh = window.innerHeight/100 en pixels, recalculé à chaque resize/orientation. -->
+  <script>
+    (function () {
+      function setVH() {
+        document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+      }
+      setVH();
+      window.addEventListener('resize', setVH);
+      window.addEventListener('orientationchange', setVH);
+      // iOS visualViewport (gère barre Safari qui apparaît/disparaît au scroll)
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setVH);
+      }
+    })();
+  </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-menu-fullscreen-cover";
+    var APP_VERSION = "20260514-vh-fix-ios";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
