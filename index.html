@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-basket-odds-scraped";
+    var APP_VERSION = "20260515-cote-editable-top-card";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -240,13 +240,17 @@
         <p class="verdict" x-text="pari.verdict"></p>
 
         <footer class="bet-card-foot">
-          <span class="cote">
+          <label class="cote cote-editable" @click.stop>
             <span class="lbl">cote</span>
-            <span class="val" x-text="pari.cote_reelle ? pari.cote_reelle.toFixed(2) : '—'"></span>
-          </span>
+            <input type="number" step="0.01" inputmode="decimal"
+                   class="cote-input"
+                   x-model="coteInputs[pari.rank]"
+                   :placeholder="pari.cote_reelle ? pari.cote_reelle.toFixed(2) : '—'"
+                   @click.stop>
+          </label>
           <span class="mise">
-            <span class="lbl">mise (/100€)</span>
-            <span class="val" x-text="pari.kelly_mise_100eur ? pari.kelly_mise_100eur.toFixed(2) + '€' : '—'"></span>
+            <span class="lbl">mise Kelly</span>
+            <span class="val" x-text="(() => { const c = parseFloat(coteInputs[pari.rank]) || pari.cote_reelle; const m = computeMise(pari, c); return m > 0 ? fmtEur(m) : '—'; })()"></span>
           </span>
           <span class="score">
             <span class="lbl">score</span>

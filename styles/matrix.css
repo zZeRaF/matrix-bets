@@ -366,7 +366,8 @@ body {
   padding-top: 10px;
   border-top: 1px dashed var(--mx-border-thin);
 }
-.bet-card-foot span {
+.bet-card-foot > span,
+.bet-card-foot > label {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -383,8 +384,36 @@ body {
   font-size: 0.95rem;
   font-weight: 700;
 }
-.bet-card-foot .mise .val { color: var(--mx-text); }
+.bet-card-foot .mise .val { color: var(--mx-green-pastel); }
 .bet-card-foot .score .val { color: var(--mx-orange); }
+
+/* Input cote inline sur la card TOP — recalcul Kelly live */
+.cote-editable {
+  cursor: text;
+}
+.cote-editable .cote-input {
+  width: 64px;
+  padding: 2px 6px;
+  background: rgba(0, 32, 0, 0.8);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 3px;
+  color: var(--mx-green-bright);
+  font-family: var(--mx-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.cote-editable .cote-input::-webkit-outer-spin-button,
+.cote-editable .cote-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cote-editable .cote-input:focus {
+  outline: none;
+  border-color: var(--mx-green-bright);
+  background: rgba(0, 48, 0, 0.95);
+}
 
 /* ─── BANDEAU SANTÉ PIPELINE EN HAUT DU FEED ─── */
 .pipeline-banner {
