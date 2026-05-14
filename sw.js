@@ -4,7 +4,7 @@
 //   - data/*.json : NETWORK-FIRST
 //   - reste (CSS/JS/icons) : CACHE-FIRST avec bumping de version
 
-const CACHE_NAME = "betime-v64";
+const CACHE_NAME = "betime-v65";
 const STATIC_ASSETS = [
   "./manifest-v3.webmanifest",
   "./styles/matrix.css",
@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
   "./icons/app-icon-512-v3.png",
   "./icons/app-icon-v3.png",
   "./icons/robot-portrait-600.png",
+  "./img/universe-menu.png",
 ];
 
 self.addEventListener("install", (event) => {

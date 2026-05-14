@@ -303,6 +303,7 @@ function app() {
   return {
     // === Multi-sport : univers actif ===
     currentUniverse: "foot",  // foot | basket | tennis (chargé depuis localStorage en init)
+    showUniverseMenu: false,  // overlay menu DA artistique
 
     // === Persistant (localStorage) ===
     bankroll: 100,

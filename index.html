@@ -17,7 +17,7 @@
   <title>$MATRIX BET$</title>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260514-multi-sport-plumbing";
+    var APP_VERSION = "20260514-universe-menu-da";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -98,26 +98,51 @@
   <!-- ─── PLUIE MATRIX EN ARRIÈRE-PLAN (full-screen, sous le body) ─── -->
   <canvas id="bg-rain" class="bg-rain" aria-hidden="true"></canvas>
 
-  <!-- ─── HEADER STICKY : Bankroll + date ─── -->
+  <!-- ─── HEADER STICKY : Bankroll + date + bouton univers ─── -->
   <header class="topbar">
     <div class="brand">
       <span class="brand-text">$MATRIX BET$</span>
     </div>
+    <button class="universe-badge" @click="showUniverseMenu = true"
+            :title="'Univers actif : ' + currentUniverse + ' — cliquer pour changer'">
+      <span class="universe-badge-icon" x-text="{foot:'⚽', basket:'🏀', tennis:'🎾'}[currentUniverse]"></span>
+      <span class="universe-badge-lbl" x-text="currentUniverse.toUpperCase()"></span>
+      <span class="universe-badge-arrow">▾</span>
+    </button>
     <div class="bankroll" @click="editBankroll()">
       <span class="bankroll-lbl">BANKROLL</span>
       <span class="bankroll-val" x-text="fmtEur(bankroll)"></span>
     </div>
   </header>
 
-  <!-- ─── SÉLECTEUR D'UNIVERS MULTI-SPORT (placeholder en attendant DA finale) ─── -->
-  <nav class="universe-selector" aria-label="Choix de l'univers sportif">
-    <button class="universe-btn" :class="{active: currentUniverse === 'foot'}"
-            @click="switchUniverse('foot')">FOOT</button>
-    <button class="universe-btn" :class="{active: currentUniverse === 'basket'}"
-            @click="switchUniverse('basket')">BASKET</button>
-    <button class="universe-btn" :class="{active: currentUniverse === 'tennis'}"
-            @click="switchUniverse('tennis')">TENNIS</button>
-  </nav>
+  <!-- ─── OVERLAY MENU SÉLECTEUR D'UNIVERS (DA artistique) ─── -->
+  <div class="universe-menu-overlay" x-show="showUniverseMenu" x-transition.opacity x-cloak
+       @click.self="showUniverseMenu = false">
+    <div class="universe-menu-container">
+      <button class="universe-menu-close" @click="showUniverseMenu = false" aria-label="Fermer">✕</button>
+      <div class="universe-menu-image-wrap">
+        <img src="img/universe-menu.png" alt="Choisis ton univers" class="universe-menu-img">
+        <button class="universe-hotspot universe-hotspot-foot"
+                :class="{active: currentUniverse === 'foot'}"
+                @click="switchUniverse('foot'); showUniverseMenu = false"
+                aria-label="Choisir Foot">
+          <span class="universe-hotspot-label">FOOT</span>
+        </button>
+        <button class="universe-hotspot universe-hotspot-basket"
+                :class="{active: currentUniverse === 'basket'}"
+                @click="switchUniverse('basket'); showUniverseMenu = false"
+                aria-label="Choisir Basket">
+          <span class="universe-hotspot-label">BASKET</span>
+        </button>
+        <button class="universe-hotspot universe-hotspot-tennis"
+                :class="{active: currentUniverse === 'tennis'}"
+                @click="switchUniverse('tennis'); showUniverseMenu = false"
+                aria-label="Choisir Tennis">
+          <span class="universe-hotspot-label">TENNIS</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── BANNIÈRE INFO DU JOUR ─── -->
   <div class="day-banner" x-show="data">

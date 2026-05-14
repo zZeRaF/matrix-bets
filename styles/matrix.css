@@ -119,41 +119,127 @@ body {
   text-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
 }
 
-/* ─── SÉLECTEUR D'UNIVERS MULTI-SPORT (placeholder en attendant DA) ─── */
-.universe-selector {
-  position: relative;
-  z-index: 2;
+/* ─── BADGE UNIVERS dans la topbar (ouvre le menu artistique) ─── */
+.universe-badge {
   display: flex;
+  align-items: center;
   gap: 6px;
-  margin: 8px 16px 0;
-  padding: 4px;
-  background: rgba(0, 16, 8, 0.95);
+  padding: 6px 10px;
+  background: var(--mx-bg-dark);
   border: 1px solid var(--mx-border-thin);
   border-radius: 4px;
-  backdrop-filter: blur(8px);
-}
-.universe-btn {
-  flex: 1;
-  padding: 8px 4px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  color: var(--mx-muted);
+  color: var(--mx-green-pastel);
   font-family: var(--mx-mono);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   cursor: pointer;
   transition: all 0.15s;
 }
-.universe-btn:hover {
-  color: var(--mx-green-pastel);
-  border-color: var(--mx-border-thin);
-}
-.universe-btn.active {
-  background: var(--mx-green-header);
+.universe-badge:hover, .universe-badge:active {
   border-color: var(--mx-green-bright);
   color: var(--mx-green-bright);
+}
+.universe-badge-icon { font-size: 1rem; line-height: 1; }
+.universe-badge-arrow { color: var(--mx-muted); font-size: 0.7rem; }
+
+/* ─── OVERLAY MENU UNIVERS (DA artistique pleine page) ─── */
+.universe-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.universe-menu-container {
+  position: relative;
+  width: 100%;
+  max-width: 853px;
+  min-height: 100%;
+}
+.universe-menu-close {
+  position: fixed;
+  top: max(env(safe-area-inset-top), 12px);
+  right: max(env(safe-area-inset-right), 12px);
+  z-index: 10000;
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 50%;
+  color: var(--mx-green-bright);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.universe-menu-close:hover { border-color: var(--mx-green-bright); }
+
+.universe-menu-image-wrap {
+  position: relative;
+  width: 100%;
+  /* Ratio 853x1843 ≈ 1:2.16, déterminé via aspect-ratio pour positionner les hotspots */
+}
+.universe-menu-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Hotspots : 3 zones cliquables superposées sur l'image */
+.universe-hotspot {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
+  transition: background 0.2s;
+}
+.universe-hotspot:active,
+.universe-hotspot:hover {
+  background: linear-gradient(180deg, transparent 60%, rgba(0, 255, 102, 0.12) 100%);
+}
+.universe-hotspot.active {
+  background: linear-gradient(180deg, transparent 60%, rgba(0, 255, 102, 0.18) 100%);
+}
+/* Zones approximatives en % de la hauteur (image 853x1843) */
+.universe-hotspot-foot   { top:  0%;   height: 35%; }
+.universe-hotspot-basket { top: 35%;   height: 33%; }
+.universe-hotspot-tennis { top: 68%;   height: 32%; }
+
+.universe-hotspot-label {
+  font-family: var(--mx-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--mx-green-bright);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 10px;
+  border: 1px solid var(--mx-border-thin);
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.universe-hotspot:hover .universe-hotspot-label,
+.universe-hotspot:active .universe-hotspot-label,
+.universe-hotspot.active .universe-hotspot-label { opacity: 1; }
+.universe-hotspot.active .universe-hotspot-label {
+  border-color: var(--mx-green-bright);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
 }
 
 /* ─── BANNIÈRE DATE ─── */
