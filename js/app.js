@@ -613,17 +613,16 @@ function app() {
           this.pipelineStatus = null;
         }
         const newCotes = {};
-        const newMises = {};
         (json.top || []).forEach((p) => {
           const cote = p.cote_reelle || p.cote_estimee || "";
           newCotes[p.rank] = cote.toString();
-          // Mise par défaut = Kelly calculé sur bankroll actuelle + cote actuelle
-          // (l'utilisateur peut la modifier librement avant de placer)
-          const mise = this.computeMise(p, parseFloat(cote) || null);
-          newMises[p.rank] = mise > 0 ? mise.toFixed(2) : "";
         });
         this.coteInputs = newCotes;
-        this.miseInputs = newMises;
+        // miseInputs reste VIDE par défaut : l'utilisateur n'a pas à effacer
+        // la suggestion Kelly avant de taper sa propre mise. La suggestion
+        // s'affiche en placeholder ghost, et placeBet utilise Kelly en fallback
+        // si miseInputs[rank] est vide.
+        this.miseInputs = {};
         this.state = !json.top || json.top.length === 0 ? "empty" : "ok";
       } catch (e) {
         this.state = "error";

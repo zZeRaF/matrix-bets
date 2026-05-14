@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260515-cote-editable-top-card";
+    var APP_VERSION = "20260515-mise-empty-placeholder";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -655,7 +655,7 @@
                     <span>Mise effective (€) :</span>
                     <input type="number" step="0.01" min="0" inputmode="decimal"
                            x-model="miseInputs[pari.rank]"
-                           placeholder="14.97"
+                           :placeholder="(() => { const m = computeMise(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle); return m > 0 ? 'Kelly : ' + m.toFixed(2) : 'Mise libre'; })()"
                            class="pari-cote-input">
                     <button class="pari-mise-reset"
                             @click="miseInputs[pari.rank] = computeMise(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle).toFixed(2)"
