@@ -486,7 +486,7 @@ function app() {
         { text: "CONNEXION GITHUB...", delay: 220 },
         { text: "FETCH TOP_DU_JOUR...", delay: 250 },
         { text: "PARSE ANALYSES 4 COUCHES...", delay: 260 },
-        { text: "CALCUL KELLY /4...", delay: 250 },
+        { text: "CALCUL KELLY /8...", delay: 250 },
         { text: "READY.", delay: 300 },
       ];
       for (let i = 0; i < steps.length; i++) {
@@ -1239,8 +1239,8 @@ function app() {
       return this.history.find((b) => b.key === key) || null;
     },
 
-    // Kelly recalculé avec une cote saisie utilisateur
-    computeKelly(proba, cote, divisor = 4, cap = 0.07) {
+    // Kelly recalculé avec une cote saisie utilisateur (divisor 8 par défaut depuis 15/05)
+    computeKelly(proba, cote, divisor = 8, cap = 0.07) {
       if (!cote || cote <= 1 || !proba || proba <= 0 || proba >= 1) return 0;
       const b = cote - 1;
       const q = 1 - proba;
@@ -1252,7 +1252,7 @@ function app() {
     },
 
     // Kelly théorique non plafonné (pour détecter si le cap agit)
-    computeKellyRaw(proba, cote, divisor = 4) {
+    computeKellyRaw(proba, cote, divisor = 8) {
       if (!cote || cote <= 1 || !proba || proba <= 0 || proba >= 1) return 0;
       const b = cote - 1;
       const q = 1 - proba;
@@ -1264,7 +1264,7 @@ function app() {
     // Mise en € calculée selon la cote réelle saisie + bankroll actuelle
     computeMise(pari, coteReelle) {
       if (!pari || !coteReelle) return 0;
-      const divisor = pari.rule_id === "R3" ? 8 : 4;
+      const divisor = 8;
       const f = this.computeKelly(pari.proba_validee, coteReelle, divisor);
       return Math.round(this.bankroll * f * 100) / 100;
     },
@@ -1272,7 +1272,7 @@ function app() {
     // True si la mise est plafonnée par le cap 7% (= Kelly théorique > cap)
     isMiseCapped(pari, coteReelle) {
       if (!pari || !coteReelle) return false;
-      const divisor = pari.rule_id === "R3" ? 8 : 4;
+      const divisor = 8;
       const raw = this.computeKellyRaw(pari.proba_validee, coteReelle, divisor);
       return raw > 0.07;
     },
@@ -1318,8 +1318,7 @@ function app() {
         cote_book: coteReelle,
         proba: pari.proba_validee,
         mise: mise,
-        kelly_fraction: this.computeKelly(pari.proba_validee, coteReelle,
-                                          pari.rule_id === "R3" ? 8 : 4),
+        kelly_fraction: this.computeKelly(pari.proba_validee, coteReelle, 8),
         status: "placed",
         profit: 0,
         placed_at: new Date().toISOString(),

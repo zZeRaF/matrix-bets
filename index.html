@@ -42,7 +42,7 @@
   </script>
   <!-- FORCE UPDATE : détecte si l'utilisateur a une ancienne version cachée et force un reset complet -->
   <script>
-    var APP_VERSION = "20260515-snapshot-btn-tighter";
+    var APP_VERSION = "20260515-kelly-8-partout";
     (function () {
       // Injecte la version réelle dans le splash (sinon le user voit toujours le texte hardcodé)
       document.addEventListener("DOMContentLoaded", function () {
@@ -640,14 +640,14 @@
                   </label>
                   <div class="pari-mise-preview">
                     <div class="pari-mise-row">
-                      <span>Kelly /<span x-text="pari.rule_id === 'R3' ? '8' : '4'"></span> suggère :</span>
+                      <span>Kelly /8 suggère :</span>
                       <strong class="pari-kelly-suggestion"
                               x-text="fmtEur(computeMise(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle))"></strong>
                     </div>
                     <template x-if="isMiseCapped(pari, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle)">
                       <div class="pari-cap-hint">
                         🛡️ Mise PLAFONNÉE à 7% bankroll
-                        — Kelly théo : <span x-text="(computeKellyRaw(pari.proba_validee, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle, pari.rule_id === 'R3' ? 8 : 4) * 100).toFixed(1) + '%'"></span>
+                        — Kelly théo : <span x-text="(computeKellyRaw(pari.proba_validee, parseFloat(coteInputs[pari.rank]) || pari.cote_reelle, 8) * 100).toFixed(1) + '%'"></span>
                       </div>
                     </template>
                   </div>
